@@ -1,4 +1,0 @@
-2022-05-22 15:31:12,789 - MyAwesomeApp - DEBUG - Calling module function.
-2022-05-22 15:33:47,150 - MyAwesomeApp - DEBUG - Calling module function.
-2022-05-22 15:33:47,150 - MyAwesomeApp.mymodule.module - DEBUG - Executing multiply function.
-2022-05-22 15:33:47,150 - MyAwesomeApp - DEBUG - Finished.
