@@ -1,6 +1,7 @@
 import logging
+import os
 import sys
-APP_LOGGER_NAME = 'MyAwesomeAnalysisApp'
+APP_LOGGER_NAME = 'MADAP'
 
 
 def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
@@ -13,7 +14,9 @@ def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
     logger.handlers.clear()
     logger.addHandler(sh)
     if file_name:
-        fh = logging.FileHandler(file_name)
+        if not os.path.exists("logs"):
+            os.makedirs("logs")
+        fh = logging.FileHandler(f"./logs/{file_name}")
         fh.setFormatter(formatter)
         logger.addHandler(fh)
     return logger
