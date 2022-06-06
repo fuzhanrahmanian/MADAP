@@ -92,9 +92,6 @@ ENV/
 # file history
 .history/
 
-# Test file
-testfile/
-
 # Logs
 madap/logs/
 

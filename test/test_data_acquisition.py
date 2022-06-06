@@ -4,13 +4,13 @@ import pandas as pd
 from madap.data_acquisition import data_acquisition
 
 
-def test_data_acquisition_header():
+def test_data_acquisition():
     """Test for checking if data is imported correctly.
     """
 
     list_of_files = []
     for filename in os.scandir(r"test\testfile\supported"):
-        if filename.is_file():
+        if filename.is_file() and not filename.name.endswith(".xlsx"):
             list_of_files.append(filename)
     ground_truth = {
         "freq": [20000.0, 17698.0, 15661.0, 13859.0, 12264.0, 10852.0, 9603.1, 8497.8, 7519.8, 6654.3, 5888.4,
@@ -41,7 +41,31 @@ def test_data_acquisition_header():
     for file in list_of_files:
         pd.testing.assert_frame_equal(data_acquisition.acquire_data(file), df)
 
+def test_data_acquisition_excel():
+    list_of_files = []
+    for filename in os.scandir(r"test\testfile\supported"):
+        if filename.is_file() and filename.name.endswith(".xlsx"):
+            list_of_files.append(filename)
+        ground_truth = {
+        "freq": [20000.00,17698.00,15661.00,13859.00,12264.00,10852.00,9603.10,8497.80,7519.80,6654.30,5888.40,5210.70,4611.00,
+        4080.30,3610.60,3195.10,2827.30,2501.90,2214.00,1959.20,1733.70,1534.10,1357.60,1201.30,1063.00,940.69,832.42,736.62,651.84,
+        576.81,510.43,451.68,399.69,353.69,312.98,276.96,245.08,216.87,191.91,169.83,150.28,132.98,117.68,104.13,92.148,81.542],
+        "real": [996.4391579,1003.245635,1011.202754,1019.048496,1027.971231,1037.134842,1047.842325,1058.99579,1072.030816,
+        1086.195041,1102.287181,1120.110502,1141.571152,1164.901607,1191.588741,1222.627835,1256.944559,1296.189582,1340.803982,
+        1390.459923,1446.758204,1508.811717,1577.886626,1655.079352,1739.641959,1832.708293,1933.201436,2044.991883,2163.957467,
+        2294.30508,2432.897859,2583.970903,2748.460699,2925.713113,3116.049201,3324.921199,3551.061286,3796.190041,4066.291943,
+        4363.276694,4681.448239,5035.538679,5418.827827,5842.585057,6306.126051,6814.48061],
+        "imag" : [318.6848843,352.6084578,390.8518383,433.3915668,481.2570441,534.6138109,594.8748058,662.0094842,737.5477138,
+        821.9232061,916.3219735,1021.475064,1140.006834,1271.139102,1417.560831,1581.212922,1760.89546,1962.375852,2186.601657,
+        2434.705843,2710.98033,3016.368348,3354.767699,3731.730845,4150.107965,4614.18625,5127.284984,5703.798914,6340.093097,
+        7052.168778,7840.158041,8721.765568,9710.819111,10817.42156,12044.40678,13425.71584,14968.101,16691.83087,18617.79994,
+        20796.01133,23206.71022,25937.01312,28967.54469,32388.18452,36212.91892,40466.40407]
+    }
 
+    df = pd.DataFrame(data=ground_truth)
+
+    for file in list_of_files:
+        pd.testing.assert_frame_equal(data_acquisition.acquire_data(file), df)
 
 def test_data_acquisition_not_supported():
     """Test for checking if wrong datatypes are caught
