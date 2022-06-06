@@ -7,12 +7,12 @@ APP_LOGGER_NAME = 'MADAP'
 def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
 
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(formatter)
+    streamHandler = logging.StreamHandler(sys.stdout)
+    streamHandler.setFormatter(formatter)
     logger.handlers.clear()
-    logger.addHandler(sh)
+    logger.addHandler(streamHandler)
     if file_name:
         if not os.path.exists("logs"):
             os.makedirs("logs")
