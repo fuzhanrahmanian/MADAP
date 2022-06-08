@@ -27,7 +27,6 @@ def acquire_data(data_path):
         df = pd.read_excel(data_path)
     elif extension == ".json":
         df = pd.read_json(data_path)
-    elif
 
     return df
 
