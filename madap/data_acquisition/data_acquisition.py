@@ -62,9 +62,5 @@ def calculate_phaseshift(imaginary_impedance, real_impedance):
     Returns:
         phase shift: calculated phase shift based on real and imaginary data
     """
-
-    return np.arctan(format_data(imaginary_impedance)/format_data(real_impedance))
-
-
-
-
+    phase_shift_in_rad = np.arctan(format_data(abs(-imaginary_impedance)/format_data(abs(real_impedance))))
+    return np.rad2deg(phase_shift_in_rad)
