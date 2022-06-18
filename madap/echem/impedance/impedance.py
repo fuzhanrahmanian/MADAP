@@ -1,4 +1,5 @@
-from dataclasses import dataclass, field
+from attrs import define, field
+from attrs.setters import frozen
 from impedance import preprocessing
 from impedance.models.circuits import CustomCircuit, fitting
 from impedance.validation import linKK
@@ -14,14 +15,20 @@ from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
 log = logger.get_logger("impedance")
 
 # pylint: disable=unsubscriptable-object
-@dataclass(frozen=True, order=True)
+@define
 class EIS(EChemProcedure):
-    frequency : list[float] = field(default_factory=list)
-    real_impedance : list[float] = field(default_factory=list)
-    imaginary_impedance : list[float] = field(default_factory=list)
-    phase_shift : list[float] = field(default_factory=list)
-    voltage : float = field(default_factory=None)
-
+    frequency : list[float] = field(on_setattr=frozen)
+    real_impedance : list[float] = field(on_setattr=frozen)
+    imaginary_impedance : list[float] = field( on_setattr=frozen)
+    phase_shift : list[float] = field(on_setattr=frozen)
+    voltage : float = None
+    chi_val: float = None
+    Z_fit: list[float] = None
+    custom_circuit: str = None
+    # def __post_init__(self) -> None:
+    #     self.chi_val = None
+    #     self.Z_fit = None
+    #     self.custom_circuit = None
 
     # Schönleber, M. et al. A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests.
     # Electrochimica Acta 131, 20–27 (2014) doi: 10.1016/j.electacta.2014.01.034.
@@ -30,8 +37,8 @@ class EIS(EChemProcedure):
         f, Z = np.array(self.frequency), np.array(self.real_impedance + 1j*self.imaginary_impedance)
 
         num_rc, eval_fit , Z_linKK, res_real, res_imag = linKK(f, Z, c=cut_off, max_M=max_rc_element, fit_type=fit_type, add_cap=val_low_freq)
-        chi_val = self.chi_calculation(res_imag, res_real)
-        log.info(f"Chi value from lin_KK method is {chi_val}")
+        self.chi_val = self.chi_calculation(res_imag, res_real)
+        log.info(f"Chi value from lin_KK method is {self.chi_val}")
 
         if any(x < 0 for x in self.imaginary_impedance):
             f, Z = preprocessing.ignoreBelowX(f, Z)
@@ -60,22 +67,20 @@ class EIS(EChemProcedure):
 
                 if rmse_guess < rmse_error:
                     rmse_error = rmse_guess
-                    customCircuit = customCircuit_guess
-                    Z_fit = Z_fit_guess
+                    self.custom_circuit = customCircuit_guess
+                    self.Z_fit = Z_fit_guess
 
         else:
-                customCircuit = CustomCircuit(initial_guess=initial_value, circuit=suggested_circuit)
-                customCircuit.fit(f, Z)
-                Z_fit = customCircuit.predict(f)
-                rmse_error = fitting.rmse(Z, Z_fit)
+                self.custom_circuit = CustomCircuit(initial_guess=initial_value, circuit=suggested_circuit)
+                self.custom_circuit.fit(f, Z)
+                self.Z_fit = self.custom_circuit.predict(f)
+                rmse_error = fitting.rmse(Z, self.Z_fit)
 
         if save_dir:
             # save the data
 
             # save the fitted circuit
-            customCircuit.save(r"\Repositories\MADAP\test.json")
-
-        return Z_fit
+            self.custom_circuit.save(r"\Repositories\MADAP\test.json")
 
     def chi_calculation(self, res_imag, res_real):
         return np.sum(np.square(res_imag) + np.square(res_real))
@@ -102,8 +107,12 @@ class EIS(EChemProcedure):
 
         for i, plot_name in enumerate(plot_names):
             if plot_name =="nyquist":
-                plot.nyquist(ax=ax, frequency=self.frequency, real_impedance=self.real_impedance, imaginary_impedance=self.imaginary_impedance,
-                             legend_label=self.voltage)
+                #plot.nyquist(ax=ax, frequency=self.frequency, real_impedance=self.real_impedance, imaginary_impedance=self.imaginary_impedance,
+                #             legend_label=True, voltage=self.voltage)
+                plot.nyquist_fit(ax=ax, frequency=self.frequency, real_impedance=self.real_impedance,
+                                 imaginary_impedance=self.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
+                                 suggested_circuit=self.custom_circuit.circuit,
+                                 legend_label=True, voltage=self.voltage)
             #iplt.bode(ax[0:1], plot_dir)
             #iplt.nyquist_fit(ax[1:0], plot_dir)
             #iplt.residual(ax[1:1], plot_dir)
