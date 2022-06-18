@@ -4,19 +4,23 @@ from impedance.models.circuits import CustomCircuit, fitting
 from impedance.validation import linKK
 import numpy as np
 import json
+import os
+from utils import utils
 from echem.procedure import EChemProcedure
 from madap import logger
-from impedance_plotting import ImpedancePlotting as iplt
+import matplotlib.pyplot as plt
+from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
 
 log = logger.get_logger("impedance")
 
 # pylint: disable=unsubscriptable-object
 @dataclass(frozen=True, order=True)
 class EIS(EChemProcedure):
-    frequency : list[float] = field(default_factory=list) #= format_data(data[freq_idx])
+    frequency : list[float] = field(default_factory=list)
     real_impedance : list[float] = field(default_factory=list)
     imaginary_impedance : list[float] = field(default_factory=list)
     phase_shift : list[float] = field(default_factory=list)
+    voltage : float = field(default_factory=None)
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests.
@@ -65,14 +69,13 @@ class EIS(EChemProcedure):
                 Z_fit = customCircuit.predict(f)
                 rmse_error = fitting.rmse(Z, Z_fit)
 
-        iplt.nyquist()
-
         if save_dir:
             # save the data
-            # save the plot
+
+            # save the fitted circuit
             customCircuit.save(r"\Repositories\MADAP\test.json")
 
-        return None
+        return Z_fit
 
     def chi_calculation(self, res_imag, res_real):
         return np.sum(np.square(res_imag) + np.square(res_real))
@@ -84,8 +87,28 @@ class EIS(EChemProcedure):
 
     def analyse(self):
         pass
-    def plot(self):
-        pass
+    
+
+    def plot(self, save_dir, plot_names):
+
+        plot_dir=utils.create_dir(os.path.join(save_dir, "plots"))
+        plot = iplt()
+        if len(plot_names)%2==0:
+            num_row = num_column = len(plot_names)/2
+        else:
+            num_row, num_column = 1, len(plot_names)
+
+        fig, ax = plt.subplots(num_row, num_column, figsize=(4, 4), constrained_layout=True)
+
+        for i, plot_name in enumerate(plot_names):
+            if plot_name =="nyquist":
+                plot.nyquist(ax=ax, frequency=self.frequency, real_impedance=self.real_impedance, imaginary_impedance=self.imaginary_impedance,
+                             legend_label=self.voltage)
+            #iplt.bode(ax[0:1], plot_dir)
+            #iplt.nyquist_fit(ax[1:0], plot_dir)
+            #iplt.residual(ax[1:1], plot_dir)
+        #plt.show()
+        plot.save_plot(fig, plot_dir, self.__class__.__name__)
 
 
 # class EIS_A(plot, data): # plot and data of our defined classes maybe open a folder calls "util" and we can call it from there.
