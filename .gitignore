@@ -97,3 +97,9 @@ madap/logs/
 
 # VSCopde
 .vscode/
+
+# impedance configuration
+echem/impedance_config.py
+
+# Generated results
+results/
