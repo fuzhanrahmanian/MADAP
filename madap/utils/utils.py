@@ -1,7 +1,9 @@
+from cgitb import reset
 import os
 import logger
 import pandas as pd
 import time
+import json
 
 log = logger.get_logger("utils")
 
@@ -38,6 +40,23 @@ def assemble_data_frame(**kwargs):
     dFrame = pd.DataFrame(data=kwargs)
     return dFrame
 
-def save_data(directory, data, name):
-    log.info(f"Saving data in {directory}")
+def save_data_as_csv(directory, data, name):
+    log.info(f"Saving data in {directory} as csv")
     data.to_csv(os.path.join(directory, name))
+    
+
+def save_data_as_json(directory, data, name):
+    log.info(f"Saving data in {directory} as json")
+    with open(os.path.join(directory, name), 'w') as f:
+            json.dump(data, f)
+
+def load_data_as_json(directory, name):
+    with open(os.path.join(directory, name), 'r') as file:
+            data = json.load(file)
+    return data
+
+def append_to_save_data(directory, added_data, name):
+    data = load_data_as_json(directory, name)
+    data.update(added_data)
+    save_data_as_json(directory, data, name)
+    
