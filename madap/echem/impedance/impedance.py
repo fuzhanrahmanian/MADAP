@@ -141,24 +141,37 @@ class EIS(EChemProcedure):
         if not rmse_error < 100:
             log.warning(f"A validated circuit was not found with having a fit error of {rmse_error}")
 
-class Mottschotcky(EIS):
+class Mottschotcky(EIS, EChemProcedure):
     def __init__(self, impedance, suggested_circuit: str = None, initial_value=None, max_rc_element: int = 20, cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq=True):
-        super().__init__(impedance, suggested_circuit, initial_value, max_rc_element, cut_off, fit_type, val_low_freq)
+        EIS().__init__(impedance, suggested_circuit, initial_value, max_rc_element, cut_off, fit_type, val_low_freq)
 
-    def mottschotcky_analysis(self): 
+    def analysis(self): 
         EIS.analyze()
-        r = self.suggested_circuit.R_value()
-    # TODO
 
-    
+    def plot(self, save_dir, plots): pass
+    # TODO
     # nyquist
     # fit nyquist
     # bode
     # mott v vs 1/cp_2
+    def save_data(self, save_dir: str):pass
+    
+    def perform_all_actions(self, save_dir: str, plots: list):pass
 
-    def lissajous_analysis(self):pass
+class Lissajous(EChemProcedure):
+    def __init__(self) -> None:
+        pass
+    def analyze():
+        pass
+    
+    def plot():
+        pass
     # TODO
     # legend is the frequency
     # i vs t
     # v vs t
     # i vs E
+    def save_data():
+        pass
+    def perform_all_actions():
+        pass
