@@ -33,10 +33,10 @@ def call_impedance(data, result_dir, plots):
 
     if phase_shift == "n":
         phase_shift = da.calculate_phaseshift(data[imag_idx], data[real_idx])
-
-    procedure = impedance.EIS(da.format_data(data[freq_idx]), da.format_data(data[real_idx]),
-                                da.format_data(data[imag_idx]), phase_shift, voltage=4,
-                                suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8])
+    
+    Im = impedance.Impedance(da.format_data(data[freq_idx]), da.format_data(data[real_idx]),
+                                da.format_data(data[imag_idx]), phase_shift)
+    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8])
     procedure.perform_all_actions(result_dir, plots=[plots])
     # what functions/ procedure user wants
 
@@ -66,7 +66,7 @@ def main():
 
     # Acquire data
     data = da.acquire_data(args.data)
-    print(data.head())
+    #print(data.head())
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure == "impedance":
