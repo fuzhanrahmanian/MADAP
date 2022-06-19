@@ -1,11 +1,16 @@
 from cgitb import reset
 import os
+
+from numpy import absolute
 import logger
 import pandas as pd
 import time
 import json
 
+
 log = logger.get_logger("utils")
+
+PATH = os.path.abspath(os.path.dirname(__file__))
 
 def create_dir(directory):
     """Checks if a directory is present, if not creates one at the given location

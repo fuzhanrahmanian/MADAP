@@ -1,4 +1,3 @@
-import re
 from attrs import define, field
 from attrs.setters import frozen
 from impedance import preprocessing
@@ -7,7 +6,6 @@ from impedance.validation import linKK
 import numpy as np
 import json
 import os
-import pandas as pd
 from utils import utils
 from echem.procedure import EChemProcedure
 from madap import logger
@@ -29,13 +27,8 @@ class Impedance:
 
 #class EIS(Impedance):
 class EIS(EChemProcedure):
-    # def __init__(self, frequency, real_impedance, imaginary_impedance, phase_shift, voltage,
-    #             suggested_circuit: str = None, initial_value=None, max_rc_element: int=20,
-    #             cut_off: float=0.85, fit_type: str='complex', val_low_freq=True) -> None:
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None, initial_value = None, max_rc_element: int = 20,
                 cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq: bool = True):
-    #             cut_off: float=0.85, fit_type: str='complex', val_low_freq=True)
-        # super().__init__(frequency, real_impedance, imaginary_impedance, phase_shift, voltage)
         self.impedance = impedance
         self.voltage = voltage
         self.suggested_circuit = suggested_circuit
@@ -60,11 +53,10 @@ class EIS(EChemProcedure):
 
         # if the user did not choose any circuit, some default suggestions will be applied.
         if (self.suggested_circuit and self.initial_value) is None:
-            with open("utils/suggested_circuits.json", "r") as file:
+            with open(os.path.join(utils.PATH,"suggested_circuits.json"), "r") as file:
                 suggested_circuits = json.load(file)
 
-            # Random default threshold for rmse
-            rmse_error = 100
+            rmse_error = None
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
                 customCircuit_guess = CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
@@ -80,10 +72,14 @@ class EIS(EChemProcedure):
                 rmse_guess = fitting.rmse(Z, Z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
+                if rmse_error==None:
+                    rmse_error = rmse_guess
+
                 if rmse_guess < rmse_error:
                     rmse_error = rmse_guess
                     self.custom_circuit = customCircuit_guess
                     self.Z_fit = Z_fit_guess
+                
 
         else:
                 self.custom_circuit = CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
@@ -104,14 +100,14 @@ class EIS(EChemProcedure):
 
         for i, plot_name in enumerate(plots):
             if plot_name =="nyquist":
-                plot.nyquist(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
-                            ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
-                            voltage=self.voltage, norm_color=True)
-                # plot.nyquist_fit(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
-                #                  imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
-                #                  suggested_circuit=self.custom_circuit.circuit,
-                #                  ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
-                #                  voltage=self.voltage, norm_color=True)
+                # plot.nyquist(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
+                #             ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
+                #             voltage=self.voltage, norm_color=True)
+                plot.nyquist_fit(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
+                                 imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
+                                 suggested_circuit=self.custom_circuit.circuit,
+                                 ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
+                                 voltage=self.voltage, norm_color=True)
 
                 # plot.residual(ax=ax, frequency=self.frequency, res_real=self.res_real, res_imag=self.res_imag,
                 #               log_scale='x')
@@ -166,25 +162,3 @@ class Mottschotcky(EIS):
     # i vs t
     # v vs t
     # i vs E
-
-
-# class EIS_A(plot, data): # plot and data of our defined classes maybe open a folder calls "util" and we can call it from there.
-# There data will be assembled, new directories can be created, dataframe can be built.
-#                        # from plot we will import the plot styles, colots, type, subplots, colot bar , legend ... maybe learn the kwargs**
-
-#         # logging info to show the what we gave
-#         def nyquist_plot():pass
-#         def bode_plot(): pass
-#         def fit_eis(): pass # with randles, custom or used the predefined one, give the equivalent circuit and its paramteres (optinional save or not)
-#         def prediifined_circuits(): pass # maybe push this somewhere else , in something like config or so
-#         def plot_real_measured(): pass # draw fitted versus real in byquist plot and draw the circuit on the side
-#         def validity_fit():pass # get the residuals, chi square of real , imaginary and both # show consistency and over/under fit
-#         def plot_residual(): pass # should be part of validity
-#         def llissajous_plot(): pass # show the linearity V-I , v vs time and i vs time , stability , and casuality and stability
-#         def analsys_eis(): pass # all the functionions except lissajous
- 
-
-
-# eis_analysis  #( nyquist, fit, bode, residual)
-# mottschotcky_analysis  (nyquist, mott)
-# lissajous_analysis    (liss, opt: nyquist)
