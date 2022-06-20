@@ -39,14 +39,14 @@ class ImpedancePlotting(Plots):
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
 
         nyquist_plot = ax.scatter(real_impedance, -imaginary_impedance, c=frequency, norm=norm,
-                        cmap=color_map, rasterized=True,label=f"v = {voltage}[V]")
+                        s=10, cmap=color_map, rasterized=True,label=f"v = {voltage}[V]")
 
         nyquist_plot.set_clim(min(frequency), max(frequency))
 
 
         self.plot_identity(ax, xlabel=r"Z' $[\Omega]$", ylabel=r"-Z'' $[\Omega]$",
-                               x_lim=[0, max(real_impedance)],
-                               y_lim=[0, max(-imaginary_impedance)], ax_sci_notation=ax_sci_notation,
+                               x_lim=[0, max(real_impedance)+200],
+                               y_lim=[0, max(-imaginary_impedance)+200], ax_sci_notation=ax_sci_notation,
                                scientific_limit=scientific_limit)
 
         if (legend_label and voltage != None):
@@ -62,12 +62,29 @@ class ImpedancePlotting(Plots):
 
 
 
-    def bode(self, ax, frequency, real_impedance, imaginary_impedance, phase_shift):
+    def bode(self, ax, frequency, real_impedance, imaginary_impedance, phase_shift, ax_sci_notation=None,
+            scientific_limit=None, log_scale='x'):
         log.info("Creating Bode plot")
-        pass
+        
+        impedance_magnitude = np.sqrt(real_impedance**2 +  imaginary_impedance**2)
+        ax.scatter(frequency, impedance_magnitude, rasterized=True, s=10,c="#453781ff")
+        #ax.spines['left'].set_color("#453781ff")
+        ax.tick_params(axis="y", colors="#453781ff")
+        ax2 = ax.twinx()
+        ax2.scatter(frequency, -phase_shift, rasterized=True, s=10, c="#20a387ff")
+        #ax2.spines["right"].set_edgecolor(bode_2.get_color())
+        ax2.tick_params(axis="y", colors="#20a387ff")
+        self.plot_identity(ax, xlabel=r"f $[Hz]$", ylabel=r"|Z| $[\Omega]$",
+                        ax_sci_notation=ax_sci_notation,
+                        scientific_limit=scientific_limit, 
+                        log_scale=log_scale)
+        self.plot_identity(ax2, ylabel="\u03c6 [\u00b0]",
+                        y_lim=[self.round_tenth(-phase_shift)[0], self.round_tenth(-phase_shift)[1]],
+                        log_scale=log_scale, step_size_y=10)
+        
 
     def nyquist_fit(self, ax, frequency, real_impedance, imaginary_impedance, Z_fit, chi, suggested_circuit,
-                    colorbar:bool=True, ax_sci_notation = None, scientific_limit=None, scientific_label_colorbar=False,
+                    colorbar:bool=True, ax_sci_notation = None, scientific_limit:int=3, scientific_label_colorbar=False,
                     legend_label=False,voltage:float = None, color_map:str="viridis", norm_color=None):
 
         log.info("Creating a fitted Nyquist plot")
@@ -77,13 +94,13 @@ class ImpedancePlotting(Plots):
 
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
         nyquist_plot = ax.scatter(real_impedance, -imaginary_impedance, c=frequency, norm=norm,
-                        cmap=color_map,rasterized=True,label=nyquist_label)
+                                s=10, cmap=color_map,rasterized=True,label=nyquist_label)
 
         ax.plot(np.real(Z_fit), -np.imag(Z_fit), label=f"Fitted with {suggested_circuit}", color="k")
 
         self.plot_identity(ax, xlabel=r"Z' $[\Omega]$", ylabel=r"-Z'' $[\Omega]$",
-                               x_lim=[0, max(real_impedance)],
-                               y_lim=[0, max(-imaginary_impedance)], ax_sci_notation=ax_sci_notation,
+                               x_lim=[0, max(real_impedance) +200],
+                               y_lim=[0, max(-imaginary_impedance) +200], ax_sci_notation=ax_sci_notation,
                                scientific_limit=scientific_limit)
 
         if legend_label:

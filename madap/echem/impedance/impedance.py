@@ -24,8 +24,6 @@ class Impedance:
     phase_shift : list[float] = field(on_setattr=frozen)
 
 
-
-#class EIS(Impedance):
 class EIS(EChemProcedure):
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None, initial_value = None, max_rc_element: int = 20,
                 cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq: bool = True):
@@ -100,17 +98,19 @@ class EIS(EChemProcedure):
 
         for i, plot_name in enumerate(plots):
             if plot_name =="nyquist":
-                # plot.nyquist(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
-                #             ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
-                #             voltage=self.voltage, norm_color=True)
-                plot.nyquist_fit(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
-                                 imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
-                                 suggested_circuit=self.custom_circuit.circuit,
-                                 ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
-                                 voltage=self.voltage, norm_color=True)
+                plot.nyquist(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
+                            ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
+                            voltage=self.voltage, norm_color=True)
+                # plot.nyquist_fit(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
+                #                  imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
+                #                  suggested_circuit=self.custom_circuit.circuit,
+                #                  ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
+                #                  voltage=self.voltage, norm_color=True)
+                # plot.bode(ax, self.impedance.frequency, self.impedance.real_impedance, self.impedance.imaginary_impedance, 
+                #           self.impedance.phase_shift, ax_sci_notation="y", scientific_limit=3, log_scale="x")
 
-                # plot.residual(ax=ax, frequency=self.frequency, res_real=self.res_real, res_imag=self.res_imag,
-                #               log_scale='x')
+                # plot.residual(ax=ax, frequency=self.impedance.frequency, res_real=self.res_real, 
+                #               res_imag=self.res_imag, log_scale='x')
         name = utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
 
