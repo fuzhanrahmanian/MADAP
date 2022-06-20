@@ -30,13 +30,15 @@ def call_impedance(data, result_dir, plots):
     # TODO
     phase_shift = "n" #input()
     # TODO: Parser for Voltage
+    cell_constant = "n"
 
     if phase_shift == "n":
         phase_shift = da.calculate_phaseshift(data[imag_idx], data[real_idx])
     
     Im = impedance.Impedance(da.format_data(data[freq_idx]), da.format_data(data[real_idx]),
                                 da.format_data(data[imag_idx]), phase_shift)
-    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8])
+    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8], 
+                              cell_constant=None)
     procedure.perform_all_actions(result_dir, plots=[plots])
     # what functions/ procedure user wants
 

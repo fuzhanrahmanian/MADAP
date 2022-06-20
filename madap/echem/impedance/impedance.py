@@ -26,7 +26,7 @@ class Impedance:
 
 class EIS(EChemProcedure):
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None, initial_value = None, max_rc_element: int = 20,
-                cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq: bool = True):
+                cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq: bool = True, cell_constant: float=None):
         self.impedance = impedance
         self.voltage = voltage
         self.suggested_circuit = suggested_circuit
@@ -35,6 +35,8 @@ class EIS(EChemProcedure):
         self.cut_off = cut_off
         self.fit_type = fit_type
         self.val_low_freq = val_low_freq
+        self.cell_constant = cell_constant
+        self.conductivity = None
 
     # Schönleber, M. et al. A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests.
     # Electrochimica Acta 131, 20–27 (2014) doi: 10.1016/j.electacta.2014.01.034.
@@ -85,6 +87,10 @@ class EIS(EChemProcedure):
                 self.Z_fit = self.custom_circuit.predict(f)
                 rmse_error = fitting.rmse(Z, self.Z_fit)
 
+        if self.cell_constant:
+            self.conductivity = self._conductivity_calculation()
+
+
     def plot(self, save_dir, plots):
 
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
@@ -120,7 +126,7 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(self.__class__.__name__, "circuit.json")
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         
-        added_data = {'rc_linKK': self.num_rc_linKK, "eval_fit_linKK": self.eval_fit_linKK}
+        added_data = {'rc_linKK': self.num_rc_linKK, "eval_fit_linKK": self.eval_fit_linKK, "conductivity": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
         data = utils.assemble_data_frame(**{"frequency": self.impedance.frequency, "impedance": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance, 
@@ -140,6 +146,11 @@ class EIS(EChemProcedure):
     def _rmse_plausibility(self, rmse_error):
         if not rmse_error < 100:
             log.warning(f"A validated circuit was not found with having a fit error of {rmse_error}")
+
+    def _conductivity_calculation(self):
+        conductivity = self.cell_constant * (1/self.custom_circuit.parameters_[0])
+        log.info(f"The calculated conductivity is {conductivity}")
+        return conductivity
 
 class Mottschotcky(EIS, EChemProcedure):
     def __init__(self, impedance, suggested_circuit: str = None, initial_value=None, max_rc_element: int = 20, cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq=True):
