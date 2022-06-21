@@ -118,17 +118,19 @@ class EIS(EChemProcedure):
                                  suggested_circuit=self.custom_circuit.circuit,
                                  ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
                                  voltage=self.voltage, norm_color=True)
-            if plot_name == "bode":
+            elif plot_name == "bode":
                 plot.bode(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, 
                           imaginary_impedance=self.impedance.imaginary_impedance, 
                           phase_shift=self.impedance.phase_shift, ax_sci_notation="y", scientific_limit=3, log_scale="x")
 
-            if plot_name == "residual":
+            elif plot_name == "residual":
                 plot.residual(ax=sub_ax, frequency=self.impedance.frequency, res_real=self.res_real, 
                               res_imag=self.res_imag, log_scale='x')
             else:
                 log.error("EIS does not have the selected plot.")
                 continue
+            #sub_ax.set_box_aspect()
+        fig.tight_layout()
 
         name = utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)

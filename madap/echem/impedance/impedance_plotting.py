@@ -58,7 +58,7 @@ class ImpedancePlotting(Plots):
 
         if colorbar:
             self.add_colorbar(nyquist_plot, ax, scientific_label_colorbar, scientific_limit=scientific_limit,
-            colorbar_label=r"f $[Hz]$")
+                            colorbar_label=r"f $[Hz]$")
 
 
 
@@ -113,8 +113,8 @@ class ImpedancePlotting(Plots):
             ax.legend(new_handles, labels, loc="upper left")
 
         if colorbar:
-            self.add_colorbar(nyquist_plot, ax, scientific_label_colorbar, scientific_limit=scientific_limit)
-
+            self.add_colorbar(nyquist_plot, ax, scientific_label_colorbar, scientific_limit=scientific_limit,
+                              colorbar_label=r"f $[Hz]$")
 
     def residual(self, ax, frequency, res_real, res_imag, log_scale='x', ax_sci_notation = None,
                  scientific_limit:int=3):
@@ -134,13 +134,14 @@ class ImpedancePlotting(Plots):
     def compose_eis_subplot(self, plots:list):
 
         if len(plots)==1:
-            fig = plt.figure(figsize=(4,4), constrained_layout = True)
+            fig = plt.figure(figsize=(3.5,3), constrained_layout = True)
             spec = fig.add_gridspec(1, 1)
             ax = fig.add_subplot(spec[0,0])
             return fig, [ax]
 
         elif len(plots) == 2:
-            fig = plt.figure(figsize=(4,4), constrained_layout = True)
+            fig_size = 9 if ("nyquist" and "nyquist_fit") in plots else 8.5
+            fig = plt.figure(figsize=(fig_size, 4))
             spec = fig.add_gridspec(1, 2)
             ax1 = fig.add_subplot(spec[0, 0])
             ax2= fig.add_subplot(spec[0, 1])

@@ -49,7 +49,7 @@ class Plots():
             cb = plt.colorbar(plot, ax=ax)
 
             if colorbar_label:
-                cb.set_label(colorbar_label, fontsize=9)
+                cb.set_label(colorbar_label, fontsize=7)
                 cb.ax.yaxis.set_label_position('right')
 
 
