@@ -3,6 +3,8 @@ from attrs.setters import frozen
 from impedance import preprocessing
 from impedance.models.circuits import CustomCircuit, fitting
 from impedance.validation import linKK
+from kiwisolver import Constraint
+from matplotlib import gridspec
 import numpy as np
 import json
 import os
@@ -11,6 +13,8 @@ from echem.procedure import EChemProcedure
 from madap import logger
 import matplotlib.pyplot as plt
 from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
+import matplotlib.pylab as pl
+import matplotlib.gridspec as gridspec
 
 # reference the impedance library
 log = logger.get_logger("impedance")
@@ -95,28 +99,37 @@ class EIS(EChemProcedure):
 
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = iplt()
-        if len(plots)%2==0:
-            num_row = num_column = len(plots)/2
-        else:
-            num_row, num_column = 1, len(plots)
+        # if len(plots)%2==0:
+        #     num_row = num_column = len(plots)/2
+        # else:
+        #     num_row, num_column = 1, len(plots)
 
-        fig, ax = plt.subplots(num_row, num_column, figsize=(4, 4), constrained_layout=True)
-
-        for i, plot_name in enumerate(plots):
+        # fig = plt.figure(figsize=(4,4), constrained_layout = True)
+        # spec = fig.add_gridspec(num_row, num_column)
+        fig, available_axes = plot.compose_eis_subplot(plots=plots)
+        for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name =="nyquist":
-                plot.nyquist(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
+                plot.nyquist(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
                             ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
                             voltage=self.voltage, norm_color=True)
-                # plot.nyquist_fit(ax=ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
-                #                  imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
-                #                  suggested_circuit=self.custom_circuit.circuit,
-                #                  ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
-                #                  voltage=self.voltage, norm_color=True)
-                # plot.bode(ax, self.impedance.frequency, self.impedance.real_impedance, self.impedance.imaginary_impedance, 
-                #           self.impedance.phase_shift, ax_sci_notation="y", scientific_limit=3, log_scale="x")
+            if plot_name == "nyquist_fit":
+                plot.nyquist_fit(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
+                                 imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
+                                 suggested_circuit=self.custom_circuit.circuit,
+                                 ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
+                                 voltage=self.voltage, norm_color=True)
+            if plot_name == "bode":
+                plot.bode(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, 
+                          imaginary_impedance=self.impedance.imaginary_impedance, 
+                          phase_shift=self.impedance.phase_shift, ax_sci_notation="y", scientific_limit=3, log_scale="x")
 
-                # plot.residual(ax=ax, frequency=self.impedance.frequency, res_real=self.res_real, 
-                #               res_imag=self.res_imag, log_scale='x')
+            if plot_name == "residual":
+                plot.residual(ax=sub_ax, frequency=self.impedance.frequency, res_real=self.res_real, 
+                              res_imag=self.res_imag, log_scale='x')
+            else:
+                log.error("EIS does not have the selected plot.")
+                continue
+
         name = utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
 

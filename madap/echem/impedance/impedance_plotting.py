@@ -131,3 +131,17 @@ class ImpedancePlotting(Plots):
         ax.legend(loc="lower right")
 
 
+    def compose_eis_subplot(self, plots:list):
+
+        if len(plots)==1:
+            fig = plt.figure(figsize=(4,4), constrained_layout = True)
+            spec = fig.add_gridspec(1, 1)
+            ax = fig.add_subplot(spec[0,0])
+            return fig, [ax]
+
+        elif len(plots) == 2:
+            fig = plt.figure(figsize=(4,4), constrained_layout = True)
+            spec = fig.add_gridspec(1, 2)
+            ax1 = fig.add_subplot(spec[0, 0])
+            ax2= fig.add_subplot(spec[0, 1])
+            return fig, [ax1, ax2]
