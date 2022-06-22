@@ -4,6 +4,7 @@ from matplotlib.lines import Line2D
 import matplotlib.colors as mcl
 import numpy as np
 from plotting import Plots
+from utils import utils
 
 
 log = logger.get_logger("arrhenius_plotting")
@@ -14,38 +15,23 @@ class ArrheniusPlotting(Plots):
 
         # log conductivity should have unit of S/cm
         log.info("Creating Arrhenius plot")
-        #x_temp_in_kelvin = [1000/(temp + 273.15) for temp in temperature]
-        #subplot_ax.scatter(x_temp_in_kelvin, log_conductivity, s=10, c="black", rasterized=True)
-
-        ax2=subplot_ax.twiny()
+        subplot_ax2=subplot_ax.twiny()
         self.plot_identity(subplot_ax, xlabel=r"$\frac{1000}{T}$ $[K^{-1}]$",
                            ylabel=r"$\log$($\sigma$) [$S.cm^{-1}$]",
-                           #x_lim=[min(x_temp_in_kelvin), max(x_temp_in_kelvin)],
                            ax_sci_notation=ax_sci_notation,
                            scientific_limit=scientific_limit)
-        #subplot_ax.set_xlim([min(x_temp_in_kelvin), max(x_temp_in_kelvin)])
-        ax2.scatter(temperature, log_conductivity, s=10, c="black", rasterized=True)
-        self.plot_identity(ax2, xlabel="$T$ [\u00b0C]")#, x_lim=[min(temperature), max(temperature)], step_size_x=10)
-        
-        def cel_to_thousand_over_kelvin(temp):
-            converted_temp = 1000/(temp + 273.15)
-            return ["%.1f" % ct for ct in converted_temp]
-        
-        subplot_ax.set_xlim(ax2.get_xlim())
+        subplot_ax2.scatter(temperature, log_conductivity, s=10, c="black", rasterized=True)
+        self.plot_identity(subplot_ax2, xlabel="$T$ [\u00b0C]")
+
+        subplot_ax.set_xlim(subplot_ax2.get_xlim())
         subplot_ax.set_xticks(temperature)
-        subplot_ax.set_xticklabels(cel_to_thousand_over_kelvin(temperature))
-        
-        #subplot_ax.invert_xaxis()
+        subplot_ax.set_xticklabels(utils.cel_to_thousand_over_kelvin(temperature))
 
-        ax2.invert_xaxis()
-        
-    
-# plt.xlabel(r"$\frac{LiPF_{6}}{EC + PC + EMC}$ [$\frac{mol}{Kg}$]", fontdict=dict(size=12.5)) #, weight="bold")
-# plt.ylabel(r"$\sigma$ [$\frac{S}{cm}$]", fontdict=dict(size=12.5)) #, weight="bold")
+        subplot_ax.invert_xaxis()
+        subplot_ax2.invert_xaxis()
 
-        
     def arrhenius_fit(self, subplot_ax, temperature, conductivity,
                   colorbar:bool=True, ax_sci_notation = None, scientific_limit=None):
         log.info("Creating a fitted Arrhenius plot")
     def compose_arrgenius_subplot(self, plots_list):pass #TODO
-        
+
