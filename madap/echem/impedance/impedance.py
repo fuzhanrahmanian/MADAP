@@ -1,4 +1,3 @@
-from re import sub
 from attrs import define, field
 from attrs.setters import frozen
 from impedance import preprocessing
@@ -39,6 +38,7 @@ class EIS(EChemProcedure):
         self.val_low_freq = val_low_freq
         self.cell_constant = cell_constant
         self.conductivity = None
+        self.rmse_error = None
 
     # Schönleber, M. et al. A Method for Improving the Robustness of 
     # linear Kramers-Kronig Validity Tests.
@@ -59,7 +59,6 @@ class EIS(EChemProcedure):
             with open(os.path.join(utils.PATH,"suggested_circuits.json"), "r") as file:
                 suggested_circuits = json.load(file)
 
-            rmse_error = None
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
                 customCircuit_guess = CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
@@ -79,14 +78,14 @@ class EIS(EChemProcedure):
                     rmse_error = rmse_guess
 
                 if rmse_guess < rmse_error:
-                    rmse_error = rmse_guess
+                    self.rmse_error = rmse_guess
                     self.custom_circuit = customCircuit_guess
                     self.Z_fit = Z_fit_guess
         else:
                 self.custom_circuit = CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
                 self.custom_circuit.fit(f, Z)
                 self.Z_fit = self.custom_circuit.predict(f)
-                rmse_error = fitting.rmse(Z, self.Z_fit)
+                self.rmse_error = fitting.rmse(Z, self.Z_fit)
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
@@ -144,7 +143,8 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(self.__class__.__name__, "circuit.json")
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         
-        added_data = {'rc_linKK': self.num_rc_linKK, "eval_fit_linKK": self.eval_fit_linKK, "conductivity": self.conductivity}
+        added_data = {'rc_linKK': self.num_rc_linKK, "eval_fit_linKK": self.eval_fit_linKK, "RMSE_fit_error": self.rmse_error,
+                      "conductivity": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
         data = utils.assemble_data_frame(**{"frequency": self.impedance.frequency, "impedance": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance, 

@@ -4,6 +4,7 @@ from utils import utils
 import logger
 from data_acquisition import data_acquisition as da
 from echem.impedance import impedance
+from echem.arrhenius import arrhenius
 from pathlib import Path
 
 
@@ -55,7 +56,21 @@ def call_impedance(data, result_dir, plots):
     # find the according function in class impedance
     # either all the analysis at once or just read the specific function names
 
-def call_arrhenius(data):pass
+def call_arrhenius(data, result_dir, plots):
+    log.info("What is the name (or index) of the column of temperature (T [\u00b0C]) ?")
+    # TODO
+    temp_idx = "temp" #input()
+    # TODO
+    log.info("What is the name (or index) of the column of conductivity (\u03b1 [S/cm]) ?")
+    conductivity_idx = "cond" #input()
+    Arr = arrhenius.Arrhenius(da.format_data(data[temp_idx]), da.format_data(data[conductivity_idx]))
+    if isinstance(plots, str):
+        plots = [plots]
+    if isinstance(plots, tuple):
+        plots = list(plots)
+    Arr.perform_all_actions(result_dir, plots=plots)
+    
+
 def call_voltammetry(data):pass
 
 def main():
@@ -81,8 +96,10 @@ def main():
         plots = "nyquist" ,"nyquist_fit", "bode" , "residual" #"nyquist_fit" #, "bode" #, "residual" # input()
         call_impedance(data, result_dir, plots)
 
-    elif args.procedure == "arrhenius": pass
-
+    elif args.procedure == "arrhenius": 
+        log.info("what plot do you want? options: arrhenius, arrhenius_fit")
+        plots = "arrhenius" #,"arrhenius_fit" # input()
+        call_arrhenius(data, result_dir, plots)
     elif args.procedure == "voltammetry": pass
 
 
