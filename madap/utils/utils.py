@@ -48,7 +48,7 @@ def assemble_data_frame(**kwargs):
 def save_data_as_csv(directory, data, name):
     log.info(f"Saving data in {directory} as csv")
     data.to_csv(os.path.join(directory, name))
-    
+
 
 def save_data_as_json(directory, data, name):
     log.info(f"Saving data in {directory} as json")
@@ -64,4 +64,7 @@ def append_to_save_data(directory, added_data, name):
     data = load_data_as_json(directory, name)
     data.update(added_data)
     save_data_as_json(directory, data, name)
-    
+
+def cel_to_thousand_over_kelvin(temp):
+            converted_temp = 1000/(temp + 273.15)
+            return ["%.1f" % ct for ct in converted_temp]
