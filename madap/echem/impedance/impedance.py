@@ -4,19 +4,14 @@ from attrs.setters import frozen
 from impedance import preprocessing
 from impedance.models.circuits import CustomCircuit, fitting
 from impedance.validation import linKK
-from kiwisolver import Constraint
-from matplotlib import gridspec
 import numpy as np
 import json
 import os
 from utils import utils
 from echem.procedure import EChemProcedure
 from madap import logger
-import matplotlib.pyplot as plt
 from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
-import matplotlib.pylab as pl
-import matplotlib.gridspec as gridspec
-import random
+
 # reference the impedance library
 log = logger.get_logger("impedance")
 
@@ -96,6 +91,7 @@ class EIS(EChemProcedure):
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
             self.conductivity = self._conductivity_calculation()
+            log.info(f"The calculated conductivity is {self.conductivity}")
 
 
     def plot(self, save_dir, plots):
