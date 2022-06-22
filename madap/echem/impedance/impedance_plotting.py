@@ -60,7 +60,6 @@ class ImpedancePlotting(Plots):
                             scientific_limit=scientific_limit,
                             colorbar_label=r"f $[Hz]$")
 
-
     def bode(self, subplot_ax, frequency, real_impedance, imaginary_impedance, phase_shift,
              ax_sci_notation=None, scientific_limit=None, log_scale='x'):
         log.info("Creating Bode plot")
@@ -78,7 +77,6 @@ class ImpedancePlotting(Plots):
                         y_lim=[self.round_tenth(-phase_shift)[0],
                                self.round_tenth(-phase_shift)[1]],
                         log_scale=log_scale, step_size_y=10)
-
 
     def nyquist_fit(self, subplot_ax, frequency, real_impedance, imaginary_impedance,
                     fitted_impedance, chi, suggested_circuit, colorbar:bool=True,
@@ -133,7 +131,6 @@ class ImpedancePlotting(Plots):
                                 ax_sci_notation=ax_sci_notation,
                                 scientific_limit=scientific_limit, log_scale=log_scale)
         subplot_ax.legend(loc="lower right", fontsize=5.5)
-
 
     def compose_eis_subplot(self, plots:list):
 
