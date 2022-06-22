@@ -1,3 +1,4 @@
+from re import sub
 from attrs import define, field
 from attrs.setters import frozen
 from impedance import preprocessing
@@ -15,7 +16,7 @@ import matplotlib.pyplot as plt
 from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
 import matplotlib.pylab as pl
 import matplotlib.gridspec as gridspec
-
+import random
 # reference the impedance library
 log = logger.get_logger("impedance")
 
@@ -29,8 +30,10 @@ class Impedance:
 
 
 class EIS(EChemProcedure):
-    def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None, initial_value = None, max_rc_element: int = 20,
-                cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq: bool = True, cell_constant: float=None):
+    def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None,
+                initial_value = None, max_rc_element: int = 50,
+                cut_off: float = 0.85, fit_type: str = 'complex',
+                val_low_freq: bool = True, cell_constant: float=None):
         self.impedance = impedance
         self.voltage = voltage
         self.suggested_circuit = suggested_circuit
@@ -42,7 +45,8 @@ class EIS(EChemProcedure):
         self.cell_constant = cell_constant
         self.conductivity = None
 
-    # Schönleber, M. et al. A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests.
+    # Schönleber, M. et al. A Method for Improving the Robustness of 
+    # linear Kramers-Kronig Validity Tests.
     # Electrochimica Acta 131, 20–27 (2014) doi: 10.1016/j.electacta.2014.01.034.
     def analyze(self):
         f, Z = np.array(self.impedance.frequency), np.array(self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance)
@@ -83,8 +87,6 @@ class EIS(EChemProcedure):
                     rmse_error = rmse_guess
                     self.custom_circuit = customCircuit_guess
                     self.Z_fit = Z_fit_guess
-                
-
         else:
                 self.custom_circuit = CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
                 self.custom_circuit.fit(f, Z)
@@ -92,6 +94,7 @@ class EIS(EChemProcedure):
                 rmse_error = fitting.rmse(Z, self.Z_fit)
 
         if self.cell_constant:
+            # calculate the ionic conductivity if cell constant is available
             self.conductivity = self._conductivity_calculation()
 
 
@@ -99,37 +102,41 @@ class EIS(EChemProcedure):
 
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = iplt()
-        # if len(plots)%2==0:
-        #     num_row = num_column = len(plots)/2
-        # else:
-        #     num_row, num_column = 1, len(plots)
-
-        # fig = plt.figure(figsize=(4,4), constrained_layout = True)
-        # spec = fig.add_gridspec(num_row, num_column)
         fig, available_axes = plot.compose_eis_subplot(plots=plots)
+
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name =="nyquist":
-                plot.nyquist(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
+                sub_ax = available_axes[0] if ((len(plots)==4) or (len(plots)==3)) else sub_ax
+
+                plot.nyquist(subplot_ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, imaginary_impedance=self.impedance.imaginary_impedance,
                             ax_sci_notation='both', scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
                             voltage=self.voltage, norm_color=True)
-            if plot_name == "nyquist_fit":
-                plot.nyquist_fit(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
-                                 imaginary_impedance=self.impedance.imaginary_impedance, Z_fit=self.Z_fit, chi=self.chi_val,
+
+            elif plot_name == "nyquist_fit":
+                sub_ax = available_axes[2] if len(plots)==4 else (available_axes[0] if (len(plots)==3 and (("residual" in plots) and ("bode" in plots))) else 
+                                                                  (available_axes[1] if (len(plots)==3 and (("residual" in plots) or ("bode" in plots))) else sub_ax))
+                plot.nyquist_fit(subplot_ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance,
+                                 imaginary_impedance=self.impedance.imaginary_impedance, fitted_impedance=self.Z_fit, chi=self.chi_val,
                                  suggested_circuit=self.custom_circuit.circuit,
                                  ax_sci_notation="both", scientific_limit=3, scientific_label_colorbar=False, legend_label=True,
                                  voltage=self.voltage, norm_color=True)
+
             elif plot_name == "bode":
-                plot.bode(ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, 
+                sub_ax = available_axes[1] if len(plots)==4 else (available_axes[1] if (len(plots)==3 and ("residual" in plots)) else 
+                                                                  (available_axes[2] if (len(plots)==3 and (not "residual" in plots)) else sub_ax))
+                plot.bode(subplot_ax=sub_ax, frequency=self.impedance.frequency, real_impedance=self.impedance.real_impedance, 
                           imaginary_impedance=self.impedance.imaginary_impedance, 
                           phase_shift=self.impedance.phase_shift, ax_sci_notation="y", scientific_limit=3, log_scale="x")
 
             elif plot_name == "residual":
-                plot.residual(ax=sub_ax, frequency=self.impedance.frequency, res_real=self.res_real, 
+                sub_ax = available_axes[3] if len(plots)==4 else (available_axes[2] if len(plots)==3 else sub_ax)
+                plot.residual(subplot_ax=sub_ax, frequency=self.impedance.frequency, res_real=self.res_real, 
                               res_imag=self.res_imag, log_scale='x')
+
             else:
                 log.error("EIS does not have the selected plot.")
                 continue
-            #sub_ax.set_box_aspect()
+
         fig.tight_layout()
 
         name = utils.assemble_file_name(self.__class__.__name__)

@@ -39,14 +39,18 @@ def call_impedance(data, result_dir, plots):
                                 da.format_data(data[imag_idx]), phase_shift)
     procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8], 
                               cell_constant=None)
-    procedure.perform_all_actions(result_dir, plots=[plots])
+    if isinstance(plots, str):
+        plots = [plots]
+    if isinstance(plots, tuple):
+        plots = list(plots)
+    procedure.perform_all_actions(result_dir, plots=plots)
     # what functions/ procedure user wants
 
     # TODO , write a parser and ask what circuit user will define
     # list of available elements : 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'
     # series or parallel
-    log.info("")
-    circuit = ""
+    #slog.info("")
+    #circuit = ""
     # TODO : check if user gives any plot at all or not
     # find the according function in class impedance
     # either all the analysis at once or just read the specific function names
@@ -72,8 +76,9 @@ def main():
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure == "impedance":
-        log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
-        plots = "nyquist" # input()
+
+        log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual") 
+        plots = "nyquist" ,"nyquist_fit", "bode" , "residual" #"nyquist_fit" #, "bode" #, "residual" # input()
         call_impedance(data, result_dir, plots)
 
     elif args.procedure == "arrhenius": pass
