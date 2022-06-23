@@ -58,18 +58,26 @@ class Plots():
                 cb.update_ticks()
 
     def round_hundredth(self, nums):
-        if not nums.all() < 0: 
+        if not nums.all() < 0:
             min_num, max_num = int(math.ceil(min(nums) / 100.0)) * 100 - 100, int(math.ceil(max(nums) / 100.0)) * 100
-        else: 
+        else:
             min_num, max_num = int(math.ceil(min(nums) / 100.0)) * 100 , int(math.ceil(max(nums) / 100.0)) * 100+ 100
         return min_num, max_num
-    
+
     def round_tenth(self, nums):
         if not nums.all() < 0:
             min_num, max_num = round(min(nums), -1) - 10, round(max(nums), -1)
         else:
             min_num, max_num = round(min(nums), -1) , round(max(nums), -1) + 10
         return min_num, max_num
+
+    def set_xtick_for_two_axes(self, ax1, ax2, ax1_ticks, ax2_ticks, invert_axes=False):
+        ax1.set_xlim(ax2.get_xlim())
+        ax1.set_xticks(ax2_ticks)
+        ax1.set_xticklabels(ax1_ticks)
+        if invert_axes:
+            ax1.invert_xaxis()
+            ax2.invert_xaxis()
 
     def compose_subplot():
         pass
