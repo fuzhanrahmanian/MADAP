@@ -29,5 +29,6 @@ class ArrheniusPlotting(Plots):
     def arrhenius_fit(self, subplot_ax, temperature, conductivity,
                   colorbar:bool=True, ax_sci_notation = None, scientific_limit=None):
         log.info("Creating a fitted Arrhenius plot")
+
     def compose_arrgenius_subplot(self, plots_list):pass #TODO
 
