@@ -29,15 +29,15 @@ def call_impedance(data, result_dir, plots):
     imag_idx = "imag" #input()
     log.info("What is the name (or index) of the column of phase shift (\u03c6 [\u00b0]) (optional)? If no phase shift is required type 'n'")
     # TODO
-    phase_shift = "n" #input()
+    phase_shift = None #input()
     # TODO: Parser for Voltage
     cell_constant = "n"
 
-    if phase_shift == "n":
-        phase_shift = da.calculate_phaseshift(data[imag_idx], data[real_idx])
-    
-    Im = impedance.Impedance(da.format_data(data[freq_idx]), da.format_data(data[real_idx]),
-                                da.format_data(data[imag_idx]), phase_shift)
+    # if phase_shift == "n":
+    #     phase_shift = da.calculate_phaseshift(data[imag_idx], data[real_idx])
+
+    Im = impedance.Impedance(da.format_data(data[freq_idx]), da.format_data(data[real_idx]), da.format_data(data[imag_idx]), phase_shift)
+
     procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8], 
                               cell_constant=None)
     if isinstance(plots, str):
@@ -69,7 +69,6 @@ def call_arrhenius(data, result_dir, plots):
     if isinstance(plots, tuple):
         plots = list(plots)
     Arr.perform_all_actions(result_dir, plots=plots)
-    
 
 def call_voltammetry(data):pass
 
@@ -92,11 +91,11 @@ def main():
 
     if args.procedure == "impedance":
 
-        log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual") 
-        plots = "nyquist" ,"nyquist_fit", "bode" , "residual" #"nyquist_fit" #, "bode" #, "residual" # input()
+        log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
+        plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
         call_impedance(data, result_dir, plots)
 
-    elif args.procedure == "arrhenius": 
+    elif args.procedure == "arrhenius":
         log.info("what plot do you want? options: arrhenius, arrhenius_fit")
         plots = "arrhenius" #,"arrhenius_fit" # input()
         call_arrhenius(data, result_dir, plots)

@@ -10,6 +10,7 @@ from impedance.models.circuits import CustomCircuit, fitting
 from impedance.validation import linKK
 
 from utils import utils
+import data_acquisition.data_acquisition as da
 from echem.procedure import EChemProcedure
 from madap import logger
 from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
@@ -27,32 +28,22 @@ class Impedance:
     frequency : list[float] = field(on_setattr=frozen)
     real_impedance : list[float] = field(on_setattr=frozen)
     imaginary_impedance : list[float] = field( on_setattr=frozen)
-    phase_shift : list[float] = field()
+    phase_shift : list[float] = field(default=None)
+
 
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
         return f"Impedance(frequency={self.frequency}, real_impedance={self.real_impedance}, \
                 imaginary_impedance={self.imaginary_impedance}, phase_shift={self.phase_shift})"
 
-    def __init__(self) -> None:
-        """Initialize the object."""
-        self.phase_shift = self.calculate_phase_shift() \
-                           if self.phase_shift is None else self.phase_shift
+    # def __post_init__(self):
+    #     """Initialize the object."""
+    #     self.phase_shift = self.calculate_phase_shift() if self.phase_shift is None else self.phase_shift
 
-    def calculate_phase_shift(self):
-        """calculate phase shift
+    # def __call__(self):
+    #     if self.phase_shift is None:
+    #         self.phase_shift = self.calculate_phase_shift()
 
-        Args:
-            imaginary_impedance (class): imaginary impedance data
-            real_impedance (class): real impedance data
-
-        Returns:
-            phase shift: calculated phase shift based on real and imaginary data
-        """
-        phase_shift_in_rad = np.arctan(utils.format_data(
-                             abs(-self.imaginary_impedance)/utils.format_data(abs(self.real_impedance))))
-
-        return np.rad2deg(phase_shift_in_rad)
 class EIS(EChemProcedure):
     """General EIS class for the analysis of the EIS data.
 
@@ -82,13 +73,15 @@ class EIS(EChemProcedure):
         self.chi_val = None
         self.custom_circuit = None
         self.z_fit = None
+        self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
+
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
     # linear Kramers-Kronig Validity Tests.
     # Electrochimica Acta 131, 20–27 (2014) doi: 10.1016/j.electacta.2014.01.034.
     def analyze(self):
         """General function for performing the impedance analysis.
-        This will fit the circuit and calculate the conductivity.
+        This will fit the circuit and calculate the conductivity if is applicable.
         """
         f_circuit, z_circuit = np.array(self.impedance.frequency), np.array(self.impedance.real_impedance +
                1j*self.impedance.imaginary_impedance)
@@ -245,6 +238,22 @@ class EIS(EChemProcedure):
         conductivity = self.cell_constant * (1/self.custom_circuit.parameters_[0])
         log.info(f"The calculated conductivity is {conductivity}")
         return conductivity
+
+    def _calculate_phase_shift(self) -> list[float]:
+        """calculate phase shift
+
+        Args:
+            imaginary_impedance (class): imaginary impedance data
+            real_impedance (class): real impedance data
+
+        Returns:
+            phase shift: calculated phase shift based on real and imaginary data
+        """
+
+        phase_shift_in_rad = np.arctan(da.format_data(
+                             abs(-self.impedance.imaginary_impedance)/da.format_data(abs(self.impedance.real_impedance))))
+        return np.rad2deg(phase_shift_in_rad)
+
 
 class Mottschotcky(EIS, EChemProcedure):
     """ Class for performing the Mottschotcky procedure.

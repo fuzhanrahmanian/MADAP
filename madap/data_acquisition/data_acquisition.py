@@ -52,15 +52,15 @@ def format_data(data):
 
     return data
 
-def calculate_phaseshift(imaginary_impedance, real_impedance):
-    """calculate phase shift
+# def calculate_phaseshift(imaginary_impedance, real_impedance):
+#     """calculate phase shift
 
-    Args:
-        imaginary_impedance (class): imaginary impedance data
-        real_impedance (class): real impedance data
+#     Args:
+#         imaginary_impedance (class): imaginary impedance data
+#         real_impedance (class): real impedance data
 
-    Returns:
-        phase shift: calculated phase shift based on real and imaginary data
-    """
-    phase_shift_in_rad = np.arctan(format_data(abs(-imaginary_impedance)/format_data(abs(real_impedance))))
-    return np.rad2deg(phase_shift_in_rad)
+#     Returns:
+#         phase shift: calculated phase shift based on real and imaginary data
+#     """
+#     phase_shift_in_rad = np.arctan(format_data(abs(-imaginary_impedance)/format_data(abs(real_impedance))))
+#     return np.rad2deg(phase_shift_in_rad)
