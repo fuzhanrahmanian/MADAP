@@ -13,6 +13,9 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         pass
 
     def plot():
+        # TODO V vs t
+        # TODO dQ vs dV
+        # TODO v vs Q
         pass
 
     def save_data():
