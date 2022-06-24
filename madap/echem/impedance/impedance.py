@@ -177,7 +177,7 @@ class EIS(EChemProcedure):
                               res_imag=self.res_imag, log_scale='x')
 
             else:
-                log.error("EIS does not have the selected plot.")
+                log.error("EIS class does not have the selected plot.")
                 continue
 
         fig.tight_layout()
