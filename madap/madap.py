@@ -5,6 +5,7 @@ import logger
 from data_acquisition import data_acquisition as da
 from echem.impedance import impedance
 from echem.arrhenius import arrhenius
+from echem.voltammetry import voltammetry
 from pathlib import Path
 
 
@@ -40,12 +41,6 @@ def call_impedance(data, result_dir, plots):
 
     procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8], 
                               cell_constant=None)
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
-    procedure.perform_all_actions(result_dir, plots=plots)
-    # what functions/ procedure user wants
 
     # TODO , write a parser and ask what circuit user will define
     # list of available elements : 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'
@@ -55,6 +50,14 @@ def call_impedance(data, result_dir, plots):
     # TODO : check if user gives any plot at all or not
     # find the according function in class impedance
     # either all the analysis at once or just read the specific function names
+
+    if isinstance(plots, str):
+        plots = [plots]
+    if isinstance(plots, tuple):
+        plots = list(plots)
+    procedure.perform_all_actions(result_dir, plots=plots)
+    # what functions/ procedure user wants
+
 
 def call_arrhenius(data, result_dir, plots):
     log.info("What is the name (or index) of the column of temperature (T [\u00b0C]) ?")
@@ -70,7 +73,26 @@ def call_arrhenius(data, result_dir, plots):
         plots = list(plots)
     Arr.perform_all_actions(result_dir, plots=plots)
 
-def call_voltammetry(data):pass
+def call_voltammetry(data, result_dir, plots):
+    log.info("What is the name (or index) of the column of voltage (v [V]) ?")
+    # TODO
+    voltage_idx = "voltage" #input()
+    # TODO
+    log.info("What is the name (or index) of the column of current (I [A]) ?")
+    current_idx = "current" #input()
+    # TODO
+    log.info("What is the name (or index) of the column of time (t [s]) ?")
+    time_idx = "time" #input()
+
+    Arr = voltammetry.Voltammetry(da.format_data(data[voltage_idx]), da.format_data(data[current_idx]),
+                                da.format_data(data[time_idx]))
+    if isinstance(plots, str):
+        plots = [plots]
+    if isinstance(plots, tuple):
+        plots = list(plots)
+    Arr.perform_all_actions(result_dir, plots=plots)
+
+
 
 def main():
     log.info("==================================WELCOME TO MADAP==================================")
