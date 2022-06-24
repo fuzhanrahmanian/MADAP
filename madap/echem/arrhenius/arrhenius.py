@@ -45,9 +45,7 @@ class Arrhenius(EChemProcedure):
     def plot(self, save_dir:str, plots:list):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = aplt()
-        # use compose_arrgenius_subplot to create a subplot for each plot
-        #fig, ax = plt.subplots(1, 1, figsize=(3, 3))
-        # TODO arrplot and its fitting
+
         fig, available_axes = plot.compose_arrhenius_subplot(plots=plots)
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name == "arrhenius":
@@ -68,12 +66,35 @@ class Arrhenius(EChemProcedure):
         plot.save_plot(fig, plot_dir, name)
 
     def save_data(self, save_dir:str):
-        pass    # TODO
+        """Save the results of the analysis.
+
+        Args:
+            save_dir (str): Directory where the data should be saved.
+        """
+        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
+        # Save the fitted circuit
+        name = utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
+        meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
+                    "arr_constant": self.arrhenius_constant, "activation": self.activation,
+                    "gas_constant": self.gas_constant}
+
+        utils.save_data_as_json(directory=save_dir, name=name, data=meta_data)
+        # Save the dataset
+        data = utils.assemble_data_frame(**{"temperatures": self.temperatures,
+                                            "conductivity": self.conductivity,
+                                            "inverted_scale_temperatures": self.inverted_scale_temperatures,
+                                            "log_conductivty": self._log_conductivity(),
+                                            "log_conductivity_fit":self.ln_conductivity_fit})
+
+        data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
+        utils.save_data_as_csv(save_dir, data, data_name)
+
 
     def perform_all_actions(self, save_dir:str, plots:list):
         self.analyze()
         self.plot(save_dir=save_dir, plots=plots)
-        #self.save_data(save_dir=save_dir)
+        self.save_data(save_dir=save_dir)
+
     def _log_conductivity(self):
         return np.log(self.conductivity)
 
