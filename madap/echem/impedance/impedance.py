@@ -196,13 +196,13 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(self.__class__.__name__, "circuit.json")
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_error,
-                      "conductivity": self.conductivity}
+                      "conductivity [S/cm]": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
-        data = utils.assemble_data_frame(**{"frequency": self.impedance.frequency,
-                                            "impedance": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
-                                            "fit_impedance": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
-                                            "Z_linKK": self.z_linkk})
+        data = utils.assemble_data_frame(**{"frequency [Hz]": self.impedance.frequency,
+                                            r"impedance $[\Omega]$": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
+                                            r"fit_impedance $[\Omega]$": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
+                                            r"Z_linKK $[\Omega]$": self.z_linkk})
         data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
         utils.save_data_as_csv(save_dir, data, data_name)
 
@@ -236,7 +236,7 @@ class EIS(EChemProcedure):
             float: conductivity of the circuit
         """
         conductivity = self.cell_constant * (1/self.custom_circuit.parameters_[0])
-        log.info(f"The calculated conductivity is {conductivity}")
+        log.info(f"The calculated conductivity is {conductivity} [S.cm⁻¹]")
         return conductivity
 
     def _calculate_phase_shift(self) -> list[float]:

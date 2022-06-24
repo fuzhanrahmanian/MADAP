@@ -75,16 +75,16 @@ class Arrhenius(EChemProcedure):
         # Save the fitted circuit
         name = utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
         meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
-                    "arr_constant": self.arrhenius_constant, "activation": self.activation,
-                    "gas_constant": self.gas_constant}
+                    "arr_constant [S.cm⁻¹]": self.arrhenius_constant, "activation [mJ/mol]": self.activation,
+                    "gas_constant [J/mol.K]": self.gas_constant}
 
         utils.save_data_as_json(directory=save_dir, name=name, data=meta_data)
         # Save the dataset
-        data = utils.assemble_data_frame(**{"temperatures": self.temperatures,
-                                            "conductivity": self.conductivity,
-                                            "inverted_scale_temperatures": self.inverted_scale_temperatures,
-                                            "log_conductivty": self._log_conductivity(),
-                                            "log_conductivity_fit":self.ln_conductivity_fit})
+        data = utils.assemble_data_frame(**{"temperatures [\u00b0C]": self.temperatures,
+                                            "conductivity [S\cm]": self.conductivity,
+                                            "inverted_scale_temperatures [1000/K]": self.inverted_scale_temperatures,
+                                            "log_conductivty [ln(S/cm)]": self._log_conductivity(),
+                                            "log_conductivity_fit [ln(S/cm)]":self.ln_conductivity_fit})
 
         data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
         utils.save_data_as_csv(save_dir, data, data_name)
