@@ -64,7 +64,3 @@ def append_to_save_data(directory, added_data, name):
     data = load_data_as_json(directory, name)
     data.update(added_data)
     save_data_as_json(directory, data, name)
-
-def cel_to_thousand_over_kelvin(temps):
-            converted_temps = 1000/(temps + 273.15)
-            return ["%.1f" % ct for ct in converted_temps]

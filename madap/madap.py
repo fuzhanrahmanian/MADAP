@@ -97,7 +97,7 @@ def main():
 
     elif args.procedure == "arrhenius":
         log.info("what plot do you want? options: arrhenius, arrhenius_fit")
-        plots = "arrhenius" #,"arrhenius_fit" # input()
+        plots = "arrhenius", "arrhenius_fit" #,"arrhenius_fit" # input()
         call_arrhenius(data, result_dir, plots)
     elif args.procedure == "voltammetry": pass
 
