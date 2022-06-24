@@ -39,7 +39,7 @@ class Arrhenius(EChemProcedure):
         self.activation = reg.coef_[0]*(-self.gas_constant)
         self.ln_conductivity_fit = reg.predict(self.inverted_scale_temperatures.values.reshape(-1,1))
 
-        log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)} [S.cm⁻¹] and activation is {round(self.activation,4)} [mJ/mol] with the score {self.fit_score}")
+        log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)}   [S.cm⁻¹] and activation is {round(self.activation,4)} [mJ/mol] with the score {self.fit_score}")
 
 
     def plot(self, save_dir:str, plots:list):
