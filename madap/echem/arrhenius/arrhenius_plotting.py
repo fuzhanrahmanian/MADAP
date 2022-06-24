@@ -1,10 +1,6 @@
 from madap import logger
 from matplotlib import pyplot as plt
-from matplotlib.lines import Line2D
-import matplotlib.colors as mcl
-import numpy as np
 from plotting import Plots
-from utils import utils
 
 
 log = logger.get_logger("arrhenius_plotting")

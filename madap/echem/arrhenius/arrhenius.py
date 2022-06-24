@@ -1,5 +1,4 @@
 import os
-from re import sub
 from attrs import define, field
 from attrs.setters import frozen
 import numpy as np
