@@ -113,7 +113,8 @@ def main():
                         required=True, help="Procedure of the analysis")
     parser.add_argument("-r", "--results", type=Path, required=True, help="Directory for saving results")
 
-    parser.add_argument("-s", "--selection", choices=["header", "specific"],help= "select whether you are choosing a header or a specific column & row in your data")
+    parser.add_argument("-s", "--selection", choices=["header", "specific"],
+                        help= "select whether you are choosing a header or a specific column & row in your data")
     # Parse the argument
     args = parser.parse_known_args()[0]
 
@@ -126,8 +127,6 @@ def main():
         parser.add_argument("-ip", "--impedance_procedure", type=str, required=True ,choices=['EIS', 'Mottschotcky', 'Lissajous'],
                             help="Which of the impedance procedures you want to use?")
 
-        #log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
-        #plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
         call_impedance(data, result_dir, parser, args)
 
     elif args.procedure == "arrhenius":
