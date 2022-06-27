@@ -24,19 +24,6 @@ def call_impedance(data, result_dir, parser, args):
         data (class): the given data frame for analysis
     """
 
-    # print("What is the name (or index) of the column of frequency (f [Hz]) ?")
-    # freq_data = da.choose_options(data)
-
-    # print("What is the name (or index) of the column of real impedance (Z' [Ω])?")
-    # real_data = da.choose_options(data)
-
-    # print("What is the name (or index) of the column of imaginary impedance (Z''[Ω]) ?")
-    # imag_data = da.choose_options(data)
-
-    # print("What is the name (or index) of the column of phase shift (\u03c6 [\u00b0]) (optional)? If no phase shift is required type 'n'")
-    # phase_shift_data = da.choose_options(data)
-
-
     if args.selection == "header":
         parser.add_argument("-n", "--name_list", type=str, nargs="+",
                                             help="name of the headers for frequency, real impedance, imaginary_impedance and phase shift \n write n if it is not applicable \n order is important.")
@@ -77,13 +64,8 @@ def call_impedance(data, result_dir, parser, args):
         #TODO
         pass
 
-    # TODO : check if user gives any plot at all or not
-    # find the according function in class impedance
-    # either all the analysis at once or just read the specific function names
-
     plots = da.format_plots(args.plots)
     procedure.perform_all_actions(result_dir, plots=plots)
-    # what functions/ procedure user wants
 
 
 def call_arrhenius(data, result_dir, plots):
@@ -130,8 +112,9 @@ def main():
     parser.add_argument("-p", "--procedure", type=str, choices=['arrhenius', 'impedance', 'voltammetry'],
                         required=True, help="Procedure of the analysis")
     parser.add_argument("-r", "--results", type=Path, required=True, help="Directory for saving results")
-    # Parse the argument
+
     parser.add_argument("-s", "--selection", choices=["header", "specific"],help= "select whether you are choosing a header or a specific column & row in your data")
+    # Parse the argument
     args = parser.parse_known_args()[0]
 
     # Acquire data
@@ -143,7 +126,7 @@ def main():
         parser.add_argument("-ip", "--impedance_procedure", type=str, required=True ,choices=['EIS', 'Mottschotcky', 'Lissajous'],
                             help="Which of the impedance procedures you want to use?")
 
-        log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
+        #log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
         #plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
         call_impedance(data, result_dir, parser, args)
 
