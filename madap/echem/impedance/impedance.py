@@ -2,7 +2,7 @@
 import os
 import json
 import numpy as np
-
+import warnings
 from attrs import define, field
 from attrs.setters import frozen
 from impedance import preprocessing
@@ -15,6 +15,7 @@ from echem.procedure import EChemProcedure
 from madap import logger
 from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
 
+warnings.warn("deprecated", DeprecationWarning)
 # reference the impedance library
 log = logger.get_logger("impedance")
 
@@ -62,7 +63,7 @@ class EIS(EChemProcedure):
         self.cut_off = cut_off
         self.fit_type = fit_type
         self.val_low_freq = val_low_freq
-        self.cell_constant = float(cell_constant) if cell_constant!="n" else None
+        self.cell_constant = cell_constant
         self.conductivity = None
         self.rmse_error = None
         self.num_rc_linkk = None
@@ -114,10 +115,10 @@ class EIS(EChemProcedure):
                 rmse_guess = fitting.rmse(z_circuit, z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
-                if rmse_error is None:
-                    rmse_error = rmse_guess
+                if self.rmse_error is None:
+                    self.rmse_error = rmse_guess
 
-                if rmse_guess < rmse_error:
+                if rmse_guess < self.rmse_error:
                     self.rmse_error = rmse_guess
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
@@ -131,7 +132,6 @@ class EIS(EChemProcedure):
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
             self.conductivity = self._conductivity_calculation()
-            log.info(f"The calculated conductivity is {self.conductivity}")
 
 
     def plot(self, save_dir, plots):

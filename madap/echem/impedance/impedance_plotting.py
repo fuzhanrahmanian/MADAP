@@ -135,7 +135,7 @@ class ImpedancePlotting(Plots):
     def compose_eis_subplot(self, plots:list):
 
         if len(plots)==1:
-            fig = plt.figure(figsize=(3.5,3), constrained_layout = True)
+            fig = plt.figure(figsize=(3.5,3))
             spec = fig.add_gridspec(1, 1)
             ax = fig.add_subplot(spec[0,0])
             return fig, [ax]

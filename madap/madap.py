@@ -1,7 +1,10 @@
 import argparse
+from secrets import choice
 import sys
 from ast import arguments
 import os
+
+from traitlets import default
 from utils import utils
 import logger
 from data_acquisition import data_acquisition as da
@@ -14,7 +17,7 @@ from pathlib import Path
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')
 
 
-def call_impedance(data, result_dir, plots, parser, args):
+def call_impedance(data, result_dir, parser, args):
     """calling the impedance procedure and parse the corresponding arguments
 
     Args:
@@ -50,28 +53,35 @@ def call_impedance(data, result_dir, plots, parser, args):
 
     Im = impedance.Impedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
 
-    # TODO: Parser for Voltage
-    print("what is the cell constant value? write n if it is not available")
-    cell_constant = "n"
-    # cell constant, voltage, suggested_circuit, initial_value
+    if args.impedance_procedure == "EIS":
+
+        parser.add_argument("-v", "--voltage", type=float, required=False, default=None, help="applied voltage if applicable")
+        parser.add_argument("-cc", "--cell_constant", type=float, required=False, default=None, help="cell constant if applicable")
+        parser.add_argument("-sc", "--suggested_circuit", type=str, required=False, default=None, help="suggested circuit if applicable. \n Available elements are 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs' \n Parallel circuit can be defined like p(element1, element2) and the series circuit like element1_element2")
+        parser.add_argument("-iv", "--initial_values", required=False, default=None,
+                            help="initial values for the suggested circuit. \n format: element1, element2, ... \n it will be used just if the suggested_circuit is available.")
+
+        parser.add_argument("-pl", "--plots", required=True, choices=["nyquist" ,"nyquist_fit", "residual", "bode"], nargs="+", help="plots to be generated")
+
+        args = parser.parse_args()
+        log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant}, suggested circuit is {args.suggested_circuit} and initial values are {args.initial_values}.")
 
 
-    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8],
-                              cell_constant=cell_constant)
+        procedure = impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit, initial_value=eval(args.initial_values),
+                                cell_constant=args.cell_constant)
 
-    # TODO , write a parser and ask what circuit user will define
-    # list of available elements : 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'
-    # series or parallel
-    #slog.info("")
-    #circuit = ""
+    elif args.impedance_procedure == "Mottschotcky":
+        #TODO
+        pass
+    elif args.impedance_procedure == "Lissajous":
+        #TODO
+        pass
+
     # TODO : check if user gives any plot at all or not
     # find the according function in class impedance
     # either all the analysis at once or just read the specific function names
 
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
+    plots = da.format_plots(args.plots)
     procedure.perform_all_actions(result_dir, plots=plots)
     # what functions/ procedure user wants
 
@@ -123,7 +133,6 @@ def main():
     # Parse the argument
     parser.add_argument("-s", "--selection", choices=["header", "specific"],help= "select whether you are choosing a header or a specific column & row in your data")
     args = parser.parse_known_args()[0]
-    #args = parser.parse_args()
 
     # Acquire data
     data = da.acquire_data(args.data)
@@ -131,10 +140,12 @@ def main():
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure == "impedance":
+        parser.add_argument("-ip", "--impedance_procedure", type=str, required=True ,choices=['EIS', 'Mottschotcky', 'Lissajous'],
+                            help="Which of the impedance procedures you want to use?")
 
         log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
-        plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
-        call_impedance(data, result_dir, plots, parser, args)
+        #plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
+        call_impedance(data, result_dir, parser, args)
 
     elif args.procedure == "arrhenius":
         log.info("what plot do you want? options: arrhenius, arrhenius_fit")
