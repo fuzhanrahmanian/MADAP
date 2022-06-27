@@ -201,9 +201,9 @@ class EIS(EChemProcedure):
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
         data = utils.assemble_data_frame(**{"frequency [Hz]": self.impedance.frequency,
-                                            r"impedance $[\Omega]$": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
-                                            r"fit_impedance $[\Omega]$": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
-                                            r"Z_linKK $[\Omega]$": self.z_linkk})
+                                            "impedance [\u03a9]": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
+                                            "fit_impedance [\u03a9]": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
+                                            "Z_linKK [\u03a9]": self.z_linkk})
         data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
         utils.save_data_as_csv(save_dir, data, data_name)
 
