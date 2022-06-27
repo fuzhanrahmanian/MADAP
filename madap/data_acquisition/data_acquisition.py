@@ -46,21 +46,36 @@ def format_data(data):
     Returns:
         A readable format of data for analysis
     """
-
-    if not np.array_equal(data, data.astype(float)):
-        data = data.astype(np.float)
+    if not data is None:
+        if not np.array_equal(data, data.astype(float)):
+            data = data.astype(np.float)
 
     return data
 
-# def calculate_phaseshift(imaginary_impedance, real_impedance):
-#     """calculate phase shift
 
-#     Args:
-#         imaginary_impedance (class): imaginary impedance data
-#         real_impedance (class): real impedance data
+def select_data(data, select_data:str):
+    # this can be use when the user wants to select a subset of the data
+    numbers = list(map(int, select_data.split(",")))
+    data = data.iloc[numbers[0]:numbers[1], numbers[2]:numbers[3]].values.reshape(-1)
+    return data
 
-#     Returns:
-#         phase shift: calculated phase shift based on real and imaginary data
-#     """
-#     phase_shift_in_rad = np.arctan(format_data(abs(-imaginary_impedance)/format_data(abs(real_impedance))))
-#     return np.rad2deg(phase_shift_in_rad)
+def choose_options(data):
+    data_index = input("Choose 1 if you are selecting the header of your column, 2 if you are selecting the index of the rows/columns and 3 if is not available, your choice is: ")
+    if data_index == '1':
+        ind = input(f"Name of the column of your choice (e.g. freq), answer: ")
+        data = data[ind]
+    elif data_index == '2':
+        ind = input(f"number of rows and columns you are selecting (start_row,end_row,start_column,end_column  e.g. 1,10,2,3), answer: ")
+        data = select_data(data, ind)
+    else:
+        data = None
+    return data
+
+
+def format_plots(plots):
+    if isinstance(plots, str):
+        plots = [plots]
+    if isinstance(plots, tuple):
+        plots = list(plots)
+    return plots
+

@@ -53,7 +53,7 @@ class EIS(EChemProcedure):
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None,
                 initial_value = None, max_rc_element: int = 50,
                 cut_off: float = 0.85, fit_type: str = 'complex',
-                val_low_freq: bool = True, cell_constant: float=None):
+                val_low_freq: bool = True, cell_constant="n"):
         self.impedance = impedance
         self.voltage = voltage
         self.suggested_circuit = suggested_circuit
@@ -62,7 +62,7 @@ class EIS(EChemProcedure):
         self.cut_off = cut_off
         self.fit_type = fit_type
         self.val_low_freq = val_low_freq
-        self.cell_constant = cell_constant
+        self.cell_constant = float(cell_constant) if cell_constant!="n" else None
         self.conductivity = None
         self.rmse_error = None
         self.num_rc_linkk = None
@@ -126,6 +126,7 @@ class EIS(EChemProcedure):
             self.custom_circuit.fit(f_circuit, z_circuit)
             self.z_fit = self.custom_circuit.predict(f_circuit)
             self.rmse_error = fitting.rmse(z_circuit, self.z_fit)
+            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_error}")
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available

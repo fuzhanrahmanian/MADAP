@@ -1,4 +1,6 @@
 import argparse
+import sys
+from ast import arguments
 import os
 from utils import utils
 import logger
@@ -12,35 +14,50 @@ from pathlib import Path
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')
 
 
-def call_impedance(data, result_dir, plots):
+def call_impedance(data, result_dir, plots, parser, args):
     """calling the impedance procedure and parse the corresponding arguments
 
     Args:
         data (class): the given data frame for analysis
     """
 
-    log.info("What is the name (or index) of the column of frequency (f [Hz]) ?")
-    # TODO : specify the part of the dataset that we want to specify
-    freq_idx = "freq" # input()
-    log.info("What is the name (or index) of the column of real impedance (Z' [Ω])?")
-    # TODO
-    real_idx = "real" #input()
-    log.info("What is the name (or index) of the column of imaginary impedance (Z''[Ω]) ?")
-    # TODO
-    imag_idx = "imag" #input()
-    log.info("What is the name (or index) of the column of phase shift (\u03c6 [\u00b0]) (optional)? If no phase shift is required type 'n'")
-    # TODO
-    phase_shift = None #input()
+    # print("What is the name (or index) of the column of frequency (f [Hz]) ?")
+    # freq_data = da.choose_options(data)
+
+    # print("What is the name (or index) of the column of real impedance (Z' [Ω])?")
+    # real_data = da.choose_options(data)
+
+    # print("What is the name (or index) of the column of imaginary impedance (Z''[Ω]) ?")
+    # imag_data = da.choose_options(data)
+
+    # print("What is the name (or index) of the column of phase shift (\u03c6 [\u00b0]) (optional)? If no phase shift is required type 'n'")
+    # phase_shift_data = da.choose_options(data)
+
+
+    if args.selection == "header":
+        parser.add_argument("-n", "--name_list", type=str, nargs="+",
+                                            help="name of the headers for frequency, real impedance, imaginary_impedance and phase shift \n write n if it is not applicable \n order is important.")
+        args = parser.parse_known_args()[0]
+        header_names = args.name_list[0].split(", ")
+        freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]], data[header_names[1]], data[header_names[2]], data[header_names[3]] if header_names[3] != "n" else None
+
+    else:
+        parser.add_argument("-rc", "--row_column", type=str, nargs="+",
+                            help="row and column number of the frequency, real impedance, imaginary_impedance and phase shift \n write n if it is not applicable \n order is important.\n format: start_row,end_row,start_column,end_column \n 1,10,1,2 means rows 1 to 10 and columns 1 to 2")
+        args = parser.parse_known_args()[0]
+        header_names = args.row_column[0].split(", ")
+        freq_data, real_data, imag_data, phase_shift_data = da.select_data(data, header_names[0]), da.select_data(data, header_names[1]), da.select_data(data, header_names[2]), da.select_data(data, header_names[3]) if header_names[3] != "n" else None
+
+    Im = impedance.Impedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
+
     # TODO: Parser for Voltage
+    print("what is the cell constant value? write n if it is not available")
     cell_constant = "n"
+    # cell constant, voltage, suggested_circuit, initial_value
 
-    # if phase_shift == "n":
-    #     phase_shift = da.calculate_phaseshift(data[imag_idx], data[real_idx])
 
-    Im = impedance.Impedance(da.format_data(data[freq_idx]), da.format_data(data[real_idx]), da.format_data(data[imag_idx]), phase_shift)
-
-    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8], 
-                              cell_constant=None)
+    procedure = impedance.EIS(Im, voltage=4, suggested_circuit="R0-p(R1,CPE1)", initial_value=[800, 1e+14, 1e-9, 0.8],
+                              cell_constant=cell_constant)
 
     # TODO , write a parser and ask what circuit user will define
     # list of available elements : 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'
@@ -104,18 +121,20 @@ def main():
                         required=True, help="Procedure of the analysis")
     parser.add_argument("-r", "--results", type=Path, required=True, help="Directory for saving results")
     # Parse the argument
-    args = parser.parse_args()
+    parser.add_argument("-s", "--selection", choices=["header", "specific"],help= "select whether you are choosing a header or a specific column & row in your data")
+    args = parser.parse_known_args()[0]
+    #args = parser.parse_args()
 
     # Acquire data
     data = da.acquire_data(args.data)
-    #print(data.head())
+    log.info(f"the header of your data is: \n {data.head()}")
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure == "impedance":
 
         log.info("what plot do you want? optiions: nyquist, bode, nyquist_fit, residual")
         plots = "nyquist" ,"nyquist_fit", "residual", "bode"  #"nyquist_fit" #, "bode" #, "residual" # input()
-        call_impedance(data, result_dir, plots)
+        call_impedance(data, result_dir, plots, parser, args)
 
     elif args.procedure == "arrhenius":
         log.info("what plot do you want? options: arrhenius, arrhenius_fit")
