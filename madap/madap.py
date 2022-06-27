@@ -3,8 +3,6 @@ from secrets import choice
 import sys
 from ast import arguments
 import os
-
-from traitlets import default
 from utils import utils
 import logger
 from data_acquisition import data_acquisition as da
@@ -26,7 +24,7 @@ def call_impedance(data, result_dir, parser, args):
 
     if args.selection == "header":
         parser.add_argument("-n", "--name_list", type=str, nargs="+",
-                                            help="name of the headers for frequency, real impedance, imaginary_impedance and phase shift \n write n if it is not applicable \n order is important.")
+                                            help="name of the headers for frequency [Hz], real impedance [\u2126], imaginary_impedance [\u2126] and phase shift \u03c6 [\u00b0] \n write n if it is not applicable \n order is important.")
         args = parser.parse_known_args()[0]
         header_names = args.name_list[0].split(", ")
         freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]], data[header_names[1]], data[header_names[2]], data[header_names[3]] if header_names[3] != "n" else None
@@ -42,7 +40,7 @@ def call_impedance(data, result_dir, parser, args):
 
     if args.impedance_procedure == "EIS":
 
-        parser.add_argument("-v", "--voltage", type=float, required=False, default=None, help="applied voltage if applicable")
+        parser.add_argument("-v", "--voltage", type=float, required=False, default=None, help="applied voltage [V] if applicable")
         parser.add_argument("-cc", "--cell_constant", type=float, required=False, default=None, help="cell constant if applicable")
         parser.add_argument("-sc", "--suggested_circuit", type=str, required=False, default=None, help="suggested circuit if applicable. \n Available elements are 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R', 'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs' \n Parallel circuit can be defined like p(element1, element2) and the series circuit like element1_element2")
         parser.add_argument("-iv", "--initial_values", required=False, default=None,
@@ -68,19 +66,30 @@ def call_impedance(data, result_dir, parser, args):
     procedure.perform_all_actions(result_dir, plots=plots)
 
 
-def call_arrhenius(data, result_dir, plots):
-    log.info("What is the name (or index) of the column of temperature (T [\u00b0C]) ?")
-    # TODO
-    temp_idx = "temp" #input()
-    # TODO
-    log.info("What is the name (or index) of the column of conductivity (\u03b1 [S/cm]) ?")
-    conductivity_idx = "cond" #input()
-    Arr = arrhenius.Arrhenius(da.format_data(data[temp_idx]), da.format_data(data[conductivity_idx]))
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
-    Arr.perform_all_actions(result_dir, plots=plots)
+def call_arrhenius(data, result_dir, parser, args):
+
+
+    if args.selection == "header":
+        parser.add_argument("-n", "--name_list", type=str, nargs="+",
+                                            help="name of the headers for temperature (T [\u00b0C]) and conductivity (\u03b1 [S/cm]) \n write n if it is not applicable \n order is important.")
+        args = parser.parse_known_args()[0]
+        header_names = args.name_list[0].split(", ")
+        temp_data, cond_data = data[header_names[0]], data[header_names[1]]
+    else:
+        parser.add_argument("-rc", "--row_column", type=str, nargs="+",
+                            help="row and column number of the temperature and conductivity \n write n if it is not applicable \n order is important.\n format: start_row,end_row,start_column,end_column \n 1,10,1,2 means rows 1 to 10 and columns 1 to 2")
+        args = parser.parse_known_args()[0]
+        header_names = args.row_column[0].split(", ")
+        temp_data, cond_data = da.select_data(data, header_names[0]), da.select_data(data, header_names[1])
+
+    Arr = arrhenius.Arrhenius(da.format_data(temp_data), da.format_data(cond_data))
+
+    parser.add_argument("-pl", "--plots", required=True, choices=["arrhenius" ,"arrhenius_fit"], nargs="+", help="plots to be generated")
+
+    args = parser.parse_args()
+
+    plots = da.format_plots(args.plots)
+    Arr.perform_all_actions(result_dir, plots = plots)
 
 def call_voltammetry(data, result_dir, plots):
     log.info("What is the name (or index) of the column of voltage (v [V]) ?")
@@ -130,10 +139,10 @@ def main():
         call_impedance(data, result_dir, parser, args)
 
     elif args.procedure == "arrhenius":
-        log.info("what plot do you want? options: arrhenius, arrhenius_fit")
-        plots = "arrhenius", "arrhenius_fit" #,"arrhenius_fit" # input()
-        call_arrhenius(data, result_dir, plots)
-    elif args.procedure == "voltammetry": pass
+        call_arrhenius(data, result_dir, parser, args)
+
+    elif args.procedure == "voltammetry":
+        parser.add_argument("-vp", "--voltammetry_procedure", type=str, required=True, choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],)
 
 
 if __name__ == "__main__":
