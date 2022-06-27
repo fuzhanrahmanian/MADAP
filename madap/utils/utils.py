@@ -52,8 +52,8 @@ def save_data_as_csv(directory, data, name):
 
 def save_data_as_json(directory, data, name):
     log.info(f"Saving data in {directory} as json")
-    with open(os.path.join(directory, name), 'w') as f:
-            json.dump(data, f)
+    with open(os.path.join(directory, name), 'w', encoding="utf8") as f:
+            json.dump(data, f, ensure_ascii=False)
 
 def load_data_as_json(directory, name):
     with open(os.path.join(directory, name), 'r') as file:
