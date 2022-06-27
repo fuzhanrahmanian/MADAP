@@ -118,7 +118,7 @@ class EIS(EChemProcedure):
                 if self.rmse_error is None:
                     self.rmse_error = rmse_guess
 
-                if rmse_guess < self.rmse_error:
+                if rmse_guess <= self.rmse_error:
                     self.rmse_error = rmse_guess
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
