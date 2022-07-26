@@ -8,6 +8,8 @@ import math
 
 log = logger.get_logger("plotting")
 class Plots():
+    """_General class for multipurpose plotting
+    """
     def __init__(self) -> None:
 
         mpl.rcParams.update(mpl.rcParamsDefault)

@@ -21,8 +21,8 @@ class ArrheniusPlotting(Plots):
             temperatures (np.array): Array of temperatures
             log_conductivity (np.array): Array of log conductivity in [S/cm]
             inverted_scale_temperatures (np.array): Array of inverted scale temperatures in [1000/K]
-            ax_sci_notation (bool, optional): Weather or not scientific notation should be adopted for axis. Defaults to None.
-            scientific_limit (int, optional): Number of significant digits. Defaults to 3.
+            ax_sci_notation (bool, optional): If True, adds scientific notation to the axis. Defaults to None.
+            scientific_limit (int, optional): If ax_sci_notation is True, defines the number of significant digits. Defaults to None.
         """
 
         log.info("Creating Arrhenius plot")

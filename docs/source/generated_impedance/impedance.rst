@@ -1,17 +1,18 @@
-Arrhenius package
+Impedance package
 =================
 
-arrhenius.arrhenius
+impedance.impedance
 --------------------------
 
-.. automodule:: arrhenius.arrhenius
+.. automodule:: impedance.impedance
    :members:
+   :undoc-members:
    :show-inheritance:
 
-arrhenius.arrhenius\_plotting
+impedance.impedance\_plotting
 ------------------------------------
 
-.. automodule:: arrhenius.arrhenius_plotting
+.. automodule:: impedance.impedance_plotting
    :members:
    :undoc-members:
    :show-inheritance:

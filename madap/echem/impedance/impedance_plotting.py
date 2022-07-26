@@ -1,35 +1,41 @@
-from madap import logger
+"""Impedance Plotting module."""
+import numpy as np
+import matplotlib.colors as mcl
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-import matplotlib.colors as mcl
-import numpy as np
-from plotting import Plots
+
+from madap import logger
+from madap.plotting import Plots
 
 
 log = logger.get_logger("impedance_plotting")
 
 class ImpedancePlotting(Plots):
+    """General Plotting class for Impedance method.
+
+    Args:
+        Plots (class): Parent class for plotting all methods.
+    """
 
     def nyquist(self, subplot_ax, frequency, real_impedance, imaginary_impedance,
                 colorbar:bool=True, ax_sci_notation = None, scientific_limit=None,
                 scientific_label_colorbar=False, legend_label=False,voltage:float = None,
                 color_map:str="viridis", norm_color=None):
-        # TODO docstring is not right fixation is needed
-        """Sets up a Nyquist plots
+        """Defines the nyquist plot for raw data
 
         Args:
-            ax (AxesSubplot): The ax of the subplot
-            frequency (pandas.core.series.Series): The series with the frequency
-            real_impedance (pandas.core.series.Series): The Series with Real Impedance
-            imaginary_impedance (pandas.core.series.Series): The series with the imaginary impedance
-            colorbar (bool, optional): Whether or not a colorbar is desired. Defaults to True.
-            ax_sci_notation (str, optiopnal): whether or not an axis should be written with
-                scientific notation. It can be 'x', 'y', 'both' or None.
-            scientific_label (optional): Scientific notation will be used for numbers
-                outside the range.Defaults to None.
-            legend_label (str, optional): Label of the legend. Defaults to None.
-            voltage (float, optional): whether or not the applied voltage should be added to legend.
-            color_map (str, optional): Colormap to be used . Defaults to "viridis".
+            subplot_ax (ax): Subplot axis
+            frequency (np.array): Frequency array.
+            real_impedance (np.array): Real impedance array.
+            imaginary_impedance (np.array): Imaginary impedance array.
+            colorbar (bool, optional): If True, adds a colorbar. Defaults to True.
+            ax_sci_notation (bool, optional): If True, adds scientific notation to the axis. Defaults to None.
+            scientific_limit (int, optional): If ax_sci_notation is True, defines the number of significant digits. Defaults to None.
+            scientific_label_colorbar (bool, optional): If True, adds scientific notation to the colorbar. Defaults to False.
+            legend_label (bool, optional): If True, adds a legend. Defaults to False.
+            voltage (float, optional): Voltage of the circuit. Defaults to None.
+            color_map (str, optional): Color map. Defaults to "viridis".
+            norm_color (bool, optional): If True, normalizes the colorbar. Defaults to None.
         """
 
         log.info("Creating Nyquist plot")
@@ -62,6 +68,18 @@ class ImpedancePlotting(Plots):
 
     def bode(self, subplot_ax, frequency, real_impedance, imaginary_impedance, phase_shift,
              ax_sci_notation=None, scientific_limit=None, log_scale='x'):
+        """Defines the bode plot for raw data
+
+        Args:
+            subplot_ax (ax): Subplot axis
+            frequency (np.array): Frequency array.
+            real_impedance (np.array): Real impedance array.
+            imaginary_impedance (np.array): Imaginary impedance array.
+            phase_shift (np.array): Phase shift array.
+            ax_sci_notation (bool, optional): If True, adds scientific notation to the axis. Defaults to None.
+            scientific_limit (int, optional): If ax_sci_notation is True, defines the number of significant digits. Defaults to None.
+            log_scale (str, optional): If 'x', plots the x axis in log scale. Defaults to 'x'.
+        """
         log.info("Creating Bode plot")
         impedance_magnitude = np.sqrt(real_impedance**2 +  imaginary_impedance**2)
         subplot_ax.scatter(frequency, impedance_magnitude, rasterized=True, s=10,c="#453781ff")
@@ -84,7 +102,25 @@ class ImpedancePlotting(Plots):
                     scientific_label_colorbar=False, legend_label=False,
                     voltage:float = None, color_map:str="viridis",
                     norm_color=None):
+        """Defines the nyquist plot for fitted data
 
+        Args:
+            subplot_ax (ax): Subplot axis
+            frequency (np.array): Frequency array.
+            real_impedance (np.array): Real impedance array.
+            imaginary_impedance (np.array): Imaginary impedance array.
+            fitted_impedance (np.array): Fitted impedance array.
+            chi (float): Chi value of the fit.
+            suggested_circuit (str): The string definition of the suggested circuit.
+            colorbar (bool, optional): If True, adds a colorbar. Defaults to True.
+            ax_sci_notation (bool, optional): If True, adds scientific notation to the axis. Defaults to None.
+            scientific_limit (int, optional): If ax_sci_notation is True, defines the number of significant digits. Defaults to None.
+            scientific_label_colorbar (bool, optional): If True, adds scientific notation to the colorbar. Defaults to False.
+            legend_label (bool, optional): If True, adds a legend. Defaults to False.
+            voltage (float, optional): Voltage of the circuit. Defaults to None.
+            color_map (str, optional): Color map. Defaults to "viridis".
+            norm_color (bool, optional): If True, normalizes the colorbar. Defaults to None.
+        """
         log.info("Creating a fitted Nyquist plot")
         nyquist_label = fr" v = {voltage}[V], $\chi$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi$ = {np.format_float_scientific(chi, 3)}"
 
@@ -120,6 +156,17 @@ class ImpedancePlotting(Plots):
     def residual(self, subplot_ax, frequency, res_real, res_imag,
                 log_scale='x', ax_sci_notation = None,
                 scientific_limit:int=3):
+        """Defines the residual plot for raw data
+
+        Args:
+            subplot_ax (ax): Subplot axis.
+            frequency (np.array): Frequency array.
+            res_real (np.array): Real residual array.
+            res_imag (np.array): Imaginary residual array.
+            log_scale (str, optional): If 'x', plots the x axis in log scale. Defaults to 'x'.
+            ax_sci_notation (bool, optional): If True, adds scientific notation to the axis. Defaults to None.
+            scientific_limit (int, optional): If ax_sci_notation is True, defines the number of significant digits. Defaults to None.
+        """
 
         log.info("Creating a residual plot")
         subplot_ax.plot(frequency, res_real, label=r"$\Delta_{real}$", color="#453781ff",
@@ -133,6 +180,14 @@ class ImpedancePlotting(Plots):
         subplot_ax.legend(loc="lower right", fontsize=5.5)
 
     def compose_eis_subplot(self, plots:list):
+        """Compose the EIS subplot
+
+        Args:
+            plots (list): List of plots to be composed.
+
+        Returns:
+            fig, ax: Figure and axis of the subplot.
+        """
 
         if len(plots)==1:
             fig = plt.figure(figsize=(3.5,3))

@@ -3,17 +3,15 @@ import os
 import json
 import numpy as np
 import warnings
+import impedance as imp
 from attrs import define, field
 from attrs.setters import frozen
-from impedance import preprocessing
-from impedance.models.circuits import CustomCircuit, fitting
-from impedance.validation import linKK
 
-from utils import utils
-import data_acquisition.data_acquisition as da
-from echem.procedure import EChemProcedure
+from madap.utils import utils
+from madap.data_acquisition import data_acquisition as da
 from madap import logger
-from echem.impedance.impedance_plotting import ImpedancePlotting as iplt
+from madap.echem.procedure import EChemProcedure
+from madap.echem.impedance.impedance_plotting import ImpedancePlotting as iplt
 
 warnings.warn("deprecated", DeprecationWarning)
 # reference the impedance library
@@ -55,6 +53,19 @@ class EIS(EChemProcedure):
                 initial_value = None, max_rc_element: int = 50,
                 cut_off: float = 0.85, fit_type: str = 'complex',
                 val_low_freq: bool = True, cell_constant="n"):
+        """ Initialize the EIS class.
+
+        Args:
+            impedance (np.array): Impedance data containing real and imaginary part.
+            voltage (float, optional): Voltage of the EIS measurement. Defaults to None.
+            suggested_circuit (str, optional): String defining the suggested circuit. Defaults to None.
+            initial_value (list, optional): Initial value of the circuit's element. Defaults to None.
+            max_rc_element (int, optional): Maximum number of RC element to be used in the circuit. Defaults to 50.
+            cut_off (float, optional): Cut off value of the fitted elements. Defaults to 0.85.
+            fit_type (str, optional): Fit type. Defaults to 'complex'.
+            val_low_freq (bool, optional): If True, the low frequency is used for the fit. Defaults to True.
+            cell_constant (str, optional): Cell constant. Defaults to "n".
+        """
         self.impedance = impedance
         self.voltage = voltage
         self.suggested_circuit = suggested_circuit
@@ -87,13 +98,13 @@ class EIS(EChemProcedure):
         f_circuit, z_circuit = np.array(self.impedance.frequency), np.array(self.impedance.real_impedance +
                1j*self.impedance.imaginary_impedance)
 
-        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, self.res_real, self.res_imag = linKK(f_circuit, z_circuit, c=self.cut_off, max_M=self.max_rc_element,
+        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, self.res_real, self.res_imag = imp.linKK(f_circuit, z_circuit, c=self.cut_off, max_M=self.max_rc_element,
                                                                         fit_type=self.fit_type, add_cap=self.val_low_freq)
         self.chi_val = self._chi_calculation()
         log.info(f"Chi value from lin_KK method is {self.chi_val}")
 
         if any(x < 0 for x in self.impedance.imaginary_impedance):
-            f_circuit, z_circuit = preprocessing.ignoreBelowX(f_circuit, z_circuit)
+            f_circuit, z_circuit = imp.preprocessing.ignoreBelowX(f_circuit, z_circuit)
 
         # if the user did not choose any circuit, some default suggestions will be applied.
         if (self.suggested_circuit and self.initial_value) is None:
@@ -102,7 +113,7 @@ class EIS(EChemProcedure):
 
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
-                custom_circuit_guess = CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
+                custom_circuit_guess = imp.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
 
                 try:
                     custom_circuit_guess.fit(f_circuit, z_circuit)
@@ -112,7 +123,7 @@ class EIS(EChemProcedure):
                     continue
 
                 z_fit_guess = custom_circuit_guess.predict(f_circuit)
-                rmse_guess = fitting.rmse(z_circuit, z_fit_guess)
+                rmse_guess = imp.fitting.rmse(z_circuit, z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
                 if self.rmse_error is None:
@@ -123,10 +134,10 @@ class EIS(EChemProcedure):
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
         else:
-            self.custom_circuit = CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
+            self.custom_circuit = imp.CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
             self.custom_circuit.fit(f_circuit, z_circuit)
             self.z_fit = self.custom_circuit.predict(f_circuit)
-            self.rmse_error = fitting.rmse(z_circuit, self.z_fit)
+            self.rmse_error = imp.fitting.rmse(z_circuit, self.z_fit)
             log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_error}")
 
         if self.cell_constant:

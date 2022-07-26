@@ -1,7 +1,7 @@
-Arrhenius
+Impedance
 =========
 
 .. toctree::
    :maxdepth: 4
 
-   arrhenius
+   impedance
