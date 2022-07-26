@@ -1,16 +1,30 @@
 from madap import logger
 from matplotlib import pyplot as plt
-from plotting import Plots
+from madap.plotting import Plots
 
 
 log = logger.get_logger("arrhenius_plotting")
 
 class ArrheniusPlotting(Plots):
+    """General Plotting class for Arrhenius method.
 
-    def arrhenius(self, subplot_ax, temperatures, log_conductivity, inversted_scale_temperatures,
+    Args:
+        Plots (class): Parent class for plotting all methods.
+    """
+
+    def arrhenius(self, subplot_ax, temperatures, log_conductivity, inverted_scale_temperatures,
             ax_sci_notation = None, scientific_limit: int = 3):
+        """Defines the Arrhenius plot for raw data
 
-        # log conductivity should have unit of S/cm
+        Args:
+            subplot_ax (ax): Subplot axis
+            temperatures (np.array): Array of temperatures
+            log_conductivity (np.array): Array of log conductivity in [S/cm]
+            inverted_scale_temperatures (np.array): Array of inverted scale temperatures in [1000/K]
+            ax_sci_notation (bool, optional): Weather or not scientific notation should be adopted for axis. Defaults to None.
+            scientific_limit (int, optional): Number of significant digits. Defaults to 3.
+        """
+
         log.info("Creating Arrhenius plot")
         subplot_ax2=subplot_ax.twiny()
         self.plot_identity(subplot_ax, xlabel=r"$\frac{1000}{T}$ $[K^{-1}]$",
@@ -20,12 +34,26 @@ class ArrheniusPlotting(Plots):
 
         subplot_ax2.scatter(temperatures, log_conductivity, s=10, c="#20a387ff", rasterized=True)
         self.plot_identity(subplot_ax2, xlabel="$T$ [\u00b0C]")
-        self.set_xtick_for_two_axes(subplot_ax, subplot_ax2, ["%.1f" % ct for ct in inversted_scale_temperatures], temperatures, invert_axes=True)
+        self.set_xtick_for_two_axes(subplot_ax, subplot_ax2, ["%.1f" % ct for ct in inverted_scale_temperatures], temperatures, invert_axes=True)
 
     def arrhenius_fit(self, subplot_ax, temperatures, log_conductivity, inverted_scale_temperatures,
                     ln_conductivity_fit, activation, arrhenius_constant, r2_score,
                     ax_sci_notation = None, scientific_limit: int=3):
+        """
+        Defines the Arrhenius plot for fitted data
 
+        Args:
+            subplot_ax (ax): Subplot axis
+            temperatures (np.array): Array of temperatures
+            log_conductivity (np.array): Array of log conductivity in [S/cm]
+            inverted_scale_temperatures (np.array): Array of inverted scale temperatures in [1000/K]
+            ln_conductivity_fit (np.array): Array of fitted log conductivity in [S/cm]
+            activation (float): Activation energy in [mJ/mol]
+            arrhenius_constant (float): Arrhenius constant in [mJ/mol]
+            r2_score (float): R2 score of the fit
+            ax_sci_notation (bool, optional): Weather or not scientific notation should be adopted for axis. Defaults to None.
+            scientific_limit (int, optional): Number of significant digits. Defaults to 3.
+        """
         log.info("Creating a fitted Arrhenius plot")
         subplot_ax2=subplot_ax.twiny()
         subplot_ax.plot(inverted_scale_temperatures, ln_conductivity_fit, c="#453781ff", linewidth=1, linestyle="--",
@@ -42,9 +70,17 @@ class ArrheniusPlotting(Plots):
         self.plot_identity(subplot_ax2, xlabel="$T$ [\u00b0C]")
 
     def compose_arrhenius_subplot(self, plots:list):
+        """Creates subplots template for the Arrhenius plots.
+
+        Args:
+            plots (list): List of plots to be composed.
+
+        Returns:
+            fig, ax: Figure and axis of the subplot.
+        """
 
         if len(plots)==1:
-            fig = plt.figure(figsize=(3, 3)) # figsize=(7, 3)
+            fig = plt.figure(figsize=(3, 3))
             spec = fig.add_gridspec(1, 1)
             ax = fig.add_subplot(spec[0,0])
             return fig, [ax]

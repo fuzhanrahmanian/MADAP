@@ -3,18 +3,29 @@ from attrs import define, field
 from attrs.setters import frozen
 import numpy as np
 import math
-from utils import utils
+from madap.utils import utils
 from sklearn.linear_model import LinearRegression
-from echem.procedure import EChemProcedure
-from echem.arrhenius.arrhenius_plotting import ArrheniusPlotting as aplt
+from madap.echem.procedure import EChemProcedure
+from madap.echem.arrhenius.arrhenius_plotting import ArrheniusPlotting as aplt
 from madap import logger
 import matplotlib.pyplot as plt
 
 log = logger.get_logger("arrhenius")
 @define
 class Arrhenius(EChemProcedure):
-    """
-    Arrhenius class
+    """ Class definition for visualization and analysis of Arrhenius equation.
+
+    Attributes:
+        temperatures (np.array): Array of temperatures in Celcius.
+        conductivity (np.array): Array of conductivity in S/cm.
+        gas_constant (float): Gas constant in [J/mol.K].
+        activation (float): Activation energy in [mJ/mol].
+        arrhenius_constant (float): Arrhenius constant in [S.cm⁻¹].
+        inverted_scale_temperatures (np.array): Array of temperatures in 1000/K.
+        fit_score (float): R2 score of the fit.
+        ln_conductivity_fit (np.array): Array of log conductivity fit.
+        intercept (float): Intercept of the fit.
+        coefficients (float): Slope of the fit.
     """
     temperatures: list[float] = field(on_setattr=frozen)
     conductivity: list[float] = field(on_setattr=frozen)
@@ -28,6 +39,8 @@ class Arrhenius(EChemProcedure):
     coefficients = None
 
     def analyze(self):
+        """Analyze the data and fit the Arrhenius equation.
+        """
         # the linear fit formula: ln(sigma) = -E/RT + ln(A)
         self._cel_to_thousand_over_kelvin()
 
@@ -42,6 +55,12 @@ class Arrhenius(EChemProcedure):
 
 
     def plot(self, save_dir:str, plots:list):
+        """Plot the raw data and/or the results of the Arrhenius analysis.
+
+        Args:
+            save_dir (str): Directory where the plots should be saved.
+            plots (list): List of plots included in the analysis.
+        """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = aplt()
 
@@ -50,7 +69,7 @@ class Arrhenius(EChemProcedure):
             if plot_name == "arrhenius":
                 plot.arrhenius(subplot_ax=sub_ax, temperatures= self.temperatures,
                                log_conductivity= self._log_conductivity(),
-                               inversted_scale_temperatures = self.inverted_scale_temperatures)
+                               inverted_scale_temperatures = self.inverted_scale_temperatures)
             elif plot_name == "arrhenius_fit":
                 plot.arrhenius_fit(subplot_ax = sub_ax, temperatures = self.temperatures, log_conductivity = self._log_conductivity(),
                                 inverted_scale_temperatures = self.inverted_scale_temperatures,
@@ -90,13 +109,29 @@ class Arrhenius(EChemProcedure):
 
 
     def perform_all_actions(self, save_dir:str, plots:list):
+        """Wrapper function to perform all actions:\n
+         - Analyze the data \n
+         - Plot the data \n
+         - Save the data
+
+        Args:
+            save_dir (str): Directory where the data should be saved.
+            plots (list): plots to be included in the analysis.
+        """
         self.analyze()
         self.plot(save_dir=save_dir, plots=plots)
         self.save_data(save_dir=save_dir)
 
     def _log_conductivity(self):
+        """Convert the conductivity to log scale.
+
+        Returns:
+            np.array: Log of the conductivity.
+        """
         return np.log(self.conductivity)
 
     def _cel_to_thousand_over_kelvin(self):
-            converted_temps = 1000/(self.temperatures + 273.15)
-            self.inverted_scale_temperatures = converted_temps
+        """Convert the temperatures from Celcius to 1000/K.
+        """
+        converted_temps = 1000/(self.temperatures + 273.15)
+        self.inverted_scale_temperatures = converted_temps
