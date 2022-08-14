@@ -60,12 +60,12 @@ def select_data(data, select_data:str):
     return data
 
 def choose_options(data):
-    data_index = input("Choose 1 if you are selecting the header of your column, 2 if you are selecting the index of the rows/columns and 3 if is not available, your choice is: ")
+    data_index = input("Choose 1 if you are selecting the header of your column, 2 if you are selecting the index of the rows/columns and 3 if is not available. \n Your selection is: ")
     if data_index == '1':
-        ind = input(f"Name of the column of your choice (e.g. freq), answer: ")
+        ind = input(f"Name of the column of your choice (e.g. freq): ")
         data = data[ind]
     elif data_index == '2':
-        ind = input(f"number of rows and columns you are selecting (start_row,end_row,start_column,end_column  e.g. 1,10,2,3), answer: ")
+        ind = input(f"Number of rows and columns you are selecting (start_row,end_row,start_column,end_column  e.g. 1,10,2,3): ")
         data = select_data(data, ind)
     else:
         data = None
