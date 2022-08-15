@@ -1,5 +1,5 @@
 import os
-from madap import logger
+from madap.logger import logger
 import pandas as pd
 import numpy as np
 
