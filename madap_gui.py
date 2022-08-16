@@ -38,7 +38,7 @@ def gui_layout(madap):
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font="bold", pad=(1,(40,0)))],
                              [sg.Text(gui_elements.HEADER_OR_SPECIFIC_HELP, justification='left')],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers', size=(15,1))],
-                             sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1))]
+                             sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
@@ -51,10 +51,10 @@ def gui_layout(madap):
                     [sg.Text(gui_elements.CELL_CONSTANT_HELP, justification='left'), sg.InputText(key="-cell_constant-", enable_events=True), sg.Text('[1/cm]')],
                     [sg.Text('Suggeted Circuit',justification='left', font="bold", pad=(1,(40,0)))],
                     [sg.Text(gui_elements.SUGGESTED_CIRCUIT_HELP, justification='left')],
-                    [sg.InputText(key="-suggested_circuit-", size = (80,1))],
+                    [sg.InputText(key="-suggested_circuit-", size = (80,1), default_text="R0-p(R1,CPE1)")],
                     [sg.Text('Initial Value', justification='left', font="bold", pad=(1,(40,0)))],
                     [sg.Text(gui_elements.INITIAL_VALUES_HELP, justification='left')],
-                    [sg.InputText(key="-initial_value-", size = (80,1), enable_events=True)]]
+                    [sg.InputText(key="-initial_value-", size = (80,1), enable_events=True, default_text="[800,1e+14,1e-9,0.8]")]]
 
     tab_layout_Liss = [[sg.Text('This is inside Lissajous')],
                 [sg.Input(key='-inLiss-')]]
@@ -109,7 +109,7 @@ def main():
             # Create an "empty" class for the selected procedure every time the tab is shifted
             # This should prevent the user from changing the procedure without selecting a new tab
             madap_gui = MadapGui()
-            madap_gui.impedance_procedure = values[event].strip('-TAB_')
+            madap_gui.impedance_procedure = values[0].strip('-TAB_')
         if event == '-voltage-' and len(values['-voltage-']) and values['-voltage-'][-1] not in ('012345678890,.'):
             window['-voltage-'].update(values['-voltage-'][:-1])
         if event == '-cell_constant-' and len(values['-cell_constant-']) and values['-cell_constant-'][-1] not in ('012345678890,.'):
@@ -123,8 +123,8 @@ def main():
             madap_gui.plots = values['-EIS_PLOTS-']
             madap_gui.voltage = values['-voltage-']
             madap_gui.cell_constant = values['-cell_constant-']
-            madap_gui.suggested_circuit = values['-suggested_circuit-']
-            madap_gui.initial_value = list(values['-initial_value-'].split(","))
+            madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
+            madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.header_list = list(madap_gui.header_list.split(','))

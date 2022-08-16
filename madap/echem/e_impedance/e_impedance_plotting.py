@@ -226,5 +226,7 @@ class ImpedancePlotting(Plots):
             ax4 = fig.add_subplot(spec[1, 1])
             return fig, [ax1, ax2, ax3, ax4]
 
+        elif len(plots) == 0:
+            log.error("No plots for EIS were selected.")
         else:
             log.error("Maximum plots for EIS is exceeded.")

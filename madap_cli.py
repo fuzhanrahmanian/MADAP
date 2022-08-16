@@ -106,7 +106,7 @@ def call_impedance(data, result_dir, args):
     if args.header_list:
         # Check if args header is a list
         if isinstance(args.header_list, list):
-            header_names = args.header_list[0].split(", ")
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
         else:
             header_names = args.header_list
         freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]],\
