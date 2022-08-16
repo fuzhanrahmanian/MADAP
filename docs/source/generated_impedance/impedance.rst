@@ -1,18 +1,18 @@
 Impedance package
 =================
 
-impedance.impedance
+e\_impedance.e\_impedance
 --------------------------
 
-.. automodule:: impedance.impedance
+.. automodule:: e_impedance.e_impedance
    :members:
    :undoc-members:
    :show-inheritance:
 
-impedance.impedance\_plotting
+e\_impedance.e\_impedance\_plotting
 ------------------------------------
 
-.. automodule:: impedance.impedance_plotting
+.. automodule:: e_impedance.e_impedance_plotting
    :members:
    :undoc-members:
    :show-inheritance:

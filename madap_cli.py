@@ -6,7 +6,7 @@ import os
 from madap.utils import utils
 from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
-from madap.echem.impedance import impedance
+from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
 from madap.echem.voltammetry import voltammetry
 from pathlib import Path
@@ -105,7 +105,7 @@ def call_impedance(data, result_dir, args):
 
     if args.header_list:
         # Check if args header is a list
-        if not isinstance(args.header_list, list):
+        if isinstance(args.header_list, list):
             header_names = args.header_list[0].split(", ")
         else:
             header_names = args.header_list
@@ -122,14 +122,14 @@ def call_impedance(data, result_dir, args):
                                                             da.select_data(data, row_col[3]) \
                                                             if row_col[3] != "n" else None
 
-    Im = impedance.Impedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
+    Im = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
 
     if args.impedance_procedure == "EIS":
         log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant},\
                    suggested circuit is {args.suggested_circuit} and initial values are {args.initial_values}.")
 
         # Instantiate the procedure
-        procedure = impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit,
+        procedure = e_impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit,
                                   initial_value=eval(args.initial_values) if args.initial_values else None, cell_constant=args.cell_constant)
 
     elif args.impedance_procedure == "Mottschotcky":
