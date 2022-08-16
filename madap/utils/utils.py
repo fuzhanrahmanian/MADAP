@@ -2,7 +2,7 @@ from cgitb import reset
 import os
 
 from numpy import absolute
-import logger
+import madap.logger as logger
 import pandas as pd
 import time
 import json
