@@ -54,12 +54,13 @@ class Arrhenius(EChemProcedure):
         log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)}   [S.cm⁻¹] and activation is {round(self.activation,4)} [mJ/mol] with the score {self.fit_score}")
 
 
-    def plot(self, save_dir:str, plots:list):
+    def plot(self, save_dir:str, plots:list, optional_name:str = None):
         """Plot the raw data and/or the results of the Arrhenius analysis.
 
         Args:
             save_dir (str): Directory where the plots should be saved.
             plots (list): List of plots included in the analysis.
+            optional_name (str): Optional name for the analysis.
         """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = aplt()
@@ -80,18 +81,24 @@ class Arrhenius(EChemProcedure):
                 log.error("Arrhenius class does not have the selected plot.")
         fig.tight_layout()
 
-        name = utils.assemble_file_name(self.__class__.__name__)
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
+        plt.clf()
 
-    def save_data(self, save_dir:str):
+    def save_data(self, save_dir:str, optional_name:str = None):
         """Save the results of the analysis.
 
         Args:
             save_dir (str): Directory where the data should be saved.
+            optional_name (str): Optional name for the analysis.
         """
         save_dir = utils.create_dir(os.path.join(save_dir, "data"))
         # Save the fitted circuit
-        name = utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
+
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__, "linear_fit.json") if \
+                optional_name else utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
+
         meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
                     "arr_constant [S.cm⁻¹]": self.arrhenius_constant, "activation [mJ/mol]": self.activation,
                     "gas_constant [J/mol.K]": self.gas_constant}
@@ -104,11 +111,12 @@ class Arrhenius(EChemProcedure):
                                             "log_conductivty [ln(S/cm)]": self._log_conductivity(),
                                             "log_conductivity_fit [ln(S/cm)]":self.ln_conductivity_fit})
 
-        data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
+        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
+                        optional_name else  utils.assemble_file_name(self.__class__.__name__, "data.csv")
         utils.save_data_as_csv(save_dir, data, data_name)
 
 
-    def perform_all_actions(self, save_dir:str, plots:list):
+    def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         """Wrapper function to perform all actions:\n
          - Analyze the data \n
          - Plot the data \n
@@ -117,10 +125,11 @@ class Arrhenius(EChemProcedure):
         Args:
             save_dir (str): Directory where the data should be saved.
             plots (list): plots to be included in the analysis.
+            optional_name (str): Optional name for the analysis.
         """
         self.analyze()
-        self.plot(save_dir=save_dir, plots=plots)
-        self.save_data(save_dir=save_dir)
+        self.plot(save_dir=save_dir, plots=plots, optional_name=optional_name)
+        self.save_data(save_dir=save_dir, optional_name=optional_name)
 
     def _log_conductivity(self):
         """Convert the conductivity to log scale.

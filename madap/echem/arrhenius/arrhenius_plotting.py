@@ -89,6 +89,6 @@ class ArrheniusPlotting(Plots):
             fig = plt.figure(figsize=(6, 3))
             spec = fig.add_gridspec(1, 2)
             ax1 = fig.add_subplot(spec[0, 0])
-            ax2= fig.add_subplot(spec[0, 1])
+            ax2 = fig.add_subplot(spec[0, 1])
             return fig, [ax1, ax2]
 
