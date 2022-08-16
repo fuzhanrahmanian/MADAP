@@ -3,12 +3,12 @@ from secrets import choice
 import sys
 from ast import arguments
 import os
-from utils import utils
-import logger
-from data_acquisition import data_acquisition as da
-from echem.impedance import impedance
-from echem.arrhenius import arrhenius
-from echem.voltammetry import voltammetry
+from madap.utils import utils
+from madap.logger import logger
+from madap.data_acquisition import data_acquisition as da
+from madap.echem.impedance import impedance
+from madap.echem.arrhenius import arrhenius
+from madap.echem.voltammetry import voltammetry
 from pathlib import Path
 
 
@@ -104,7 +104,11 @@ def call_impedance(data, result_dir, args):
     """
 
     if args.header_list:
-        header_names = args.header_list[0].split(", ")
+        # Check if args header is a list
+        if not isinstance(args.header_list, list):
+            header_names = args.header_list[0].split(", ")
+        else:
+            header_names = args.header_list
         freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]],\
                                                             data[header_names[1]],\
                                                             data[header_names[2]],\
@@ -188,7 +192,27 @@ def call_voltammetry(data, result_dir, plots):
         plots = list(plots)
     Arr.perform_all_actions(result_dir, plots=plots)
 
+def start_procedure(args):
+    """Function to prepare the data for analysis.
+    It also prepares folder for results and plots.
 
+    Args:
+        args (object): Object containing arguments from parser or gui.
+    """
+
+    data = da.acquire_data(args.file)
+    log.info(f"the header of your data is: \n {data.head()}")
+    result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
+
+    if args.procedure in ["impedance", "Impedance"]:
+        call_impedance(data, result_dir, args)
+
+    elif args.procedure == "arrhenius":
+        call_arrhenius(data, result_dir, args)
+
+    elif args.procedure == "voltammetry":
+        log.info("Voltammetrys is not supported at the moment. Exiting ...")
+        exit()
 
 def main():
     log.info("==================================WELCOME TO MADAP==================================")
@@ -198,18 +222,7 @@ def main():
     args = parser.parse_args()
 
     # Acquire data
-    data = da.acquire_data(args.file)
-    log.info(f"the header of your data is: \n {data.head()}")
-    result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
-
-    if args.procedure == "impedance":
-        call_impedance(data, result_dir, args)
-
-    elif args.procedure == "arrhenius":
-        call_arrhenius(data, result_dir, args)
-
-    elif args.procedure == "voltammetry":
-        parser.add_argument("-vp", "--voltammetry_procedure", type=str, required=True, choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],)
+    start_procedure(args)
 
 
 if __name__ == "__main__":

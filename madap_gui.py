@@ -1,5 +1,7 @@
+from posixpath import split
 from tkinter import Scrollbar
 import PySimpleGUI as sg
+from madap_cli import start_procedure
 from madap.utils import gui_elements
 
 
@@ -9,19 +11,20 @@ class MadapGui:
 
     def __init__(self):
        self.procedure = "Impedance"
-       self.impedance_procedure=""
-       self.data_path = ""
-       self.result_path = ""
-       self.header_list = ""
-       self.specific=""
-       self.selected_plots = ""
-       self.voltage = 0
-       self.cell_constant = 0
-       self.suggested_circuit = ""
+       self.impedance_procedure= "EIS"
+       self.file = None
+       self.results = None
+       self.header_list = None
+       self.specific= None
+       self.plots = None
+       self.voltage = None
+       self.cell_constant = None
+       self.suggested_circuit = None
+       self.initial_values = None
 
 
 def gui_layout(madap):
-    
+
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
     layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
                         sg.Button("Arrhenius", key="-BUT_Arrhenius-"),
@@ -62,7 +65,7 @@ def gui_layout(madap):
     layout_Impedance = [[sg.TabGroup(
                         [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
                         sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black')]]
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black', enable_events=True)]]
 
     layout_Arrhenius = [[sg.Text('This is Arrhenius')]]
 
@@ -102,11 +105,11 @@ def main():
             window[f'-COL_{event}-'].update(visible=True)
             window[f'-BUT_{event}-'].update(button_color=('white', 'black'))
             madap_gui.procedure = event
-        if event in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
+        if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
             # Create an "empty" class for the selected procedure every time the tab is shifted
             # This should prevent the user from changing the procedure without selecting a new tab
             madap_gui = MadapGui()
-            madap_gui.impedance_procedure = event.strip('-TAB_')
+            madap_gui.impedance_procedure = values[event].strip('-TAB_')
         if event == '-voltage-' and len(values['-voltage-']) and values['-voltage-'][-1] not in ('012345678890,.'):
             window['-voltage-'].update(values['-voltage-'][:-1])
         if event == '-cell_constant-' and len(values['-cell_constant-']) and values['-cell_constant-'][-1] not in ('012345678890,.'):
@@ -114,22 +117,22 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) and values['-initial_value-'][-1] not in ('012345678890,.e-+[]'):
             window['-initial_value-'].update(values['-initial_value-'][:-1])
         if event == 'RUN':
-            madap_gui.data_path = values['-DATA_PATH-']
-            madap_gui.result_path = values['-RESULT_PATH-']
-            madap_gui.selected_plots = values['-EIS_PLOTS-']
+            madap_gui.procedure
+            madap_gui.file = values['-DATA_PATH-']
+            madap_gui.results = values['-RESULT_PATH-']
+            madap_gui.plots = values['-EIS_PLOTS-']
             madap_gui.voltage = values['-voltage-']
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-']
-            if values['-HEADER_OR_SPECIFIC-'] == 'Header':
-                madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-']
+            madap_gui.initial_value = list(values['-initial_value-'].split(","))
+            if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
+                madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
+                madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
-                madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-']
-            print(madap_gui.data_path)
-            print(madap_gui.result_path)
-            print(madap_gui.selected_plots)
-            print(madap_gui.voltage)
-            print(madap_gui.cell_constant)
-            print(madap_gui.suggested_circuit)
+                madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
+                madap_gui.specific = list(madap_gui.specific.split(','))
+            print(madap_gui)
+            start_procedure(madap_gui)
             window.close()
             break
     window.close()
