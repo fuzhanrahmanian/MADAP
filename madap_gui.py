@@ -65,7 +65,7 @@ def gui_layout(madap):
     layout_Impedance = [[sg.TabGroup(
                         [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
                         sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black', enable_events=True)]]
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='topleft', selected_title_color='black', enable_events=True)]]
 
     layout_Arrhenius = [[sg.Text('This is Arrhenius')]]
 
@@ -76,9 +76,9 @@ def gui_layout(madap):
         [layout_buttons],
         [layout_data],
         [layout_data_selection],
-        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True),
-        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True),
-        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True)],
+        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, size=(1000, 700), vertical_scroll_only=True),
+        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
+        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)],
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -90,7 +90,7 @@ def main():
     madap_gui = MadapGui()
     layout = gui_layout(madap_gui)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, size=(1000, 800), resizable=True)
+    window = sg.Window(title, layout, size=(1200, 1200), resizable=True)
 
     colors = (sg.theme_text_color(), sg.theme_background_color())
     while True:

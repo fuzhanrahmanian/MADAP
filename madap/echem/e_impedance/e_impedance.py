@@ -235,15 +235,11 @@ class EIS(EChemProcedure):
             plots (list): List of plot types to be plotted.
         """
         self.analyze()
-        self.plot(save_dir, plot, optional_name=optional_name)
+        self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.
-
-        Args:
-            res_imag (list): imaginary part of the residual
-            res_real (list): real part of the residual
 
         Returns:
             float: chi value of the fit
