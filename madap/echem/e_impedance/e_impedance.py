@@ -31,7 +31,6 @@ class EImpedance:
     imaginary_impedance : list[float] = field( on_setattr=frozen)
     phase_shift : list[float] = field(default=None)
 
-
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
         return f"Impedance(frequency={self.frequency}, real_impedance={self.real_impedance}, \
@@ -88,6 +87,7 @@ class EIS(EChemProcedure):
         self.custom_circuit = None
         self.z_fit = None
         self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
+        self.figure = None
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
@@ -196,9 +196,10 @@ class EIS(EChemProcedure):
                 continue
 
         fig.tight_layout()
-
+        self.figure = fig
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
+
         plot.save_plot(fig, plot_dir, name)
 
     def save_data(self, save_dir:str, optional_name:str = None):
@@ -237,6 +238,14 @@ class EIS(EChemProcedure):
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+    @property
+    def figure(self):
+        return self._figure
+
+    @figure.setter
+    def figure(self, figure):
+        self._figure = figure
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.
