@@ -1,6 +1,8 @@
-from posixpath import split
-from tkinter import Scrollbar
+from turtle import update
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
+import io
 from madap_cli import start_procedure
 from madap.utils import gui_elements
 
@@ -23,6 +25,26 @@ class MadapGui:
        self.initial_values = None
 
 
+def draw_figure(element, figure):
+    """
+    Draws the previously created "figure" in the supplied Image Element
+
+    :param element: an Image Element
+    :param figure: a Matplotlib figure
+    :return: The figure canvas
+    """
+
+    plt.close('all')  # erases previously drawn plots
+    canv = FigureCanvasAgg(figure)
+    buf = io.BytesIO()
+    canv.print_figure(buf, format='png')
+    if buf is None:
+        return None
+    buf.seek(0)
+    element.update(data=buf.read())
+    return canv
+
+
 def gui_layout(madap):
 
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
@@ -38,7 +60,7 @@ def gui_layout(madap):
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font="bold", pad=(1,(40,0)))],
                              [sg.Text(gui_elements.HEADER_OR_SPECIFIC_HELP, justification='left')],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers', size=(15,1))],
-                             sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]
+                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
@@ -71,14 +93,20 @@ def gui_layout(madap):
 
     layout_Voltammetry = [[sg.Text('This is Voltammetry')]]
 
+    procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True),
+                        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
+                        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)]]
+
+    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection)]])
+
+    col2 = sg.Column([
+        [sg.Frame('Methods:', procedure_column)],
+        [sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
 
     layout = [
         [layout_buttons],
         [layout_data],
-        [layout_data_selection],
-        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, size=(1000, 700), vertical_scroll_only=True),
-        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
-        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)],
+        [col1, col2],
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -90,7 +118,7 @@ def main():
     madap_gui = MadapGui()
     layout = gui_layout(madap_gui)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, size=(1200, 1200), resizable=True)
+    window = sg.Window(title, layout, resizable=True)
 
     colors = (sg.theme_text_color(), sg.theme_background_color())
     while True:
@@ -132,10 +160,10 @@ def main():
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.specific = list(madap_gui.specific.split(','))
             print(madap_gui)
-            start_procedure(madap_gui)
-            window.close()
-            break
-    window.close()
+            procedure = start_procedure(madap_gui)
+            window['-COL_PLOTS-'].update(visible=True)
+            draw_figure(window['-IMAGE-'], procedure.figure)
+
 
 if __name__ == '__main__':
     main()

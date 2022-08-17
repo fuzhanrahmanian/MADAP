@@ -147,6 +147,8 @@ def call_impedance(data, result_dir, args):
     # Perform all actions
     procedure.perform_all_actions(result_dir, plots=plots)
 
+    return procedure
+
 def call_arrhenius(data, result_dir, args):
     """Calling the arrhenius procedure and parse the corresponding arguments
 
@@ -205,14 +207,16 @@ def start_procedure(args):
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure in ["impedance", "Impedance"]:
-        call_impedance(data, result_dir, args)
+        procedure = call_impedance(data, result_dir, args)
 
     elif args.procedure == "arrhenius":
-        call_arrhenius(data, result_dir, args)
+        procedure = call_arrhenius(data, result_dir, args)
 
     elif args.procedure == "voltammetry":
         log.info("Voltammetrys is not supported at the moment. Exiting ...")
         exit()
+
+    return procedure
 
 def main():
     log.info("==================================WELCOME TO MADAP==================================")
