@@ -67,17 +67,17 @@ data = pd.read_csv(os.path.join(os.getcwd(),r"data/CompleteDataWithArr.csv"), se
 del data['Unnamed: 0']
 
 Ec_PC_ratio = data["EC"]/data["PC"]
-EC_PC_EMC_raio = round((data["EC"] + data["PC"])/ data["EMC"], 1)
+EC_PC_EMC_ratio = round((data["EC"] + data["PC"])/ data["EMC"], 1)
 
 
 # specify the figure markers
 marker_sign = []
 for i in range(len(data)):
-    if EC_PC_EMC_raio.unique()[0] == EC_PC_EMC_raio.iloc[i]:
+    if EC_PC_EMC_ratio.unique()[0] == EC_PC_EMC_ratio.iloc[i]:
         marker_sign.append("o")
-    elif EC_PC_EMC_raio.unique()[1] == EC_PC_EMC_raio.iloc[i]:
+    elif EC_PC_EMC_ratio.unique()[1] == EC_PC_EMC_ratio.iloc[i]:
         marker_sign.append("^")
-    elif EC_PC_EMC_raio.unique()[2] == EC_PC_EMC_raio.iloc[i]:
+    elif EC_PC_EMC_ratio.unique()[2] == EC_PC_EMC_ratio.iloc[i]:
         marker_sign.append("D")
 
 # append the EC/PC ratio to the dataFrame
@@ -101,17 +101,18 @@ def mscatter(x,y,ax=None, m=None, **kw):
         sc.set_paths(paths)
     return sc
 
-
+# plot the activation vs. (EC/PC) colorbar (LiPF6) scatter point circle and triangle for different EMC concentrationS
 fig, ax = plt.subplots(figsize=(4.9,4))
 scatter = mscatter(x=np.array(data["EC/PC"]) , y=  np.array(data["activation_[mJ/mol]"]),\
                     c= np.array(data["LiPF6"]), s=9, m=data["marker"], ax=ax)
 
-legend_elements = [Line2D([0], [0], marker='o', color='k', label=f'label=f"(EC + PC): EMC = {EC_PC_EMC_raio.unique()[0]}',
-                          markerfacecolor='k', markersize=15),
-                   Line2D([0], [0], marker='o', color='k', label=f"(EC + PC): EMC = {EC_PC_EMC_raio.unique()[0]}",
-                          markerfacecolor='k', markersize=15),
-                   Line2D([0], [0], marker='o', color='k', label=f'(EC + PC): EMC = {EC_PC_EMC_raio.unique()[0]}',
-                          markerfacecolor='k', markersize=15)]
+# Create a customize legend for the plot
+legend_elements = [Line2D([0], [0], marker='o', color='k', label=f"(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[0]}",
+                          markerfacecolor='k', linestyle="None"),
+                   Line2D([0], [0], marker='^', color='k', label=f"(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[1]}",
+                          markerfacecolor='k', linestyle="None"),
+                   Line2D([0], [0], marker='D', color='k', label=f'(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[2]}',
+                          markerfacecolor='k', linestyle="None")] # , markersize=15
 
 # add colorbar
 cb = plt.colorbar(scatter)
@@ -123,5 +124,6 @@ plt.ylabel(r"$E$ $[mJ/mol]$")
 
 #plt.legend(handles, labels)
 plt.legend(handles=legend_elements)#, loc="best", frameon=False)
+
 #plt.show()
 plt.savefig(os.path.join(save_dir, "activation_EC_PC_EMC.svg"))
