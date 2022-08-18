@@ -1,0 +1,6 @@
+add activation , custom fit conductivity , default conductivity, bode, nyquist, arrhenius,
+nyquist fit default/custom(x2), residual dedault/custom (x2), 
+arrhenius fit default/custom (x2), cell constant ----> 13 columns in total
+
+
+

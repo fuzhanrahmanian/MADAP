@@ -124,6 +124,5 @@ plt.ylabel(r"$E$ $[mJ/mol]$")
 
 #plt.legend(handles, labels)
 plt.legend(handles=legend_elements)#, loc="best", frameon=False)
-
 #plt.show()
 plt.savefig(os.path.join(save_dir, "activation_EC_PC_EMC.svg"))
