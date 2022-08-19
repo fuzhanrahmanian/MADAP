@@ -45,38 +45,35 @@ def draw_figure(element, figure):
     return canv
 
 
-def gui_layout(madap):
+def gui_layout(madap, colors):
 
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
     layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
-                        sg.Button("Arrhenius", key="-BUT_Arrhenius-"),
-                        sg.Button("Voltammetry", key="-BUT_Voltammetry-")]]
+                        sg.Button("Arrhenius", key="-BUT_Arrhenius-", button_color=colors),
+                        sg.Button("Voltammetry", key="-BUT_Voltammetry-", button_color=colors)]]
 
     # ----------- Create a layout with a field for a data path and a result path ----------- #
-    layout_data = [[sg.Text('Data Path', size=(15, 1)), sg.InputText(key='-DATA_PATH-', size=(55,1)), sg.FileBrowse(key='-BROWSE_DATA_PATH-')],
-                   [sg.Text('Result Path', size=(15, 1)), sg.InputText(key='-RESULT_PATH-', size=(55,1)), sg.FolderBrowse(key='-BROWSE_RESULT_PATH-')],
+    layout_data = [[sg.Text('Data Path', size=(10, 1)), sg.InputText(key='-DATA_PATH-', size=(55,1)), sg.FileBrowse(key='-BROWSE_DATA_PATH-')],
+                   [sg.Text('Result Path', size=(10, 1)), sg.InputText(key='-RESULT_PATH-', size=(55,1)), sg.FolderBrowse(key='-BROWSE_RESULT_PATH-')],
                 ]
 
-    layout_data_selection = [[sg.Text('Headers or specific',justification='left', font="bold", pad=(1,(40,0)))],
-                             [sg.Text(gui_elements.HEADER_OR_SPECIFIC_HELP, justification='left')],
-                             [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers', size=(15,1))],
-                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]]
+    layout_data_selection = [[sg.Text('Headers or specific',justification='left', font=("Arial", 13))],
+                             [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers')],
+                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="freq, real, imag")]]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
-    tab_layout_EIS = [[sg.Text('This are the settings for the EIS procedure', size = (80,1))],
-                    [sg.Text('Plots',justification='left', font="bold",  pad=(1,(40,0))),],
-                    [sg.Listbox([x for x in madap.eis_plots], key='-EIS_PLOTS-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE)],
-                    [sg.Text('Voltage',justification='left', font="bold", pad=(1,(40,0))), ],
-                    [sg.Text(gui_elements.VOLTAGE_HELP, justification='left'), sg.InputText(key="-voltage-", enable_events=True), sg.Text('[V]')],
-                    [sg.Text('Cell constant',justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.CELL_CONSTANT_HELP, justification='left'), sg.InputText(key="-cell_constant-", enable_events=True), sg.Text('[1/cm]')],
-                    [sg.Text('Suggeted Circuit',justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.SUGGESTED_CIRCUIT_HELP, justification='left')],
-                    [sg.InputText(key="-suggested_circuit-", size = (80,1), default_text="R0-p(R1,CPE1)")],
-                    [sg.Text('Initial Value', justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.INITIAL_VALUES_HELP, justification='left')],
-                    [sg.InputText(key="-initial_value-", size = (80,1), enable_events=True, default_text="[800,1e+14,1e-9,0.8]")]]
+    tab_layout_EIS = [[sg.Text('This are the parameters for the EIS procedure')],
+                    [sg.Text('Voltage (optional)',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [ sg.InputText(key="-voltage-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True), sg.Text('[V]')],
+                    [sg.Text('Cell constant (optional)',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.InputText(key="-cell_constant-", tooltip=gui_elements.CELL_CONSTANT_HELP, enable_events=True), sg.Text('[1/cm]')],
+                    [sg.Text('Suggeted Circuit',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP, default_text="R0-p(R1,CPE1)")],
+                    [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP, default_text="[800,1e+14,1e-9,0.8]")],
+                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.Listbox([x for x in madap.eis_plots], key='-EIS_PLOTS-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
 
     tab_layout_Liss = [[sg.Text('This is inside Lissajous')],
                 [sg.Input(key='-inLiss-')]]
@@ -85,23 +82,25 @@ def gui_layout(madap):
                     [sg.Input(key='-inMott-')]]
 
     layout_Impedance = [[sg.TabGroup(
-                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
-                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='topleft', selected_title_color='black', enable_events=True)]]
+                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_x=True, expand_y=True),
+                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_x=True, expand_y=True),
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_x=True, expand_y=True)]],
+                        tab_location='topleft', selected_title_color='black', enable_events=True, expand_x=True, expand_y=True)]]
 
     layout_Arrhenius = [[sg.Text('This is Arrhenius')]]
 
     layout_Voltammetry = [[sg.Text('This is Voltammetry')]]
 
-    procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True),
-                        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
-                        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)]]
+    procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
+                        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
+                        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True)]]
 
-    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection)]])
+    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15), size=(550, 100), expand_x=True, expand_y=True)],
+                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 500), expand_x=True, expand_y=True)]],
+                      expand_x=True, expand_y=True)
 
-    col2 = sg.Column([
-        [sg.Frame('Methods:', procedure_column)],
-        [sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
+    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-', expand_x=True, expand_y=True)]],
+                        expand_x=True, expand_y=True, size=(550, 620))
 
     layout = [
         [layout_buttons],
@@ -114,13 +113,13 @@ def gui_layout(madap):
 
 def main():
 
-    sg.theme("DarkBlue")
+    sg.theme("LightGreen6")
     madap_gui = MadapGui()
-    layout = gui_layout(madap_gui)
-    title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, resizable=True)
-
     colors = (sg.theme_text_color(), sg.theme_background_color())
+    layout = gui_layout(madap_gui, colors)
+    title = 'MADAP: Modular Automatic Data Analysis Platform'
+    window = sg.Window(title, layout, resizable=True, size=(600, 770))
+
     while True:
         event, values = window.read()
         print(event, values)
@@ -136,7 +135,6 @@ def main():
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
             # Create an "empty" class for the selected procedure every time the tab is shifted
             # This should prevent the user from changing the procedure without selecting a new tab
-            madap_gui = MadapGui()
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
         if event == '-voltage-' and len(values['-voltage-']) and values['-voltage-'][-1] not in ('012345678890,.'):
             window['-voltage-'].update(values['-voltage-'][:-1])

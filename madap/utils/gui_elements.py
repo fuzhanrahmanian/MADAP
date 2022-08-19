@@ -1,27 +1,26 @@
 # Just a file containing some lengthy text
 HEADER_OR_SPECIFIC_HELP="If the data selection is 'Headers', insert the headers for: " \
-                        "\n - frequency [Hz] \n - real impedance [\u2126] \n - imaginary_impedance [\u2126] \n - phase shift \u03c6 [\u00b0]. \n" \
-                        "Example: 'freq, real, imag, n'" \
+                        "\nfrequency [Hz], real impedance [\u2126], imaginary impedance, phase shift \u03c6[\u00b0] (optional). Order is relevant.\n" \
+                        "Example: 'freq, real, imag'" \
                         "\n \n"\
-                        "If the data selection is 'Specific' insert Row and column number.\n " \
-                        "Format:\n 'start_row,end_row,start_column,end_column': 1,10,1,2 translates to rows 1 to 10 and columns 1 to 2.\n" \
-                        "Example: '0,40,0,1, 0,40,1,2, 0,40,2,3, n'\n" \
-                        "\n \n"\
-                        "Write 'n' if it is not applicable. Order is relevant. "
+                        "If the data selection is 'Specific' insert the row and column numbers. Order is relevant." \
+                        "\nFormat: 'start_row,end_row,start_column,end_column': 1,10,1,2 translates to rows 1 to 10 and columns 1 to 2." \
+                        "Example: '0,40,0,1, 0,40,1,2, 0,40,2,3'"
 
-SUGGESTED_CIRCUIT_HELP="Suggested circuit if applicable.\n" \
-                        "Available circuit elements are 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R'," \
-                        "'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'.\n" \
-                        "Parallel circuit can be defined as p(element1, element2)" \
-                        "and the series circuit like element1_element2, i.e. : R0-p(R1,CPE1)"
+SUGGESTED_CIRCUIT_HELP="Suggested circuit (optional).\n" \
+                        "Available circuit elements are: 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R'," \
+                        "'p', 'L', 'TLMQ', 'CPE', 'G', 'La', 'T', 'Gs'." \
+                        "\nParallel circuit can be defined as p(element1, element2) " \
+                        "and the series circuit like element1_element2."\
+                        "\nFormat: R0-p(R1,CPE1)"
 
 INITIAL_VALUES_HELP="Initial values for the suggested circuit." \
-                    "\nFormat: element1, element2, ..." \
-                    "\nIt will be used just if the suggested_circuit is available, i.e.: [800,1e+14,1e-9,0.8] "
+                    "\nIt will be used just if the suggested circuit was defined. " \
+                    "\nFormat: [element1, element2, ...], i.e.: [800,1e+14,1e-9,0.8] "
 
-VOLTAGE_HELP="Applied voltage if applicable"
+VOLTAGE_HELP="Applied voltage (optional)"
 
-CELL_CONSTANT_HELP="Cell constant if applicable"
+CELL_CONSTANT_HELP="Cell constant (optional)"
 
 
 def plotting_element(subparser, plots):
