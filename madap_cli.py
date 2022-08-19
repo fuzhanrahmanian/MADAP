@@ -109,18 +109,18 @@ def call_impedance(data, result_dir, args):
             header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
         else:
             header_names = args.header_list
-        freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]],\
-                                                            data[header_names[1]],\
-                                                            data[header_names[2]],\
-                                                            data[header_names[3]] \
-                                                            if header_names[3] != "n" else None
+
+        phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
+
+        freq_data, real_data, imag_data = data[header_names[0]],\
+                                          data[header_names[1]],\
+                                          data[header_names[2]]
     if args.specific:
         row_col = args.specific[0].split(", ")
-        freq_data, real_data, imag_data, phase_shift_data = da.select_data(data, row_col[0]), \
-                                                            da.select_data(data, row_col[1]), \
-                                                            da.select_data(data, row_col[2]), \
-                                                            da.select_data(data, row_col[3]) \
-                                                            if row_col[3] != "n" else None
+        phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
+        freq_data, real_data, imag_data = da.select_data(data, row_col[0]), \
+                                          da.select_data(data, row_col[1]), \
+                                          da.select_data(data, row_col[2])
 
     Im = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
 
