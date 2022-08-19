@@ -47,6 +47,9 @@ def format_data(data):
         A readable format of data for analysis
     """
     if not data is None:
+        if isinstance(data, list):
+            data = np.array(data, dtype=np.float32)
+
         if not np.array_equal(data, data.astype(float)):
             data = data.astype(np.float)
 
