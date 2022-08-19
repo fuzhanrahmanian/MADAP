@@ -77,7 +77,7 @@ class EIS(EChemProcedure):
         self.val_low_freq = val_low_freq
         self.cell_constant = cell_constant
         self.conductivity = None
-        self.rmse_error = None
+        self.rmse_calc = None
         self.num_rc_linkk = None
         self.eval_fit_linkk = None
         self.z_linkk = None
@@ -128,19 +128,19 @@ class EIS(EChemProcedure):
                 rmse_guess = circuits.fitting.rmse(z_circuit, z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
-                if self.rmse_error is None:
-                    self.rmse_error = rmse_guess
+                if self.rmse_calc is None:
+                    self.rmse_calc = rmse_guess
 
-                if rmse_guess <= self.rmse_error:
-                    self.rmse_error = rmse_guess
+                if rmse_guess <= self.rmse_calc:
+                    self.rmse_calc = rmse_guess
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
         else:
             self.custom_circuit = circuits.CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
             self.custom_circuit.fit(f_circuit, z_circuit)
             self.z_fit = self.custom_circuit.predict(f_circuit)
-            self.rmse_error = circuits.fitting.rmse(z_circuit, self.z_fit)
-            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_error}")
+            self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
+            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_calc}")
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
@@ -215,7 +215,7 @@ class EIS(EChemProcedure):
         optional_name else utils.assemble_file_name(self.__class__.__name__, "circuit.json")
 
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
-        added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_error,
+        added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
                       "conductivity [S/cm]": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
