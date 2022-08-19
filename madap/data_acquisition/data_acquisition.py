@@ -48,7 +48,7 @@ def format_data(data):
     """
     if not data is None:
         if isinstance(data, list):
-            data = np.array(data, dtype=np.float32)
+            data = np.array(data, dtype=np.float64)
 
         if not np.array_equal(data, data.astype(float)):
             data = data.astype(np.float)
