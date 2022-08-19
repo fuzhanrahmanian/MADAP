@@ -5,6 +5,7 @@ import numpy as np
 import math
 from madap.utils import utils
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 from madap.echem.procedure import EChemProcedure
 from madap.echem.arrhenius.arrhenius_plotting import ArrheniusPlotting as aplt
 from madap import logger
@@ -37,6 +38,7 @@ class Arrhenius(EChemProcedure):
     ln_conductivity_fit = None
     intercept = None
     coefficients = None
+    mse_calc = None
 
     def analyze(self):
         """Analyze the data and fit the Arrhenius equation.
@@ -50,6 +52,7 @@ class Arrhenius(EChemProcedure):
         self.arrhenius_constant = math.exp(reg.intercept_)
         self.activation = reg.coef_[0]*(-self.gas_constant)
         self.ln_conductivity_fit = reg.predict(self.inverted_scale_temperatures.values.reshape(-1,1))
+        self.mse_calc = mean_squared_error(self._log_conductivity(), self.ln_conductivity_fit)
 
         log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)}   [S.cm⁻¹] and activation is {round(self.activation,4)} [mJ/mol] with the score {self.fit_score}")
 
@@ -99,7 +102,7 @@ class Arrhenius(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__, "linear_fit.json") if \
                 optional_name else utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
 
-        meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
+        meta_data = {"R2_score": self.fit_score, "MSE": self.mse_calc, 'fit_slope': self.coefficients, "fit_intercept": self.intercept,
                     "arr_constant [S.cm⁻¹]": self.arrhenius_constant, "activation [mJ/mol]": self.activation,
                     "gas_constant [J/mol.K]": self.gas_constant}
 
