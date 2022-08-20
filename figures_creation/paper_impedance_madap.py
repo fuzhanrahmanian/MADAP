@@ -4,6 +4,7 @@
 # copy the current dataFrame and add predicted conductivity and resistance
 # headers are ;experimentID;electrolyteLabel;PC;EC;EMC;LiPF6;inverseTemperature;temperature;conductivity;resistance;Z';Z'';frequency;electrolyteAmount
 # plot conductivity vs. (EC/PC) colorbar (LiPF6/EMC)
+<<<<<<< HEAD
 # add default and get circuits to the dataFrame
 import sys
 import os
@@ -91,3 +92,6 @@ for exp_id in tqdm(data["experimentID"].unique()):
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
+=======
+# add default and get circuits to the dataFrame
+>>>>>>> 4617e37 (added scripts for figure creation)
