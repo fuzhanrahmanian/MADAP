@@ -181,8 +181,15 @@ def gui_layout(madap):
     layout = [
         [layout_buttons],
         [layout_data],
+<<<<<<< HEAD
         [col1, col2],
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
+=======
+        [layout_data_selection],
+        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True),
+        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True),
+        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True)],
+>>>>>>> 8160471 (add scrolling feature)
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -195,6 +202,12 @@ def main():
 
     # Create class with initial values
     madap_gui = MadapGui()
+<<<<<<< HEAD
+=======
+    layout = gui_layout(madap_gui)
+    title = 'MADAP: Modular Automatic Data Analysis Platform'
+    window = sg.Window(title, layout, size=(1000, 800), resizable=True)
+>>>>>>> 8160471 (add scrolling feature)
 
     # Get primary colors and assemble window
     colors = (sg.theme_text_color(), sg.theme_background_color())
