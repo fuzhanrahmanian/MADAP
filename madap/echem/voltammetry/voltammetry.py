@@ -1,8 +1,8 @@
 import os
 from attrs import define, field
 from attrs.setters import frozen
-from madap import logger
-from echem.procedure import EChemProcedure
+from madap.logger import logger
+from madap.echem.procedure import EChemProcedure
 
 
 log = logger.get_logger("voltammetry")

@@ -78,7 +78,7 @@ class ArrheniusPlotting(Plots):
         Returns:
             fig, ax: Figure and axis of the subplot.
         """
-
+        plt.close('all')
         if len(plots)==1:
             fig = plt.figure(figsize=(3, 3))
             spec = fig.add_gridspec(1, 1)

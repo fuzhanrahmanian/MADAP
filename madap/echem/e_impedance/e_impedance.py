@@ -3,15 +3,17 @@ import os
 import json
 import numpy as np
 import warnings
-import impedance as imp
 from attrs import define, field
 from attrs.setters import frozen
 
+import impedance.validation as validation
+import impedance.preprocessing as preprocessing
+import impedance.models.circuits as circuits
 from madap.utils import utils
 from madap.data_acquisition import data_acquisition as da
 from madap import logger
 from madap.echem.procedure import EChemProcedure
-from madap.echem.impedance.impedance_plotting import ImpedancePlotting as iplt
+from madap.echem.e_impedance.e_impedance_plotting import ImpedancePlotting as iplt
 
 warnings.warn("deprecated", DeprecationWarning)
 # reference the impedance library
@@ -19,7 +21,7 @@ log = logger.get_logger("impedance")
 
 # pylint: disable=unsubscriptable-object
 @define
-class Impedance:
+class EImpedance:
     """Class for data definition that will be used during the Impedance analysis.
         The data includes the following: frequency, real impedance, imaginary impedance,
         and the phase shift. These attributes are all pandas.Series. and will stay immutable except the phase shift.
@@ -28,7 +30,6 @@ class Impedance:
     real_impedance : list[float] = field(on_setattr=frozen)
     imaginary_impedance : list[float] = field( on_setattr=frozen)
     phase_shift : list[float] = field(default=None)
-
 
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
@@ -76,7 +77,7 @@ class EIS(EChemProcedure):
         self.val_low_freq = val_low_freq
         self.cell_constant = cell_constant
         self.conductivity = None
-        self.rmse_error = None
+        self.rmse_calc = None
         self.num_rc_linkk = None
         self.eval_fit_linkk = None
         self.z_linkk = None
@@ -86,6 +87,7 @@ class EIS(EChemProcedure):
         self.custom_circuit = None
         self.z_fit = None
         self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
+        self.figure = None
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
@@ -98,22 +100,22 @@ class EIS(EChemProcedure):
         f_circuit, z_circuit = np.array(self.impedance.frequency), np.array(self.impedance.real_impedance +
                1j*self.impedance.imaginary_impedance)
 
-        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, self.res_real, self.res_imag = imp.linKK(f_circuit, z_circuit, c=self.cut_off, max_M=self.max_rc_element,
+        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, self.res_real, self.res_imag = validation.linKK(f_circuit, z_circuit, c=self.cut_off, max_M=self.max_rc_element,
                                                                         fit_type=self.fit_type, add_cap=self.val_low_freq)
         self.chi_val = self._chi_calculation()
         log.info(f"Chi value from lin_KK method is {self.chi_val}")
 
         if any(x < 0 for x in self.impedance.imaginary_impedance):
-            f_circuit, z_circuit = imp.preprocessing.ignoreBelowX(f_circuit, z_circuit)
+            f_circuit, z_circuit = preprocessing.ignoreBelowX(f_circuit, z_circuit)
 
         # if the user did not choose any circuit, some default suggestions will be applied.
         if (self.suggested_circuit and self.initial_value) is None:
-            with open(os.path.join(utils.PATH,"suggested_circuits.json"), "r") as file:
+            with open(os.path.join("suggested_circuits.json"), "r") as file:
                 suggested_circuits = json.load(file)
 
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
-                custom_circuit_guess = imp.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
+                custom_circuit_guess = circuits.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
 
                 try:
                     custom_circuit_guess.fit(f_circuit, z_circuit)
@@ -123,22 +125,22 @@ class EIS(EChemProcedure):
                     continue
 
                 z_fit_guess = custom_circuit_guess.predict(f_circuit)
-                rmse_guess = imp.fitting.rmse(z_circuit, z_fit_guess)
+                rmse_guess = circuits.fitting.rmse(z_circuit, z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
-                if self.rmse_error is None:
-                    self.rmse_error = rmse_guess
+                if self.rmse_calc is None:
+                    self.rmse_calc = rmse_guess
 
-                if rmse_guess <= self.rmse_error:
-                    self.rmse_error = rmse_guess
+                if rmse_guess <= self.rmse_calc:
+                    self.rmse_calc = rmse_guess
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
         else:
-            self.custom_circuit = imp.CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
+            self.custom_circuit = circuits.CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
             self.custom_circuit.fit(f_circuit, z_circuit)
             self.z_fit = self.custom_circuit.predict(f_circuit)
-            self.rmse_error = imp.fitting.rmse(z_circuit, self.z_fit)
-            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_error}")
+            self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
+            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_calc}")
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
@@ -194,9 +196,10 @@ class EIS(EChemProcedure):
                 continue
 
         fig.tight_layout()
-
+        self.figure = fig
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
+
         plot.save_plot(fig, plot_dir, name)
 
     def save_data(self, save_dir:str, optional_name:str = None):
@@ -212,7 +215,7 @@ class EIS(EChemProcedure):
         optional_name else utils.assemble_file_name(self.__class__.__name__, "circuit.json")
 
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
-        added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_error,
+        added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
                       "conductivity [S/cm]": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
@@ -233,15 +236,19 @@ class EIS(EChemProcedure):
             plots (list): List of plot types to be plotted.
         """
         self.analyze()
-        self.plot(save_dir, plot, optional_name=optional_name)
+        self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+    @property
+    def figure(self):
+        return self._figure
+
+    @figure.setter
+    def figure(self, figure):
+        self._figure = figure
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.
-
-        Args:
-            res_imag (list): imaginary part of the residual
-            res_real (list): real part of the residual
 
         Returns:
             float: chi value of the fit

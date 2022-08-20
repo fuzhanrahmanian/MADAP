@@ -1,5 +1,5 @@
 import os
-from madap import logger
+from madap.logger import logger
 import pandas as pd
 import numpy as np
 
@@ -47,6 +47,9 @@ def format_data(data):
         A readable format of data for analysis
     """
     if not data is None:
+        if isinstance(data, list):
+            data = np.array(data, dtype=np.float64)
+
         if not np.array_equal(data, data.astype(float)):
             data = data.astype(np.float)
 
