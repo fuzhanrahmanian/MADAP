@@ -8,6 +8,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+import re
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
@@ -37,44 +38,56 @@ plot_type = ["nyquist" ,"nyquist_fit", "residual", "bode"]
 # load the data
 data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
 del data['Unnamed: 0']
-
+temperatures = data["temperature [°C]"].unique().tolist()
+temperatures.sort()
 # one time train without a custom circuit and with the default circuit
 if DEFAULTTRAIN:
-    for exp_id in tqdm(data["experimentID"].unique()):
-        for temp in data["temperature [°C]"].unique():
-        # get the data for the current experiment
-            freq_data =eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"][0])
-            real_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][0])
-            imag_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "imaginary impedance Z'' [Ohm]"][0])
+    suggested_circuit="R0-p(R1,CPE1)"
+    initial_value=[800,1e+14,1e-9,0.8]
+else:
+    suggested_circuit= None
+    initial_value= None
+
+ind_data = 0
+for exp_id in tqdm(data["experimentID"].unique()):
+    for temp in tqdm(temperatures):
+    # get the data for the current experiment
+        print(f"The index is {ind_data}")
+        print(len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]))
+        if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
+            freq_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"][ind_data])
+            real_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][ind_data])
+            imag_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "imaginary impedance Z'' [Ohm]"][ind_data])
             phase_shift_data = None
-            cell_constant = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "cell constant, standard deviation"][0])[0]
+            cell_constant = float(re.findall(r'\b(\d*\.?\d+)', data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "cell constant, standard deviation"][ind_data])[0])
+
             # initialize the Impedance class
             Im = imp.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), phase_shift_data)
 
             # initialis the EIS procedure
-            Eis  = imp.EIS(Im, voltage=None, suggested_circuit="R0-p(R1,CPE1)",
-                                    initial_value=[800,1e+14,1e-9,0.8], cell_constant = cell_constant)
+            Eis  = imp.EIS(Im, voltage=None, suggested_circuit=suggested_circuit,
+                                    initial_value=initial_value, cell_constant = cell_constant)
             # analyze the data
             Eis.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
 
-            # add phaseshift, resistance, Conductivity , Circuit, circuits values, fit score RMSE, errors/confidance
-            # "Fit": true, "Parameters": [1111.447578481177, 481035473447764.56, 7.910124148034937e-08, 0.881950020624159], 
-            # "Confidence": [662.1935795742313, 0.007738940308997105, 9.150118977335364e-09, 0.015475407455327397], 
-            # "rc_linKK": 6, "eval_fit_linKK": 0.7982701895051114, "RMSE_fit_error": 5154.242270867189,
-            # "conductivity [S/cm]": 0.0018894278422646855}
             #1. phase_shift
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "phase_shift \u03c6 [\u00b0]"] = Eis.impedance.phase_shift
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "phase_shift \u03c6 [\u00b0]"] = str(Eis.impedance.phase_shift)
             #2. conductivity
             data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_conductivity_default [S/cm]"] = Eis.conductivity
-            #3. circuit that fit , type of fit, true or false
-            #4. parameters plus theirs errors/confidance
-            #5. RMSE of the fit
-            #6. rc_linKK
-            #7. eval_fit_linKK
-            #8. resistance [Ohm]
+            #3. parameters plus theirs errors/confidance
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_fit_params_default"] = str([(val, err) for val, err in zip(Eis.custom_circuit.parameters_, Eis.custom_circuit.conf_)])
+            #4. RMSE of the fit
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_rmse_default"] = Eis.rmse_calc
+            #5. num_rc_linKK
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_num_rc_linKK_default"] = Eis.num_rc_linkk
+            #6. eval_fit_linKK
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madao_eval_fit_linKK_default"] = Eis.eval_fit_linkk
+            #7. resistance [Ohm]
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_resistance_default [Ohm"]=  Eis.custom_circuit.parameters_[0]
+            #8 chi_value
+            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_chi_square_dafault"] = Eis.chi_val
+            ind_data += 1
 
-if CUSTOMTRAIN: pass
-# one time train with a custom circuit
-        #print(data.head(n=20))
+data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
-data.to_csv(os.path.join(os.getcwd(),r"data/CompleteDataWithimp.csv"), sep=";", index=True)
+data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
