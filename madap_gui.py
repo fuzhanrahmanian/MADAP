@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 from cgitb import enable
 from madap_cli import start_procedure
 import matplotlib.pyplot as plt
@@ -7,18 +5,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
 import io
 import time
-=======
-from posixpath import split
-from tkinter import Scrollbar
-=======
-from turtle import update
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasAgg
->>>>>>> c0e295a (Added functionallity for including plots)
-import PySimpleGUI as sg
-import io
-from madap_cli import start_procedure
->>>>>>> e1ec172 (More work on the GUI)
 from madap.utils import gui_elements
 
 
@@ -41,10 +27,6 @@ class MadapGui:
        self.initial_values = None
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c0e295a (Added functionallity for including plots)
 def draw_figure(element, figure):
     """
     Draws the previously created "figure" in the supplied Image Element
@@ -64,7 +46,6 @@ def draw_figure(element, figure):
     element.update(data=buf.read())
     return canv
 
-<<<<<<< HEAD
 def validate_fields(madap_gui):
     if madap_gui.file == '':
         sg.po('The data path is empty. Select a supported dataset file.', title='Input Error')
@@ -91,16 +72,6 @@ def validate_fields(madap_gui):
                 return False
 
 def gui_layout(madap, colors):
-=======
-=======
-
-<<<<<<< HEAD
->>>>>>> c0e295a (Added functionallity for including plots)
-def gui_layout(madap):
->>>>>>> e1ec172 (More work on the GUI)
-=======
-def gui_layout(madap, colors):
->>>>>>> b6f9522 (Improved GUI desing and hears handling)
 
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
     layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
@@ -112,8 +83,6 @@ def gui_layout(madap, colors):
                    [sg.Text('Result Path', size=(10, 1)), sg.InputText(key='-RESULT_PATH-', size=(55,1)), sg.FolderBrowse(key='-BROWSE_RESULT_PATH-')],
                 ]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     # ----------- Create a layout with a field for a data selection options ----------- #
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font=("Arial", 13))],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers')],
@@ -132,47 +101,6 @@ def gui_layout(madap, colors):
                     [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP, default_text="[800,1e+14,1e-9,0.8]")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-', size=(50,len(madap.eis_plots)+1), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
-=======
-    layout_data_selection = [[sg.Text('Headers or specific',justification='left', font="bold", pad=(1,(40,0)))],
-                             [sg.Text(gui_elements.HEADER_OR_SPECIFIC_HELP, justification='left')],
-                             [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers', size=(15,1))],
-                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]]
-
-
-    # ----------- Create tabs for Impedance procedure ----------- #
-    tab_layout_EIS = [[sg.Text('This are the settings for the EIS procedure', size = (80,1))],
-                    [sg.Text('Plots',justification='left', font="bold",  pad=(1,(40,0))),],
-                    [sg.Listbox([x for x in madap.eis_plots], key='-EIS_PLOTS-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE)],
-                    [sg.Text('Voltage',justification='left', font="bold", pad=(1,(40,0))), ],
-                    [sg.Text(gui_elements.VOLTAGE_HELP, justification='left'), sg.InputText(key="-voltage-", enable_events=True), sg.Text('[V]')],
-                    [sg.Text('Cell constant',justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.CELL_CONSTANT_HELP, justification='left'), sg.InputText(key="-cell_constant-", enable_events=True), sg.Text('[1/cm]')],
-                    [sg.Text('Suggeted Circuit',justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.SUGGESTED_CIRCUIT_HELP, justification='left')],
-                    [sg.InputText(key="-suggested_circuit-", size = (80,1), default_text="R0-p(R1,CPE1)")],
-                    [sg.Text('Initial Value', justification='left', font="bold", pad=(1,(40,0)))],
-                    [sg.Text(gui_elements.INITIAL_VALUES_HELP, justification='left')],
-                    [sg.InputText(key="-initial_value-", size = (80,1), enable_events=True, default_text="[800,1e+14,1e-9,0.8]")]]
->>>>>>> 1740bbb (Compeladted first version of EIS GUI)
-=======
-    layout_data_selection = [[sg.Text('Headers or specific',justification='left', font=("Arial", 13))],
-                             [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers')],
-                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="freq, real, imag")]]
-
-
-    # ----------- Create tabs for Impedance procedure ----------- #
-    tab_layout_EIS = [[sg.Text('This are the parameters for the EIS procedure')],
-                    [sg.Text('Voltage (optional)',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [ sg.InputText(key="-voltage-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True), sg.Text('[V]')],
-                    [sg.Text('Cell constant (optional)',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-cell_constant-", tooltip=gui_elements.CELL_CONSTANT_HELP, enable_events=True), sg.Text('[1/cm]')],
-                    [sg.Text('Suggeted Circuit',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP, default_text="R0-p(R1,CPE1)")],
-                    [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP, default_text="[800,1e+14,1e-9,0.8]")],
-                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.Listbox([x for x in madap.eis_plots], key='-EIS_PLOTS-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
->>>>>>> b6f9522 (Improved GUI desing and hears handling)
 
     tab_layout_Liss = [[sg.Text('This is inside Lissajous')],
                 [sg.Input(key='-inLiss-')]]
@@ -182,27 +110,10 @@ def gui_layout(madap, colors):
 
     # ----------- Layout the Impedance Options (Three TABS) ----------- #
     layout_Impedance = [[sg.TabGroup(
-<<<<<<< HEAD
-<<<<<<< HEAD
                         [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_y=True),
                         sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_y=True),
                         sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_y=True)]],
                         tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]]
-=======
-                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
-                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
-<<<<<<< HEAD
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black', enable_events=True)]]
->>>>>>> e1ec172 (More work on the GUI)
-=======
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='topleft', selected_title_color='black', enable_events=True)]]
->>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
-=======
-                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_x=True, expand_y=True),
-                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_x=True, expand_y=True),
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_x=True, expand_y=True)]],
-                        tab_location='topleft', selected_title_color='black', enable_events=True, expand_x=True, expand_y=True)]]
->>>>>>> b6f9522 (Improved GUI desing and hears handling)
 
     # ----------- Layout the Arrhenius Options ----------- #
     layout_Arrhenius = [[sg.Text('This are the parameters for the Arrhenius procedure')],
@@ -212,16 +123,6 @@ def gui_layout(madap, colors):
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_Voltammetry = [[sg.Text('This is Voltammetry')]]
 
-    procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
-                        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
-                        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True)]]
-
-    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15), size=(550, 100), expand_x=True, expand_y=True)],
-                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 500), expand_x=True, expand_y=True)]],
-                      expand_x=True, expand_y=True)
-
-    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-', expand_x=True, expand_y=True)]],
-                        expand_x=True, expand_y=True, size=(550, 620))
 
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
     procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
@@ -240,25 +141,8 @@ def gui_layout(madap, colors):
     layout = [
         [layout_buttons],
         [layout_data],
-<<<<<<< HEAD
-<<<<<<< HEAD
         [col1, col2],
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
-=======
-        [layout_data_selection],
-<<<<<<< HEAD
-        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True),
-        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True),
-        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True)],
->>>>>>> 8160471 (add scrolling feature)
-=======
-        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, size=(1000, 700), vertical_scroll_only=True),
-        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
-        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)],
->>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
-=======
-        [col1, col2],
->>>>>>> c0e295a (Added functionallity for including plots)
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -266,26 +150,11 @@ def gui_layout(madap, colors):
 
 def main():
 
-<<<<<<< HEAD
     # Select a theme
     sg.theme("LightGreen6")
 
     # Create class with initial values
     madap_gui = MadapGui()
-<<<<<<< HEAD
-=======
-    layout = gui_layout(madap_gui)
-    title = 'MADAP: Modular Automatic Data Analysis Platform'
-<<<<<<< HEAD
-<<<<<<< HEAD
-    window = sg.Window(title, layout, size=(1000, 800), resizable=True)
->>>>>>> 8160471 (add scrolling feature)
-=======
-    window = sg.Window(title, layout, size=(1200, 1200), resizable=True)
->>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
-=======
-    window = sg.Window(title, layout, resizable=True)
->>>>>>> c0e295a (Added functionallity for including plots)
 
     # Get primary colors and assemble window
     colors = (sg.theme_text_color(), sg.theme_background_color())
@@ -293,15 +162,6 @@ def main():
     title = 'MADAP: Modular Automatic Data Analysis Platform'
     window = sg.Window(title, layout, resizable=True)
     # Event loop
-=======
-    sg.theme("LightGreen6")
-    madap_gui = MadapGui()
-    colors = (sg.theme_text_color(), sg.theme_background_color())
-    layout = gui_layout(madap_gui, colors)
-    title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, resizable=True, size=(600, 770))
-
->>>>>>> b6f9522 (Improved GUI desing and hears handling)
     while True:
         event, values = window.read()
         print(event, values)
@@ -315,23 +175,9 @@ def main():
             window[f'-BUT_{event}-'].update(button_color=('white', 'black'))
             madap_gui.procedure = event
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
-<<<<<<< HEAD
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
 
         # Prevent the user from inoutting a value that is not a number in the voltage, cell constant and initial_value input field
-=======
-            # Create an "empty" class for the selected procedure every time the tab is shifted
-            # This should prevent the user from changing the procedure without selecting a new tab
-<<<<<<< HEAD
-            madap_gui = MadapGui()
-<<<<<<< HEAD
-            madap_gui.impedance_procedure = values[event].strip('-TAB_')
->>>>>>> e1ec172 (More work on the GUI)
-=======
-=======
->>>>>>> b6f9522 (Improved GUI desing and hears handling)
-            madap_gui.impedance_procedure = values[0].strip('-TAB_')
->>>>>>> 1740bbb (Compeladted first version of EIS GUI)
         if event == '-voltage-' and len(values['-voltage-']) and values['-voltage-'][-1] not in ('012345678890,.'):
             window['-voltage-'].update(values['-voltage-'][:-1])
         if event == '-cell_constant-' and len(values['-cell_constant-']) and values['-cell_constant-'][-1] not in ('012345678890,.'):
@@ -339,7 +185,6 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) and values['-initial_value-'][-1] not in ('012345678890,.e-+[]'):
             window['-initial_value-'].update(values['-initial_value-'][:-1])
         if event == 'RUN':
-<<<<<<< HEAD
             window['-LOG-'].update('Starting procedure...')
             madap_gui.procedure
             madap_gui.file = values['-DATA_PATH-']
@@ -349,28 +194,12 @@ def main():
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
             madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
-=======
-            madap_gui.procedure
-            madap_gui.file = values['-DATA_PATH-']
-            madap_gui.results = values['-RESULT_PATH-']
-            madap_gui.plots = values['-EIS_PLOTS-']
-            madap_gui.voltage = values['-voltage-']
-            madap_gui.cell_constant = values['-cell_constant-']
-<<<<<<< HEAD
-            madap_gui.suggested_circuit = values['-suggested_circuit-']
-            madap_gui.initial_value = list(values['-initial_value-'].split(","))
->>>>>>> e1ec172 (More work on the GUI)
-=======
-            madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
-            madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
->>>>>>> 1740bbb (Compeladted first version of EIS GUI)
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.specific = list(madap_gui.specific.split(','))
-<<<<<<< HEAD
 
             # Validate the fields
             validation = validate_fields(madap_gui)
@@ -388,20 +217,6 @@ def main():
             draw_figure(window['-IMAGE-'], procedure.figure)
             window['-LOG-'].update('DONE! Results and plots were saved in the given path')
 
-=======
-            print(madap_gui)
-<<<<<<< HEAD
-            start_procedure(madap_gui)
-            window.close()
-            break
-    window.close()
->>>>>>> e1ec172 (More work on the GUI)
-=======
-            procedure = start_procedure(madap_gui)
-            window['-COL_PLOTS-'].update(visible=True)
-            draw_figure(window['-IMAGE-'], procedure.figure)
-
->>>>>>> c0e295a (Added functionallity for including plots)
 
 if __name__ == '__main__':
     main()
