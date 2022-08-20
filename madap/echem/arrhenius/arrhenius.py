@@ -91,7 +91,10 @@ class Arrhenius(EChemProcedure):
         self.figure = fig
 =======
 
+<<<<<<< HEAD
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+>>>>>>> c958b87 (minor modification with naming the plots)
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
@@ -112,8 +115,11 @@ class Arrhenius(EChemProcedure):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         meta_data = {"R2_score": self.fit_score, "MSE": self.mse_calc, 'fit_slope': self.coefficients, "fit_intercept": self.intercept,
 =======
+=======
+>>>>>>> c958b87 (minor modification with naming the plots)
         meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
 >>>>>>> 35e9fcb (minor modification with naming the plots)
 =======
@@ -150,6 +156,7 @@ class Arrhenius(EChemProcedure):
         self.plot(save_dir=save_dir, plots=plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     @property
     def figure(self):
@@ -160,6 +167,8 @@ class Arrhenius(EChemProcedure):
         self._figure = figure
 =======
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+>>>>>>> c958b87 (minor modification with naming the plots)
 
     def _log_conductivity(self):
         """Convert the conductivity to log scale.

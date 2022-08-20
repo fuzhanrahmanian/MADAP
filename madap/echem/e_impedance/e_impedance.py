@@ -197,6 +197,7 @@ class EIS(EChemProcedure):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def plot(self, save_dir, plots, optional_name: str = None):
 =======
     def plot(self, save_dir, plots):
@@ -204,11 +205,15 @@ class EIS(EChemProcedure):
 =======
     def plot(self, save_dir, plots, optional_name: str = None):
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+    def plot(self, save_dir, plots, optional_name: str = None):
+>>>>>>> c958b87 (minor modification with naming the plots)
         """Plot the results of the analysis.
 
         Args:
             save_dir (str): directory where to save the data
             plots (list): list of plot types to be plotted
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
             optional_name (str, optional): name of the file to be saved. Defaults to None.
@@ -217,6 +222,9 @@ class EIS(EChemProcedure):
 =======
             optional_name (str, optional): name of the file to be saved. Defaults to None.
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+            optional_name (str, optional): name of the file to be saved. Defaults to None.
+>>>>>>> c958b87 (minor modification with naming the plots)
         """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = iplt()
@@ -276,6 +284,7 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
 
+<<<<<<< HEAD
         plot.save_plot(fig, plot_dir, name)
 
 <<<<<<< HEAD
@@ -284,12 +293,22 @@ class EIS(EChemProcedure):
 =======
     def save_data(self, save_dir:str, optional_name:str = None):
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__)
+        plot.save_plot(fig, plot_dir, name)
+
+    def save_data(self, save_dir:str, optional_name:str = None):
+>>>>>>> c958b87 (minor modification with naming the plots)
         """Save the results of the analysis.
 
         Args:
             save_dir (str): Directory where the data should be saved.
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c958b87 (minor modification with naming the plots)
             optional_name (None): Optional name for the data.
         """
         save_dir = utils.create_dir(os.path.join(save_dir, "data"))
@@ -297,6 +316,7 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__, "circuit.json") if \
         optional_name else utils.assemble_file_name(self.__class__.__name__, "circuit.json")
 
+<<<<<<< HEAD
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
 <<<<<<< HEAD
@@ -310,6 +330,8 @@ class EIS(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__, "circuit.json") if \
         optional_name else utils.assemble_file_name(self.__class__.__name__, "circuit.json")
 
+=======
+>>>>>>> c958b87 (minor modification with naming the plots)
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_error,
 >>>>>>> 84e4cac (Renamed files)
@@ -322,6 +344,7 @@ class EIS(EChemProcedure):
                                             "impedance [\u03a9]": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
                                             "fit_impedance [\u03a9]": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
                                             "Z_linKK [\u03a9]": self.z_linkk})
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
@@ -344,6 +367,14 @@ class EIS(EChemProcedure):
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
+                        optional_name else  utils.assemble_file_name(self.__class__.__name__, "data.csv")
+
+        utils.save_data_as_csv(save_dir, data, data_name)
+
+    def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
+>>>>>>> c958b87 (minor modification with naming the plots)
         """ Wrapper function for executing all action
 
         Args:
@@ -351,6 +382,7 @@ class EIS(EChemProcedure):
             plots (list): List of plot types to be plotted.
         """
         self.analyze()
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -378,6 +410,10 @@ class EIS(EChemProcedure):
 >>>>>>> 35e9fcb (minor modification with naming the plots)
 =======
 >>>>>>> c0e295a (Added functionallity for including plots)
+=======
+        self.plot(save_dir, plot, optional_name=optional_name)
+        self.save_data(save_dir=save_dir, optional_name=optional_name)
+>>>>>>> c958b87 (minor modification with naming the plots)
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.
