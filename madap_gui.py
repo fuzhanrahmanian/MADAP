@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from cgitb import enable
 from madap_cli import start_procedure
 import matplotlib.pyplot as plt
@@ -5,6 +6,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
 import io
 import time
+=======
+from posixpath import split
+from tkinter import Scrollbar
+import PySimpleGUI as sg
+from madap_cli import start_procedure
+>>>>>>> e1ec172 (More work on the GUI)
 from madap.utils import gui_elements
 
 
@@ -27,6 +34,7 @@ class MadapGui:
        self.initial_values = None
 
 
+<<<<<<< HEAD
 def draw_figure(element, figure):
     """
     Draws the previously created "figure" in the supplied Image Element
@@ -72,6 +80,9 @@ def validate_fields(madap_gui):
                 return False
 
 def gui_layout(madap, colors):
+=======
+def gui_layout(madap):
+>>>>>>> e1ec172 (More work on the GUI)
 
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
     layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
@@ -110,10 +121,16 @@ def gui_layout(madap, colors):
 
     # ----------- Layout the Impedance Options (Three TABS) ----------- #
     layout_Impedance = [[sg.TabGroup(
+<<<<<<< HEAD
                         [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_y=True),
                         sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_y=True),
                         sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_y=True)]],
                         tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]]
+=======
+                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
+                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black', enable_events=True)]]
+>>>>>>> e1ec172 (More work on the GUI)
 
     # ----------- Layout the Arrhenius Options ----------- #
     layout_Arrhenius = [[sg.Text('This are the parameters for the Arrhenius procedure')],
@@ -175,9 +192,16 @@ def main():
             window[f'-BUT_{event}-'].update(button_color=('white', 'black'))
             madap_gui.procedure = event
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
+<<<<<<< HEAD
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
 
         # Prevent the user from inoutting a value that is not a number in the voltage, cell constant and initial_value input field
+=======
+            # Create an "empty" class for the selected procedure every time the tab is shifted
+            # This should prevent the user from changing the procedure without selecting a new tab
+            madap_gui = MadapGui()
+            madap_gui.impedance_procedure = values[event].strip('-TAB_')
+>>>>>>> e1ec172 (More work on the GUI)
         if event == '-voltage-' and len(values['-voltage-']) and values['-voltage-'][-1] not in ('012345678890,.'):
             window['-voltage-'].update(values['-voltage-'][:-1])
         if event == '-cell_constant-' and len(values['-cell_constant-']) and values['-cell_constant-'][-1] not in ('012345678890,.'):
@@ -185,6 +209,7 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) and values['-initial_value-'][-1] not in ('012345678890,.e-+[]'):
             window['-initial_value-'].update(values['-initial_value-'][:-1])
         if event == 'RUN':
+<<<<<<< HEAD
             window['-LOG-'].update('Starting procedure...')
             madap_gui.procedure
             madap_gui.file = values['-DATA_PATH-']
@@ -194,12 +219,23 @@ def main():
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
             madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
+=======
+            madap_gui.procedure
+            madap_gui.file = values['-DATA_PATH-']
+            madap_gui.results = values['-RESULT_PATH-']
+            madap_gui.plots = values['-EIS_PLOTS-']
+            madap_gui.voltage = values['-voltage-']
+            madap_gui.cell_constant = values['-cell_constant-']
+            madap_gui.suggested_circuit = values['-suggested_circuit-']
+            madap_gui.initial_value = list(values['-initial_value-'].split(","))
+>>>>>>> e1ec172 (More work on the GUI)
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.specific = list(madap_gui.specific.split(','))
+<<<<<<< HEAD
 
             # Validate the fields
             validation = validate_fields(madap_gui)
@@ -217,6 +253,13 @@ def main():
             draw_figure(window['-IMAGE-'], procedure.figure)
             window['-LOG-'].update('DONE! Results and plots were saved in the given path')
 
+=======
+            print(madap_gui)
+            start_procedure(madap_gui)
+            window.close()
+            break
+    window.close()
+>>>>>>> e1ec172 (More work on the GUI)
 
 if __name__ == '__main__':
     main()
