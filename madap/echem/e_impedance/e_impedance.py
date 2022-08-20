@@ -32,9 +32,12 @@ class EImpedance:
     phase_shift : list[float] = field(default=None)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 84e4cac (Renamed files)
+=======
+>>>>>>> c0e295a (Added functionallity for including plots)
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
         return f"Impedance(frequency={self.frequency}, real_impedance={self.real_impedance}, \
@@ -96,9 +99,13 @@ class EIS(EChemProcedure):
         self.z_fit = None
         self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.figure = None
 =======
 >>>>>>> 84e4cac (Renamed files)
+=======
+        self.figure = None
+>>>>>>> c0e295a (Added functionallity for including plots)
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
@@ -236,6 +243,7 @@ class EIS(EChemProcedure):
 
         fig.tight_layout()
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.figure = fig
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
@@ -245,8 +253,12 @@ class EIS(EChemProcedure):
     def save_data(self, save_dir:str, optional_name:str = None):
 =======
 
+=======
+        self.figure = fig
+>>>>>>> c0e295a (Added functionallity for including plots)
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
+
         plot.save_plot(fig, plot_dir, name)
 
 <<<<<<< HEAD
@@ -332,6 +344,7 @@ class EIS(EChemProcedure):
     @figure.setter
     def figure(self, figure):
         self._figure = figure
+<<<<<<< HEAD
 =======
         self.plot(save_dir, plots)
         self.save_data(save_dir)
@@ -343,6 +356,8 @@ class EIS(EChemProcedure):
 >>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+>>>>>>> c0e295a (Added functionallity for including plots)
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.

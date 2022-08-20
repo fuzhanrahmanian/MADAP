@@ -190,9 +190,13 @@ class ImpedancePlotting(Plots):
         """
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         plt.close('all')
 =======
 >>>>>>> 84e4cac (Renamed files)
+=======
+        plt.close('all')
+>>>>>>> c0e295a (Added functionallity for including plots)
         if len(plots)==1:
             fig = plt.figure(figsize=(3.5,3))
             spec = fig.add_gridspec(1, 1)

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from cgitb import enable
 from madap_cli import start_procedure
 import matplotlib.pyplot as plt
@@ -9,7 +10,13 @@ import time
 =======
 from posixpath import split
 from tkinter import Scrollbar
+=======
+from turtle import update
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasAgg
+>>>>>>> c0e295a (Added functionallity for including plots)
 import PySimpleGUI as sg
+import io
 from madap_cli import start_procedure
 >>>>>>> e1ec172 (More work on the GUI)
 from madap.utils import gui_elements
@@ -35,6 +42,9 @@ class MadapGui:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c0e295a (Added functionallity for including plots)
 def draw_figure(element, figure):
     """
     Draws the previously created "figure" in the supplied Image Element
@@ -54,6 +64,7 @@ def draw_figure(element, figure):
     element.update(data=buf.read())
     return canv
 
+<<<<<<< HEAD
 def validate_fields(madap_gui):
     if madap_gui.file == '':
         sg.po('The data path is empty. Select a supported dataset file.', title='Input Error')
@@ -81,6 +92,9 @@ def validate_fields(madap_gui):
 
 def gui_layout(madap, colors):
 =======
+=======
+
+>>>>>>> c0e295a (Added functionallity for including plots)
 def gui_layout(madap):
 >>>>>>> e1ec172 (More work on the GUI)
 
@@ -117,7 +131,7 @@ def gui_layout(madap):
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font="bold", pad=(1,(40,0)))],
                              [sg.Text(gui_elements.HEADER_OR_SPECIFIC_HELP, justification='left')],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers', size=(15,1))],
-                             sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]
+                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', size=(55,1), default_text="freq, real, imag, n")]]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
@@ -167,6 +181,15 @@ def gui_layout(madap):
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_Voltammetry = [[sg.Text('This is Voltammetry')]]
 
+    procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True),
+                        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
+                        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)]]
+
+    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection)]])
+
+    col2 = sg.Column([
+        [sg.Frame('Methods:', procedure_column)],
+        [sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
 
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
     procedure_column = [[sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
@@ -186,6 +209,7 @@ def gui_layout(madap):
         [layout_buttons],
         [layout_data],
 <<<<<<< HEAD
+<<<<<<< HEAD
         [col1, col2],
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
 =======
@@ -200,6 +224,9 @@ def gui_layout(madap):
         sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
         sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)],
 >>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
+=======
+        [col1, col2],
+>>>>>>> c0e295a (Added functionallity for including plots)
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -217,11 +244,15 @@ def main():
     layout = gui_layout(madap_gui)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
 <<<<<<< HEAD
+<<<<<<< HEAD
     window = sg.Window(title, layout, size=(1000, 800), resizable=True)
 >>>>>>> 8160471 (add scrolling feature)
 =======
     window = sg.Window(title, layout, size=(1200, 1200), resizable=True)
 >>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
+=======
+    window = sg.Window(title, layout, resizable=True)
+>>>>>>> c0e295a (Added functionallity for including plots)
 
     # Get primary colors and assemble window
     colors = (sg.theme_text_color(), sg.theme_background_color())
@@ -314,11 +345,18 @@ def main():
 
 =======
             print(madap_gui)
+<<<<<<< HEAD
             start_procedure(madap_gui)
             window.close()
             break
     window.close()
 >>>>>>> e1ec172 (More work on the GUI)
+=======
+            procedure = start_procedure(madap_gui)
+            window['-COL_PLOTS-'].update(visible=True)
+            draw_figure(window['-IMAGE-'], procedure.figure)
+
+>>>>>>> c0e295a (Added functionallity for including plots)
 
 if __name__ == '__main__':
     main()

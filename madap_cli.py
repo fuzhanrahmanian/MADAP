@@ -215,7 +215,11 @@ def start_procedure(args):
     if args.procedure in ["impedance", "Impedance"]:
         procedure = call_impedance(data, result_dir, args)
 
+<<<<<<< HEAD
     elif args.procedure in ["arrhenius", "Arrhenius"]:
+=======
+    elif args.procedure == "arrhenius":
+>>>>>>> c0e295a (Added functionallity for including plots)
         procedure = call_arrhenius(data, result_dir, args)
 
     elif args.procedure == "voltammetry":
