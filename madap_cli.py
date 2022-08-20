@@ -6,11 +6,7 @@ import os
 from madap.utils import utils
 from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
-<<<<<<< HEAD
 from madap.echem.e_impedance import e_impedance
-=======
-from madap.echem.impedance import impedance
->>>>>>> e1ec172 (More work on the GUI)
 from madap.echem.arrhenius import arrhenius
 from madap.echem.voltammetry import voltammetry
 from pathlib import Path
@@ -109,7 +105,6 @@ def call_impedance(data, result_dir, args):
 
     if args.header_list:
         # Check if args header is a list
-<<<<<<< HEAD
         if isinstance(args.header_list, list):
             header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
         else:
@@ -128,37 +123,13 @@ def call_impedance(data, result_dir, args):
                                           da.select_data(data, row_col[2])
 
     Im = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
-=======
-        if not isinstance(args.header_list, list):
-            header_names = args.header_list[0].split(", ")
-        else:
-            header_names = args.header_list
-        freq_data, real_data, imag_data, phase_shift_data = data[header_names[0]],\
-                                                            data[header_names[1]],\
-                                                            data[header_names[2]],\
-                                                            data[header_names[3]] \
-                                                            if header_names[3] != "n" else None
-    if args.specific:
-        row_col = args.specific[0].split(", ")
-        freq_data, real_data, imag_data, phase_shift_data = da.select_data(data, row_col[0]), \
-                                                            da.select_data(data, row_col[1]), \
-                                                            da.select_data(data, row_col[2]), \
-                                                            da.select_data(data, row_col[3]) \
-                                                            if row_col[3] != "n" else None
-
-    Im = impedance.Impedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
->>>>>>> e1ec172 (More work on the GUI)
 
     if args.impedance_procedure == "EIS":
         log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant},\
                    suggested circuit is {args.suggested_circuit} and initial values are {args.initial_values}.")
 
         # Instantiate the procedure
-<<<<<<< HEAD
         procedure = e_impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit,
-=======
-        procedure = impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit,
->>>>>>> e1ec172 (More work on the GUI)
                                   initial_value=eval(args.initial_values) if args.initial_values else None, cell_constant=args.cell_constant)
 
     elif args.impedance_procedure == "Mottschotcky":
@@ -176,11 +147,8 @@ def call_impedance(data, result_dir, args):
     # Perform all actions
     procedure.perform_all_actions(result_dir, plots=plots)
 
-<<<<<<< HEAD
     return procedure
 
-=======
->>>>>>> e1ec172 (More work on the GUI)
 def call_arrhenius(data, result_dir, args):
     """Calling the arrhenius procedure and parse the corresponding arguments
 
@@ -192,15 +160,11 @@ def call_arrhenius(data, result_dir, args):
 
 
     if args.header_list:
-<<<<<<< HEAD
         if isinstance(args.header_list, list):
             header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
         else:
             header_names = args.header_list
 
-=======
-        header_names = args.header_list[0].split(", ")
->>>>>>> e1ec172 (More work on the GUI)
         temp_data, cond_data = data[header_names[0]], data[header_names[1]]
     if args.specific:
         row_col = args.specific[0].split(", ")
@@ -215,11 +179,8 @@ def call_arrhenius(data, result_dir, args):
     # Perform all actions
     Arr.perform_all_actions(result_dir, plots = plots)
 
-<<<<<<< HEAD
     return Arr
 
-=======
->>>>>>> e1ec172 (More work on the GUI)
 def call_voltammetry(data, result_dir, plots):
     log.info("What is the name (or index) of the column of voltage (v [V]) ?")
     # TODO
@@ -252,27 +213,17 @@ def start_procedure(args):
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     if args.procedure in ["impedance", "Impedance"]:
-<<<<<<< HEAD
         procedure = call_impedance(data, result_dir, args)
 
     elif args.procedure in ["arrhenius", "Arrhenius"]:
         procedure = call_arrhenius(data, result_dir, args)
-=======
-        call_impedance(data, result_dir, args)
-
-    elif args.procedure == "arrhenius":
-        call_arrhenius(data, result_dir, args)
->>>>>>> e1ec172 (More work on the GUI)
 
     elif args.procedure == "voltammetry":
         log.info("Voltammetrys is not supported at the moment. Exiting ...")
         exit()
 
-<<<<<<< HEAD
     return procedure
 
-=======
->>>>>>> e1ec172 (More work on the GUI)
 def main():
     log.info("==================================WELCOME TO MADAP==================================")
     # Create the parser
