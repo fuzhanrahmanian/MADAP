@@ -231,9 +231,14 @@ class ImpedancePlotting(Plots):
             return fig, [ax1, ax2, ax3, ax4]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         elif len(plots) == 0:
             log.error("No plots for EIS were selected.")
 =======
 >>>>>>> 84e4cac (Renamed files)
+=======
+        elif len(plots) == 0:
+            log.error("No plots for EIS were selected.")
+>>>>>>> 1740bbb (Compeladted first version of EIS GUI)
         else:
             log.error("Maximum plots for EIS is exceeded.")
