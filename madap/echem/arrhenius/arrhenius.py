@@ -39,7 +39,10 @@ class Arrhenius(EChemProcedure):
     intercept = None
     coefficients = None
     mse_calc = None
+<<<<<<< HEAD
     figure = None
+=======
+>>>>>>> 1477089 (add error calculation for analysis)
 
     def analyze(self):
         """Analyze the data and fit the Arrhenius equation.
@@ -108,10 +111,14 @@ class Arrhenius(EChemProcedure):
                 optional_name else utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         meta_data = {"R2_score": self.fit_score, "MSE": self.mse_calc, 'fit_slope': self.coefficients, "fit_intercept": self.intercept,
 =======
         meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
 >>>>>>> 35e9fcb (minor modification with naming the plots)
+=======
+        meta_data = {"R2_score": self.fit_score, "MSE": self.mse_calc, 'fit_slope': self.coefficients, "fit_intercept": self.intercept,
+>>>>>>> 1477089 (add error calculation for analysis)
                     "arr_constant [S.cm⁻¹]": self.arrhenius_constant, "activation [mJ/mol]": self.activation,
                     "gas_constant [J/mol.K]": self.gas_constant}
 
