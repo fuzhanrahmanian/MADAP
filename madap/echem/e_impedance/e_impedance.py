@@ -31,6 +31,10 @@ class EImpedance:
     imaginary_impedance : list[float] = field( on_setattr=frozen)
     phase_shift : list[float] = field(default=None)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 84e4cac (Renamed files)
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
         return f"Impedance(frequency={self.frequency}, real_impedance={self.real_impedance}, \
@@ -77,7 +81,11 @@ class EIS(EChemProcedure):
         self.val_low_freq = val_low_freq
         self.cell_constant = cell_constant
         self.conductivity = None
+<<<<<<< HEAD
         self.rmse_calc = None
+=======
+        self.rmse_error = None
+>>>>>>> 84e4cac (Renamed files)
         self.num_rc_linkk = None
         self.eval_fit_linkk = None
         self.z_linkk = None
@@ -87,7 +95,10 @@ class EIS(EChemProcedure):
         self.custom_circuit = None
         self.z_fit = None
         self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
+<<<<<<< HEAD
         self.figure = None
+=======
+>>>>>>> 84e4cac (Renamed files)
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
@@ -128,32 +139,52 @@ class EIS(EChemProcedure):
                 rmse_guess = circuits.fitting.rmse(z_circuit, z_fit_guess)
                 log.info(f"With the guessed circuit {guess_circuit} the RMSE error is {rmse_guess}")
 
+<<<<<<< HEAD
                 if self.rmse_calc is None:
                     self.rmse_calc = rmse_guess
 
                 if rmse_guess <= self.rmse_calc:
                     self.rmse_calc = rmse_guess
+=======
+                if self.rmse_error is None:
+                    self.rmse_error = rmse_guess
+
+                if rmse_guess <= self.rmse_error:
+                    self.rmse_error = rmse_guess
+>>>>>>> 84e4cac (Renamed files)
                     self.custom_circuit = custom_circuit_guess
                     self.z_fit = z_fit_guess
         else:
             self.custom_circuit = circuits.CustomCircuit(initial_guess=self.initial_value, circuit=self.suggested_circuit)
             self.custom_circuit.fit(f_circuit, z_circuit)
             self.z_fit = self.custom_circuit.predict(f_circuit)
+<<<<<<< HEAD
             self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
             log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_calc}")
+=======
+            self.rmse_error = circuits.fitting.rmse(z_circuit, self.z_fit)
+            log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_error}")
+>>>>>>> 84e4cac (Renamed files)
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
             self.conductivity = self._conductivity_calculation()
 
 
+<<<<<<< HEAD
     def plot(self, save_dir, plots, optional_name: str = None):
+=======
+    def plot(self, save_dir, plots):
+>>>>>>> 84e4cac (Renamed files)
         """Plot the results of the analysis.
 
         Args:
             save_dir (str): directory where to save the data
             plots (list): list of plot types to be plotted
+<<<<<<< HEAD
             optional_name (str, optional): name of the file to be saved. Defaults to None.
+=======
+>>>>>>> 84e4cac (Renamed files)
         """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = iplt()
@@ -196,6 +227,7 @@ class EIS(EChemProcedure):
                 continue
 
         fig.tight_layout()
+<<<<<<< HEAD
         self.figure = fig
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
@@ -203,10 +235,18 @@ class EIS(EChemProcedure):
         plot.save_plot(fig, plot_dir, name)
 
     def save_data(self, save_dir:str, optional_name:str = None):
+=======
+
+        name = utils.assemble_file_name(self.__class__.__name__)
+        plot.save_plot(fig, plot_dir, name)
+
+    def save_data(self, save_dir:str):
+>>>>>>> 84e4cac (Renamed files)
         """Save the results of the analysis.
 
         Args:
             save_dir (str): Directory where the data should be saved.
+<<<<<<< HEAD
             optional_name (None): Optional name for the data.
         """
         save_dir = utils.create_dir(os.path.join(save_dir, "data"))
@@ -216,6 +256,14 @@ class EIS(EChemProcedure):
 
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
+=======
+        """
+        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
+        # Save the fitted circuit
+        name = utils.assemble_file_name(self.__class__.__name__, "circuit.json")
+        self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
+        added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_error,
+>>>>>>> 84e4cac (Renamed files)
                       "conductivity [S/cm]": self.conductivity}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
@@ -223,12 +271,19 @@ class EIS(EChemProcedure):
                                             "impedance [\u03a9]": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
                                             "fit_impedance [\u03a9]": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
                                             "Z_linKK [\u03a9]": self.z_linkk})
+<<<<<<< HEAD
         data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
                         optional_name else  utils.assemble_file_name(self.__class__.__name__, "data.csv")
 
         utils.save_data_as_csv(save_dir, data, data_name)
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
+=======
+        data_name = utils.assemble_file_name(self.__class__.__name__, "data.csv")
+        utils.save_data_as_csv(save_dir, data, data_name)
+
+    def perform_all_actions(self, save_dir:str, plots:list):
+>>>>>>> 84e4cac (Renamed files)
         """ Wrapper function for executing all action
 
         Args:
@@ -236,6 +291,7 @@ class EIS(EChemProcedure):
             plots (list): List of plot types to be plotted.
         """
         self.analyze()
+<<<<<<< HEAD
         self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 
@@ -246,10 +302,21 @@ class EIS(EChemProcedure):
     @figure.setter
     def figure(self, figure):
         self._figure = figure
+=======
+        self.plot(save_dir, plots)
+        self.save_data(save_dir)
+>>>>>>> 84e4cac (Renamed files)
 
     def _chi_calculation(self):
         """ Calculate the chi value of the fit.
 
+<<<<<<< HEAD
+=======
+        Args:
+            res_imag (list): imaginary part of the residual
+            res_real (list): real part of the residual
+
+>>>>>>> 84e4cac (Renamed files)
         Returns:
             float: chi value of the fit
         """
