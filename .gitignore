@@ -103,3 +103,7 @@ echem/impedance_config.py
 
 # Generated results
 results/
+electrolyte_figures/
+
+#Datasets
+data/
