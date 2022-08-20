@@ -84,10 +84,15 @@ class Arrhenius(EChemProcedure):
             else:
                 log.error("Arrhenius class does not have the selected plot.")
         fig.tight_layout()
+<<<<<<< HEAD
         self.figure = fig
+=======
+
+>>>>>>> 35e9fcb (minor modification with naming the plots)
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
+        plt.clf()
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the results of the analysis.
@@ -102,7 +107,11 @@ class Arrhenius(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__, "linear_fit.json") if \
                 optional_name else utils.assemble_file_name(self.__class__.__name__, "linear_fit.json")
 
+<<<<<<< HEAD
         meta_data = {"R2_score": self.fit_score, "MSE": self.mse_calc, 'fit_slope': self.coefficients, "fit_intercept": self.intercept,
+=======
+        meta_data = {"R2_score": self.fit_score,'fit_slope': self.coefficients, "fit_intercept": self.intercept,
+>>>>>>> 35e9fcb (minor modification with naming the plots)
                     "arr_constant [S.cm⁻¹]": self.arrhenius_constant, "activation [mJ/mol]": self.activation,
                     "gas_constant [J/mol.K]": self.gas_constant}
 
@@ -133,6 +142,7 @@ class Arrhenius(EChemProcedure):
         self.analyze()
         self.plot(save_dir=save_dir, plots=plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
+<<<<<<< HEAD
 
     @property
     def figure(self):
@@ -141,6 +151,8 @@ class Arrhenius(EChemProcedure):
     @figure.setter
     def figure(self, figure):
         self._figure = figure
+=======
+>>>>>>> 35e9fcb (minor modification with naming the plots)
 
     def _log_conductivity(self):
         """Convert the conductivity to log scale.
