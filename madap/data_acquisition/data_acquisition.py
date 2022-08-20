@@ -48,15 +48,7 @@ def format_data(data):
     """
     if not data is None:
         if isinstance(data, list):
-<<<<<<< HEAD
-<<<<<<< HEAD
             data = np.array(data, dtype=np.float64)
-=======
-            data = np.array(data, dtype=np.float32)
->>>>>>> abe1488 (fix the datatypes for data acquisition)
-=======
-            data = np.array(data, dtype=np.float64)
->>>>>>> ee11024 (adds some more checksup on dataset type)
 
         if not np.array_equal(data, data.astype(float)):
             data = data.astype(np.float)
@@ -89,4 +81,3 @@ def format_plots(plots):
     if isinstance(plots, tuple):
         plots = list(plots)
     return plots
-
