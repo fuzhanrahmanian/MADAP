@@ -4,7 +4,6 @@
 # copy the current dataFrame and add predicted conductivity and resistance
 # headers are ;experimentID;electrolyteLabel;PC;EC;EMC;LiPF6;inverseTemperature;temperature;conductivity;resistance;Z';Z'';frequency;electrolyteAmount
 # plot conductivity vs. (EC/PC) colorbar (LiPF6/EMC)
-<<<<<<< HEAD
 # add default and get circuits to the dataFrame
 import sys
 import os
@@ -41,13 +40,60 @@ data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.c
 del data['Unnamed: 0']
 temperatures = data["temperature [°C]"].unique().tolist()
 temperatures.sort()
+
+
+def get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False):
+    freq_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"][ind_data])
+    real_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][ind_data])
+    imag_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "imaginary impedance Z'' [Ohm]"][ind_data])
+    cell_constant = float(re.findall(r'\b(\d*\.?\d+)', data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "cell constant, standard deviation"][ind_data])[0])
+
+    if phase_shift:
+        phase_shift_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "phase_shift \u03c6 [\u00b0]"][ind_data])
+    else:
+        phase_shift_data = None
+
+    return freq_data, real_data, imag_data, cell_constant, phase_shift_data
+
+
+def eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit, initial_value, cell_constant,plot_type, exp_id):
+
+    # initialize the Impedance class
+    Im = imp.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), phase_shift_data)
+
+    # initialis the EIS procedure
+    Eis  = imp.EIS(Im, voltage=None, suggested_circuit=suggested_circuit,
+                            initial_value=initial_value, cell_constant = cell_constant)
+    # analyze the data
+    Eis.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
+
+    return Eis
+
+def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_shift = False):
+    if phase_shift:
+        #1. phase_shift
+        data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "phase_shift \u03c6 [\u00b0]"] = str(Eis.impedance.phase_shift)
+    #2. conductivity
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_conductivity_{analysis_type} [S/cm]"] = Eis.conductivity
+    #3. parameters plus theirs errors/confidance
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_fit_params_{analysis_type}"] = str([(val, err) for val, err in zip(Eis.custom_circuit.parameters_, Eis.custom_circuit.conf_)])
+    #4. RMSE of the fit
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_rmse_{analysis_type}"] = Eis.rmse_calc
+    #5. num_rc_linKK
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_num_rc_linKK_{analysis_type}"] = Eis.num_rc_linkk
+    #6. eval_fit_linKK
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madao_eval_fit_linKK_{analysis_type}"] = Eis.eval_fit_linkk
+    #7. resistance [Ohm]
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_resistance_{analysis_type} [Ohm]"]=  Eis.custom_circuit.parameters_[0]
+    #8 chi_value
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_chi_square_{analysis_type}"] = Eis.chi_val
+
+
+# ---------------------- Train with default circtuit ----------------------
+
 # one time train without a custom circuit and with the default circuit
-if DEFAULTTRAIN:
-    suggested_circuit="R0-p(R1,CPE1)"
-    initial_value=[800,1e+14,1e-9,0.8]
-else:
-    suggested_circuit= None
-    initial_value= None
+suggested_circuit="R0-p(R1,CPE1)"
+initial_value=[800,1e+14,1e-9,0.8]
 
 ind_data = 0
 for exp_id in tqdm(data["experimentID"].unique()):
@@ -56,42 +102,25 @@ for exp_id in tqdm(data["experimentID"].unique()):
         print(f"The index is {ind_data}")
         print(len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]))
         if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
-            freq_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"][ind_data])
-            real_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][ind_data])
-            imag_data = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "imaginary impedance Z'' [Ohm]"][ind_data])
-            phase_shift_data = None
-            cell_constant = float(re.findall(r'\b(\d*\.?\d+)', data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "cell constant, standard deviation"][ind_data])[0])
+            freq_data, real_data, imag_data, cell_constant, phase_shift_data = get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False)
 
-            # initialize the Impedance class
-            Im = imp.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), phase_shift_data)
+            if DEFAULTTRAIN:
 
-            # initialis the EIS procedure
-            Eis  = imp.EIS(Im, voltage=None, suggested_circuit=suggested_circuit,
-                                    initial_value=initial_value, cell_constant = cell_constant)
-            # analyze the data
-            Eis.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
+                Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-p(R1,CPE1)",
+                                        initial_value = [800,1e+14,1e-9,0.8], cell_constant = cell_constant,
+                                        plot_type = plot_type, exp_id= exp_id)
+                # initialize the Impedance class & initialis the EIS procedure
+                concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_shift = True)
 
-            #1. phase_shift
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "phase_shift \u03c6 [\u00b0]"] = str(Eis.impedance.phase_shift)
-            #2. conductivity
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_conductivity_default [S/cm]"] = Eis.conductivity
-            #3. parameters plus theirs errors/confidance
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_fit_params_default"] = str([(val, err) for val, err in zip(Eis.custom_circuit.parameters_, Eis.custom_circuit.conf_)])
-            #4. RMSE of the fit
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_rmse_default"] = Eis.rmse_calc
-            #5. num_rc_linKK
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_num_rc_linKK_default"] = Eis.num_rc_linkk
-            #6. eval_fit_linKK
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madao_eval_fit_linKK_default"] = Eis.eval_fit_linkk
-            #7. resistance [Ohm]
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_resistance_default [Ohm"]=  Eis.custom_circuit.parameters_[0]
-            #8 chi_value
-            data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "madap_chi_square_dafault"] = Eis.chi_val
+            if CUSTOMTRAIN:
+                Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = None,
+                                        initial_value = None, cell_constant = cell_constant,
+                                        plot_type = plot_type, exp_id = exp_id)
+
+                concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
+
             ind_data += 1
 
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
-=======
-# add default and get circuits to the dataFrame
->>>>>>> 4617e37 (added scripts for figure creation)
