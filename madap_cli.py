@@ -160,7 +160,11 @@ def call_arrhenius(data, result_dir, args):
 
 
     if args.header_list:
-        header_names = args.header_list[0].split(", ")
+        if isinstance(args.header_list, list):
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
+        else:
+            header_names = args.header_list
+
         temp_data, cond_data = data[header_names[0]], data[header_names[1]]
     if args.specific:
         row_col = args.specific[0].split(", ")
@@ -174,6 +178,8 @@ def call_arrhenius(data, result_dir, args):
 
     # Perform all actions
     Arr.perform_all_actions(result_dir, plots = plots)
+
+    return Arr
 
 def call_voltammetry(data, result_dir, plots):
     log.info("What is the name (or index) of the column of voltage (v [V]) ?")
@@ -209,7 +215,7 @@ def start_procedure(args):
     if args.procedure in ["impedance", "Impedance"]:
         procedure = call_impedance(data, result_dir, args)
 
-    elif args.procedure == "arrhenius":
+    elif args.procedure in ["arrhenius", "Arrhenius"]:
         procedure = call_arrhenius(data, result_dir, args)
 
     elif args.procedure == "voltammetry":

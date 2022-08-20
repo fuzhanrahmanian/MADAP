@@ -39,6 +39,7 @@ class Arrhenius(EChemProcedure):
     intercept = None
     coefficients = None
     mse_calc = None
+    figure = None
 
     def analyze(self):
         """Analyze the data and fit the Arrhenius equation.
@@ -83,11 +84,10 @@ class Arrhenius(EChemProcedure):
             else:
                 log.error("Arrhenius class does not have the selected plot.")
         fig.tight_layout()
-
+        self.figure = fig
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
-        plt.clf()
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the results of the analysis.
@@ -133,6 +133,14 @@ class Arrhenius(EChemProcedure):
         self.analyze()
         self.plot(save_dir=save_dir, plots=plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+    @property
+    def figure(self):
+        return self._figure
+
+    @figure.setter
+    def figure(self, figure):
+        self._figure = figure
 
     def _log_conductivity(self):
         """Convert the conductivity to log scale.

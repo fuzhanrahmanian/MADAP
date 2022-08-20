@@ -1,15 +1,17 @@
-from turtle import update
+from cgitb import enable
+from madap_cli import start_procedure
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
 import io
-from madap_cli import start_procedure
+import time
 from madap.utils import gui_elements
 
 
 class MadapGui:
 
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
+    arrhenius_plots = ["arrhenius", "arrhenius_fit"]
 
     def __init__(self):
        self.procedure = "Impedance"
@@ -59,7 +61,7 @@ def gui_layout(madap, colors):
 
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font=("Arial", 13))],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers')],
-                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="freq, real, imag")]]
+                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="temp, cond")]]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
@@ -73,7 +75,7 @@ def gui_layout(madap, colors):
                     [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP, default_text="[800,1e+14,1e-9,0.8]")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.Listbox([x for x in madap.eis_plots], key='-EIS_PLOTS-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
+                    [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-', size=(50,len(madap.eis_plots)+1), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
 
     tab_layout_Liss = [[sg.Text('This is inside Lissajous')],
                 [sg.Input(key='-inLiss-')]]
@@ -82,12 +84,14 @@ def gui_layout(madap, colors):
                     [sg.Input(key='-inMott-')]]
 
     layout_Impedance = [[sg.TabGroup(
-                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_x=True, expand_y=True),
-                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_x=True, expand_y=True),
-                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_x=True, expand_y=True)]],
-                        tab_location='topleft', selected_title_color='black', enable_events=True, expand_x=True, expand_y=True)]]
+                        [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-', expand_y=True),
+                        sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-', expand_y=True),
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-', expand_y=True)]],
+                        tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]]
 
-    layout_Arrhenius = [[sg.Text('This is Arrhenius')]]
+    layout_Arrhenius = [[sg.Text('This are the parameters for the Arrhenius procedure')],
+                        [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                        [sg.Listbox([x for x in madap.arrhenius_plots], key='-PLOTS_Arrhenius-', size=(50,len(madap.arrhenius_plots)+1), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
 
     layout_Voltammetry = [[sg.Text('This is Voltammetry')]]
 
@@ -95,17 +99,17 @@ def gui_layout(madap, colors):
                         sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True),
                         sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True, expand_x=True, expand_y=True)]]
 
-    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15), size=(550, 100), expand_x=True, expand_y=True)],
-                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 500), expand_x=True, expand_y=True)]],
+    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15), size=(550, 120), expand_y=True)],
+                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 500), expand_y=True)]],
                       expand_x=True, expand_y=True)
 
-    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-', expand_x=True, expand_y=True)]],
-                        expand_x=True, expand_y=True, size=(550, 620))
+    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
 
     layout = [
         [layout_buttons],
         [layout_data],
         [col1, col2],
+        [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -118,7 +122,7 @@ def main():
     colors = (sg.theme_text_color(), sg.theme_background_color())
     layout = gui_layout(madap_gui, colors)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, resizable=True, size=(600, 770))
+    window = sg.Window(title, layout, resizable=True)
 
     while True:
         event, values = window.read()
@@ -143,10 +147,11 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) and values['-initial_value-'][-1] not in ('012345678890,.e-+[]'):
             window['-initial_value-'].update(values['-initial_value-'][:-1])
         if event == 'RUN':
+            window['-LOG-'].update('Starting procedure...')
             madap_gui.procedure
             madap_gui.file = values['-DATA_PATH-']
             madap_gui.results = values['-RESULT_PATH-']
-            madap_gui.plots = values['-EIS_PLOTS-']
+            madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
             madap_gui.voltage = values['-voltage-']
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
@@ -157,10 +162,13 @@ def main():
             else:
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.specific = list(madap_gui.specific.split(','))
-            print(madap_gui)
             procedure = start_procedure(madap_gui)
+            window['-LOG-'].update('Generating plot...')
             window['-COL_PLOTS-'].update(visible=True)
+            window['-IMAGE-']('')
             draw_figure(window['-IMAGE-'], procedure.figure)
+            window['-LOG-'].update('DONE! Results and plots were saved in the given path')
+
 
 
 if __name__ == '__main__':
