@@ -55,29 +55,3 @@ data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_arr.csv"
 
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True, mode='w+')
 
-# plot the activation vs. (EC/PC) colorbar (LiPF6) scatter point circle and triangle for different EMC concentrationS
-fig, ax = plt.subplots(figsize=(4.9,4))
-scatter = mscatter(x=np.array(data["EC/PC"]) , y=  np.array(data["activation_[mJ/mol]"]),\
-                    c= np.array(data["LiPF6"]), s=9, m=data["marker"], ax=ax)
-
-# Create a customize legend for the plot
-legend_elements = [Line2D([0], [0], marker='o', color='k', label=f"(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[0]}",
-                          markerfacecolor='k', linestyle="None"),
-                   Line2D([0], [0], marker='^', color='k', label=f"(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[1]}",
-                          markerfacecolor='k', linestyle="None"),
-                   Line2D([0], [0], marker='D', color='k', label=f'(EC + PC): EMC = {EC_PC_EMC_ratio.unique()[2]}',
-                          markerfacecolor='k', linestyle="None")] # , markersize=15
-
-# add colorbar
-cb = plt.colorbar(scatter)
-cb.set_label(label = r"$LiPF_6$ $[g]$")
-
-# add label to the axes
-plt.xlabel(r"$EC/PC$ $[g/g]$")
-plt.ylabel(r"$E$ $[mJ/mol]$")
-
-#plt.legend(handles, labels)
-plt.legend(handles=legend_elements)#, loc="best", frameon=False)
-
-#plt.show()
-plt.savefig(os.path.join(save_dir, "activation_EC_PC_EMC.svg"))
