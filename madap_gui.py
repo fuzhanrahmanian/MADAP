@@ -152,8 +152,12 @@ def gui_layout(madap):
 =======
                         [[sg.Tab('EIS', tab_layout_EIS, key='-TAB_EIS-'),
                         sg.Tab('Lissajous', tab_layout_Liss,  background_color='darkred', key='-TAB_Lissajous-'),
+<<<<<<< HEAD
                         sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='top', selected_title_color='black', enable_events=True)]]
 >>>>>>> e1ec172 (More work on the GUI)
+=======
+                        sg.Tab('Mottschosky', tab_layout_Mott, background_color='darkgreen', key='-TAB_Mottschosky-')]],  tab_location='topleft', selected_title_color='black', enable_events=True)]]
+>>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
 
     # ----------- Layout the Arrhenius Options ----------- #
     layout_Arrhenius = [[sg.Text('This are the parameters for the Arrhenius procedure')],
@@ -186,10 +190,16 @@ def gui_layout(madap):
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
 =======
         [layout_data_selection],
+<<<<<<< HEAD
         [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True),
         sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True),
         sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True)],
 >>>>>>> 8160471 (add scrolling feature)
+=======
+        [sg.Column(layout_Impedance, key='-COL_Impedance-', scrollable=True, size=(1000, 700), vertical_scroll_only=True),
+        sg.Column(layout_Arrhenius, visible=False, key='-COL_Arrhenius-', scrollable=True, vertical_scroll_only=True),
+        sg.Column(layout_Voltammetry, visible=False, key='-COL_Voltammetry-', scrollable=True, vertical_scroll_only=True)],
+>>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -206,8 +216,12 @@ def main():
 =======
     layout = gui_layout(madap_gui)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
+<<<<<<< HEAD
     window = sg.Window(title, layout, size=(1000, 800), resizable=True)
 >>>>>>> 8160471 (add scrolling feature)
+=======
+    window = sg.Window(title, layout, size=(1200, 1200), resizable=True)
+>>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
 
     # Get primary colors and assemble window
     colors = (sg.theme_text_color(), sg.theme_background_color())

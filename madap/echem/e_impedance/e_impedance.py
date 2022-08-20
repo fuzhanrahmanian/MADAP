@@ -321,6 +321,7 @@ class EIS(EChemProcedure):
         self.analyze()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 
@@ -337,6 +338,9 @@ class EIS(EChemProcedure):
 >>>>>>> 84e4cac (Renamed files)
 =======
         self.plot(save_dir, plot, optional_name=optional_name)
+=======
+        self.plot(save_dir, plots, optional_name=optional_name)
+>>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
 >>>>>>> 35e9fcb (minor modification with naming the plots)
 
@@ -344,12 +348,15 @@ class EIS(EChemProcedure):
         """ Calculate the chi value of the fit.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         Args:
             res_imag (list): imaginary part of the residual
             res_real (list): real part of the residual
 
 >>>>>>> 84e4cac (Renamed files)
+=======
+>>>>>>> 7d68c69 (Small bug fixing and fine tuning GUI)
         Returns:
             float: chi value of the fit
         """
