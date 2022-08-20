@@ -88,7 +88,6 @@ class Arrhenius(EChemProcedure):
         name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
-        plt.clf()
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the results of the analysis.
