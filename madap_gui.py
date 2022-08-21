@@ -7,7 +7,6 @@ import io
 import time
 from madap.utils import gui_elements
 
-
 class MadapGui:
 
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
@@ -209,7 +208,7 @@ def main():
             try:
                 procedure = start_procedure(madap_gui)
             except Exception as e:
-                sg.popup(f'Error: Something went wrong.')
+                sg.popup(f'Error: Something went wrong. {e}')
                 continue
             window['-LOG-'].update('Generating plot...')
             window['-COL_PLOTS-'].update(visible=True)

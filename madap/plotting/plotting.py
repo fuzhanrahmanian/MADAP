@@ -6,6 +6,7 @@ from madap import logger
 from matplotlib.axes import Axes
 import math
 
+mpl.use('svg')
 log = logger.get_logger("plotting")
 class Plots():
     """_General class for multipurpose plotting
@@ -15,13 +16,16 @@ class Plots():
         mpl.rcParams.update(mpl.rcParamsDefault)
         mpl.rc('font', size=20)
         mpl.rc('axes', titlesize=20)
-        plt.style.use(['nature', 'science', 'no-latex'])
+        style_path, _ =os.path.split(__file__)
+        plt.style.use([os.path.join(style_path, 'styles', 'nature.mplstyle'),
+                       os.path.join(style_path, 'styles', 'science.mplstyle'),
+                       os.path.join(style_path, 'styles', 'no-latex.mplstyle')])
         plt.rcParams['text.usetex'] = False
         plt.rcParams['xtick.direction'] = 'in'
         plt.rcParams['ytick.direction'] = 'in'
 
     def plot_identity(self, ax, xlabel:str=None, ylabel:str=None, x_lim:list=None, y_lim:list=None, rotation:float=0,
-                      ax_sci_notation=None, scientific_limit=0, log_scale=None, base10:bool=False, 
+                      ax_sci_notation=None, scientific_limit=0, log_scale=None, base10:bool=False,
                       step_size_x="auto", step_size_y="auto"):
         # ax_sci_notation (str, optiopnal): whether or not an axis should be written with
         #         scientific notation. It can be 'x', 'y', 'both' or None.
