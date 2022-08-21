@@ -110,7 +110,7 @@ class EIS(EChemProcedure):
 
         # if the user did not choose any circuit, some default suggestions will be applied.
         if (self.suggested_circuit and self.initial_value) is None:
-            with open(os.path.join("madap/utils/suggested_circuits.json"), "r") as file:
+            with open(os.path.join("madap", "utils", "suggested_circuits.json"), "r") as file:
                 suggested_circuits = json.load(file)
 
             for guess_circuit, guess_value in suggested_circuits.items():
