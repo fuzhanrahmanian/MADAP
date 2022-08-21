@@ -12,12 +12,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 
 import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.markers as mmarkers
-from matplotlib.lines import Line2D
+
 #matplotlib.use('Agg')
 matplotlib.rcParams["figure.max_open_warning"] = 1500
 

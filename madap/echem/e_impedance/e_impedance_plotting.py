@@ -189,14 +189,7 @@ class ImpedancePlotting(Plots):
             fig, ax: Figure and axis of the subplot.
         """
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         plt.close('all')
-=======
->>>>>>> 84e4cac (Renamed files)
-=======
-        plt.close('all')
->>>>>>> c0e295a (Added functionallity for including plots)
         if len(plots)==1:
             fig = plt.figure(figsize=(3.5,3))
             spec = fig.add_gridspec(1, 1)
@@ -234,15 +227,7 @@ class ImpedancePlotting(Plots):
             ax4 = fig.add_subplot(spec[1, 1])
             return fig, [ax1, ax2, ax3, ax4]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         elif len(plots) == 0:
             log.error("No plots for EIS were selected.")
-=======
->>>>>>> 84e4cac (Renamed files)
-=======
-        elif len(plots) == 0:
-            log.error("No plots for EIS were selected.")
->>>>>>> 1740bbb (Compeladted first version of EIS GUI)
         else:
             log.error("Maximum plots for EIS is exceeded.")

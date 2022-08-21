@@ -11,13 +11,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import re
 from tqdm import tqdm
 import pandas as pd
-import numpy as np
-from tqdm import tqdm
+
 
 import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.markers as mmarkers
-from matplotlib.lines import Line2D
 
 #matplotlib.use('Agg')
 matplotlib.rcParams["figure.max_open_warning"] = 1500
@@ -31,7 +27,7 @@ DEFAULTTRAIN = True
 CUSTOMTRAIN = False
 
 plotting.Plots()
-save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/impedance")
+save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/impedance_default")
 
 plot_type = ["nyquist" ,"nyquist_fit", "residual", "bode"]
 
