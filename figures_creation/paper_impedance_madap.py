@@ -83,6 +83,12 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_resistance_{analysis_type} [Ohm]"]=  Eis.custom_circuit.parameters_[0]
     #8 chi_value
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_chi_square_{analysis_type}"] = Eis.chi_val
+    # predicted data
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"predicted_impedance_{analysis_type} [Ohm]"] = str(Eis.z_fit)
+    # real residual
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"residual_real_{analysis_type} [Ohm]"] = str(Eis.res_real)
+    # imaginary residual
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"residual_imaginary_{analysis_type} [Ohm]"] = str(Eis.res_imag)
 
 
 # ---------------------- Train with default circtuit ----------------------
@@ -90,14 +96,15 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
 # one time train without a custom circuit and with the default circuit
 suggested_circuit="R0-p(R1,CPE1)"
 initial_value=[800,1e+14,1e-9,0.8]
-
-ind_data = 0
+# PVA_30032021_BM072_1
+#ind_data = 246
 for exp_id in tqdm(data["experimentID"].unique()):
-    for temp in tqdm(temperatures):
-    # get the data for the current experiment
-        print(f"The index is {ind_data}")
-        print(len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]))
+    for temp in temperatures:
+
         if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
+
+            ind_data = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"].index[0]
+            print(f"The index is {ind_data}")
             freq_data, real_data, imag_data, cell_constant, phase_shift_data = get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False)
 
             if DEFAULTTRAIN:
@@ -115,8 +122,10 @@ for exp_id in tqdm(data["experimentID"].unique()):
 
                 concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
 
-            ind_data += 1
+            data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
-data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
+            #ind_data += 1
+
+#data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
 data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
