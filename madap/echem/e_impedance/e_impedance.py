@@ -1,4 +1,6 @@
 """Impedance Analysis module."""
+# for EIS analysis, impedance python package has been used.
+# RefMurbach, M., Gerwe, B., Dawson-Elli, N., & Tsui, L. (2020). impedance.py: A Python package for electrochemical impedance analysis. Journal of Open Source Software, 5(). https://doi.org/10.21105/joss.02349
 import os
 import json
 import numpy as np
@@ -115,7 +117,7 @@ class EIS(EChemProcedure):
 
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
-                custom_circuit_guess = circuits.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
+                custom_circuit_guess = circuits.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit, global_opt=True)
 
                 try:
                     custom_circuit_guess.fit(f_circuit, z_circuit)
