@@ -1,3 +1,7 @@
+import sys
+
+
+import sys
 import time
 import json
 import os
@@ -41,7 +45,8 @@ def assemble_data_frame(**kwargs):
     Returns:
         _type_: _description_
     """
-    dFrame = pd.DataFrame(data=kwargs)
+    dFrame = pd.DataFrame.from_dict(kwargs, orient = "index")
+    dFrame = dFrame.transpose()
     return dFrame
 
 def save_data_as_csv(directory, data, name):
