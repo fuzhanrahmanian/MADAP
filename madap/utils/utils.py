@@ -45,8 +45,11 @@ def assemble_data_frame(**kwargs):
     Returns:
         _type_: _description_
     """
-    dFrame = pd.DataFrame.from_dict(kwargs, orient = "index")
-    dFrame = dFrame.transpose()
+    try:
+        dFrame = pd.DataFrame.from_dict(kwargs, orient = "index")
+        dFrame = dFrame.transpose()
+    except:
+        dFrame = pd.DataFrame(data=kwargs)
     return dFrame
 
 def save_data_as_csv(directory, data, name):
