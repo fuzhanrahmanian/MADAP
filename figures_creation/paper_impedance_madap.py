@@ -23,8 +23,8 @@ from madap.echem.e_impedance import e_impedance as imp
 from madap.data_acquisition import data_acquisition as da
 
 
-DEFAULTTRAIN = True
-CUSTOMTRAIN = False
+DEFAULTTRAIN = False
+CUSTOMTRAIN = True
 
 plotting.Plots()
 save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/impedance_default")
@@ -94,8 +94,8 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
 # ---------------------- Train with default circtuit ----------------------
 
 # one time train without a custom circuit and with the default circuit
-suggested_circuit="R0-p(R1,CPE1)"
-initial_value=[800,1e+14,1e-9,0.8]
+# suggested_circuit="R0-p(R1,CPE1)"
+# initial_value=[800,1e+14,1e-9,0.8]
 # PVA_30032021_BM072_1
 #ind_data = 246
 for exp_id in tqdm(data["experimentID"].unique()):
@@ -122,7 +122,7 @@ for exp_id in tqdm(data["experimentID"].unique()):
 
                 concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
 
-            data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
+            data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp_custom.csv"), sep=";", index=True)
 
             #ind_data += 1
 
