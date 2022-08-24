@@ -8,7 +8,7 @@ This package consists of 3 main classes for analysis:
 - Arrhenius 
 
 This package allows user to upload any common file format of data and the select the data of choice.
-The user can use to plot and get correspondence analysis from each procedure (i.e. by calling “eis_analysis” , Nyquist, bode as well as the correspondence equivalent circuit and its parameters will be drawn).
+The user can use to scientifically plot and get correspondence analysis from each procedure (i.e. by calling “eis_analysis” , Nyquist, bode as well as the correspondence equivalent circuit and its parameters will be drawn).
 This package can be installed via pip/conda and can be utilized with a GUI, command line or just directly importing the module in a python script.
 
 ### Documentation
