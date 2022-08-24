@@ -1,11 +1,8 @@
-from math import exp
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-from tqdm import tqdm
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -16,8 +13,7 @@ from matplotlib.lines import Line2D
 matplotlib.rcParams["figure.max_open_warning"] = 1500
 
 from madap.plotting import plotting
-from madap.echem.e_impedance import e_impedance as imp
-from madap.data_acquisition import data_acquisition as da
+
 # activation_energy_calculated [mJ/mol]
 # activation_energy_default [mJ/mol]
 plotting.Plots()
