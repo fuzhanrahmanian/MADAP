@@ -116,7 +116,7 @@ def call_impedance(data, result_dir, args):
                                           data[header_names[1]],\
                                           data[header_names[2]]
     if args.specific:
-        row_col = args.specific[0].split(", ")
+        row_col = args.specific.split(";")
         phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
         freq_data, real_data, imag_data = da.select_data(data, row_col[0]), \
                                           da.select_data(data, row_col[1]), \

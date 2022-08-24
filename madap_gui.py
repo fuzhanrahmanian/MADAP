@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
 import io
-import time
+import matplotlib
 from madap.utils import gui_elements
 
 class MadapGui:
@@ -38,7 +38,7 @@ def draw_figure(element, figure):
     plt.close('all')  # erases previously drawn plots
     canv = FigureCanvasAgg(figure)
     buf = io.BytesIO()
-    canv.print_figure(buf, format='png')
+    canv.print_figure(buf, format='png', dpi=100)
     if buf is None:
         return None
     buf.seek(0)
@@ -59,9 +59,9 @@ def validate_fields(madap_gui):
         if madap_gui.header_list and (len(madap_gui.header_list) not in [3,4]):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
                 return False
-        if madap_gui.specific and (len(madap_gui.specific) not in [3,4]):
-                sg.popup_error('Wrong number of specific inputs.', title='Input Error')
-                return False
+        # if madap_gui.specific and (len(madap_gui.specific) not in [3,4]):
+        #         sg.popup_error('Wrong number of specific inputs.', title='Input Error')
+        #        return False
     if madap_gui.procedure == 'Arrhenius':
         if madap_gui.header_list and (len(madap_gui.header_list) != 2):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
@@ -134,7 +134,7 @@ def gui_layout(madap, colors):
                       expand_x=True, expand_y=True)
 
     # ----------- Layout the right Column Element ----------- #
-    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
+    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], font=("Arial", 15), visible=False, key='-COL_PLOTS-')]])
 
     # ----------- Assemble the main layout ----------- #
     layout = [
@@ -190,7 +190,7 @@ def main():
             madap_gui.results = values['-RESULT_PATH-']
             madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
             madap_gui.voltage = values['-voltage-']
-            madap_gui.cell_constant = values['-cell_constant-']
+            madap_gui.cell_constant = float(values['-cell_constant-']) if values['-cell_constant-'] != '' else None
             madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
             madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
@@ -198,7 +198,6 @@ def main():
                 madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
-                madap_gui.specific = list(madap_gui.specific.split(','))
 
             # Validate the fields
             validation = validate_fields(madap_gui)
