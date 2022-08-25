@@ -17,13 +17,14 @@ from madap.plotting import plotting
 # activation_energy_calculated [mJ/mol]
 # activation_energy_default [mJ/mol]
 plotting.Plots()
-expriment_type = "arrhenius" #["imp", "arrhenius"]
+expriment_type = "arrhenius" #["impedance", "arrhenius"]
 analysis_type = "calculated" #["calculated,", "default", "custom"]
 
 save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/{expriment_type}_{analysis_type}")
 
 data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
 del data['Unnamed: 0']
+
 MAPPED = True
 
 # madap_resistance_default [Ohm]madap_resistance_default [Ohm]
@@ -43,24 +44,31 @@ def calc_ratio_between_electrolyte_elements(data, CONCAT=False):
 
     # specify the figure markers
     marker_sign = []
+    edge_color = []
     for i in range(len(data)):
         if EC_PC_EMC_ratio.unique()[0] == EC_PC_EMC_ratio.iloc[i]:
             marker_sign.append("o")
+            edge_color.append("black")
         elif EC_PC_EMC_ratio.unique()[1] == EC_PC_EMC_ratio.iloc[i]:
             marker_sign.append("^")
+            edge_color.append("orange")
         elif EC_PC_EMC_ratio.unique()[2] == EC_PC_EMC_ratio.iloc[i]:
             marker_sign.append("D")
+            edge_color.append("red")
+
     if CONCAT:
         # append the EC/PC ratio to the dataFrame
         data = pd.concat([data, pd.DataFrame(data["EC [g]"]/data["PC [g]"], columns= ["EC/PC [gr/gr]"])], axis= 1)
         data = pd.concat([data, pd.DataFrame(marker_sign, columns= ["marker"]) ], axis= 1)
+        data = pd.concat([data, pd.DataFrame(edge_color, columns= ["edgecolor"]) ], axis= 1)
         data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
+
     return Ec_PC_ratio, EC_PC_EMC_ratio, marker_sign, data
 
 # define a list acceptable markers for the plot
-def mscatter(x,y,ax=None, m=None, **kw):
+def mscatter(x,y, edge_color, ax=None, m=None, **kw):
     if not ax: ax=plt.gca()
-    sc = ax.scatter(x,y,**kw)
+    sc = ax.scatter(x,y,edgecolors=edge_color, **kw)
     if (m is not None) and (len(m)==len(x)):
         paths = []
         for marker in m:
@@ -105,19 +113,19 @@ def analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis = data["a
     # plot the activation vs. (EC/PC) colorbar (LiPF6) scatter point circle and triangle for different EMC concentrationS
     fig, ax = plt.subplots(figsize=fig_size)
     if experiment_type == "arrhenius":
-        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis),\
+        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis)*1000, edge_color = data["edgecolor"], linewidth = 0.38,\
                             c= np.array(data["LiPF6 [g]"]), s=9, m=data["marker"], ax=ax)
     if experiment_type == "impedance":
-        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis),\
+        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis)*1000, edge_color = data["edgecolor"], linewidth = 0.38,\
                             c= np.array(data["LiPF6 [g]"]), s=np.array(data["mapped_temp"]), m=data["marker"], ax=ax)
 
     # Create a customize legend for the plot
     legend_elements = [Line2D([0], [0], marker='o', color='k', label=f"{EC_PC_EMC_ratio.unique()[0]}",
-                            markerfacecolor='k', linestyle="None"),
+                            markerfacecolor='k', linestyle="None", markeredgecolor = "black", markeredgewidth = 0.35),
                     Line2D([0], [0], marker='^', color='k', label=f"{EC_PC_EMC_ratio.unique()[1]}",
-                            markerfacecolor='k', linestyle="None"),
+                            markerfacecolor='k', linestyle="None", markeredgecolor= "orange", markeredgewidth = 0.35),
                     Line2D([0], [0], marker='D', color='k', label=f'{EC_PC_EMC_ratio.unique()[2]}',
-                            markerfacecolor='k', linestyle="None")] # , markersize=15
+                            markerfacecolor='k', linestyle="None", markeredgecolor= "red", markeredgewidth = 0.35)] # , markersize=15 ,
 
     # add colorbar
     cb = plt.colorbar(scatter)
@@ -138,8 +146,6 @@ def analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis = data["a
             lables[i] = fr"${float(val)}$"
         legend2 = ax.legend(handles=handles, labels=lables, title= "T [°C]", prop={"size":6}, bbox_to_anchor=(1.45, 0.7), frameon= True)
 
-
-
     #plt.show()
     plt.savefig(os.path.join(save_dir, plot_name))
 
@@ -149,4 +155,4 @@ Ec_PC_ratio, EC_PC_EMC_ratio, marker_sign, data = calc_ratio_between_electrolyte
 if expriment_type == "arrhenius":
     analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data[f"activation_energy_{analysis_type} [mJ/mol]"], y_label = r"$E$ $[mJ/mol]$", fig_size = (5.7, 4.8), plot_name = f"arr_{analysis_type}.svg", experiment_type= expriment_type)
 if expriment_type == "impedance":
-    analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data["madap_conductivity_default [S/cm]"], y_label = r"$\sigma$ $[S/cm]$", fig_size = (5.7, 4.8), plot_name = f"imp_{analysis_type}.svg", experiment_type = expriment_type)
+    analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data["conductivity [S/cm]"], y_label = r"$\sigma$ $[mS/cm]$", fig_size = (5.7, 4.8), plot_name = f"imp_{analysis_type}.svg", experiment_type = expriment_type)
