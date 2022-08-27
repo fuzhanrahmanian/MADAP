@@ -23,8 +23,8 @@ from madap.echem.e_impedance import e_impedance as imp
 from madap.data_acquisition import data_acquisition as da
 
 
-DEFAULTTRAIN = False
-CUSTOMTRAIN = True
+DEFAULTTRAIN = True
+CUSTOMTRAIN = False
 
 plotting.Plots()
 save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/impedance_default")
@@ -78,18 +78,19 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
     #5. num_rc_linKK
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_num_rc_linKK_{analysis_type}"] = Eis.num_rc_linkk
     #6. eval_fit_linKK
-    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madao_eval_fit_linKK_{analysis_type}"] = Eis.eval_fit_linkk
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_eval_fit_linKK_{analysis_type}"] = Eis.eval_fit_linkk
     #7. resistance [Ohm]
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_resistance_{analysis_type} [Ohm]"]=  Eis.custom_circuit.parameters_[0]
     #8 chi_value
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"madap_chi_square_{analysis_type}"] = Eis.chi_val
     # predicted data
-    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"predicted_impedance_{analysis_type} [Ohm]"] = str(Eis.z_fit)
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"predicted_impedance_{analysis_type} [Ohm]"] = str(Eis.z_fit.tolist())
     # real residual
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"residual_real_{analysis_type} [Ohm]"] = str(Eis.res_real)
     # imaginary residual
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"residual_imaginary_{analysis_type} [Ohm]"] = str(Eis.res_imag)
-
+    # custom circuit
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), f"custom_circuit_{analysis_type}"] = str(Eis.custom_circuit)
 
 # ---------------------- Train with default circtuit ----------------------
 

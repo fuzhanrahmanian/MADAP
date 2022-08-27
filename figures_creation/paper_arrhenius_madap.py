@@ -44,7 +44,7 @@ for exp_id in tqdm(data["experimentID"].unique()):
     # 1. activation
     data.loc[data["experimentID"] == exp_id, f"activation_energy_{analysis_type} [mJ/mol]"] = Arr.activation
     # 2. cell constant
-    data.loc[data["experimentID"] == exp_id, f"activation_constant_{analysis_type} [S/cm]"] = Arr.arrhenius_constant
+    data.loc[data["experimentID"] == exp_id, f"activation_constant_{analysis_type}"] = Arr.arrhenius_constant
     # 3. r2 score
     data.loc[data["experimentID"] == exp_id, f"activation_r2_score_{analysis_type}"] = Arr.fit_score
     # 4. mse score
@@ -54,7 +54,7 @@ for exp_id in tqdm(data["experimentID"].unique()):
     # 6. inverted scale temperature
     data.loc[data["experimentID"] == exp_id, f"inverted_scale_temperature_{analysis_type} [1000/K]"] = Arr.inverted_scale_temperatures
     # 7 fitted conductivity
-    data.loc[data["experimentID"] == exp_id, f"fitted_conductivity_{analysis_type} [S/cm]"] = Arr.ln_conductivity_fit
+    data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity_{analysis_type} [ln(S/cm)]"] = Arr.ln_conductivity_fit
 
     data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_arr_default.csv"), sep=";", index=True)
 
