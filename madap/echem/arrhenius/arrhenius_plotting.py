@@ -68,6 +68,8 @@ class ArrheniusPlotting(Plots):
         subplot_ax.legend(loc="upper right", fontsize=5.5)
 
         self.plot_identity(subplot_ax2, xlabel="$T$ [\u00b0C]")
+        self.ax1 = subplot_ax
+        self.ax2 = subplot_ax2
 
     def compose_arrhenius_subplot(self, plots:list):
         """Creates subplots template for the Arrhenius plots.
