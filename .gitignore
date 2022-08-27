@@ -107,3 +107,6 @@ electrolyte_figures/
 
 #Datasets
 data/
+
+# cache
+figure_creation/

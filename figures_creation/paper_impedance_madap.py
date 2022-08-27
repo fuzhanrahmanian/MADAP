@@ -5,12 +5,18 @@
 # headers are ;experimentID;electrolyteLabel;PC;EC;EMC;LiPF6;inverseTemperature;temperature;conductivity;resistance;Z';Z'';frequency;electrolyteAmount
 # plot conductivity vs. (EC/PC) colorbar (LiPF6/EMC)
 # add default and get circuits to the dataFrame
+from functools import cache
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import re
 from tqdm import tqdm
 import pandas as pd
+from joblib import Parallel, delayed
+from joblib import Memory
+location = r"figure_creation/cache_dir"
+memory = Memory(location, verbose=True)
+
 
 
 import matplotlib
@@ -23,11 +29,16 @@ from madap.echem.e_impedance import e_impedance as imp
 from madap.data_acquisition import data_acquisition as da
 
 
-DEFAULTTRAIN = True
-CUSTOMTRAIN = False
+DEFAULTTRAIN = False
+CUSTOMTRAIN = True
+
+# 1. train with custom circuit and no initial value
+# 2. train with default circuit and no initial value
+# 3. train with default circuit and with initial value
+name = "custom" #["default", "custom", "default_with_initial_value"]
 
 plotting.Plots()
-save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/impedance_default")
+save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/impedance_{name}")
 
 plot_type = ["nyquist" ,"nyquist_fit", "residual", "bode"]
 
@@ -98,8 +109,9 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
 # suggested_circuit="R0-p(R1,CPE1)"
 # initial_value=[800,1e+14,1e-9,0.8]
 # PVA_30032021_BM072_1
-#ind_data = 246
-for exp_id in tqdm(data["experimentID"].unique()):
+# ind_data = 246
+
+def constly_compute(data, exp_id):
     for temp in temperatures:
 
         if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
@@ -114,7 +126,7 @@ for exp_id in tqdm(data["experimentID"].unique()):
                                         initial_value = [800,1e+14,1e-9,0.8], cell_constant = cell_constant,
                                         plot_type = plot_type, exp_id= exp_id)
                 # initialize the Impedance class & initialis the EIS procedure
-                concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_shift = True)
+                concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_shift = False)
 
             if CUSTOMTRAIN:
                 Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = None,
@@ -123,10 +135,21 @@ for exp_id in tqdm(data["experimentID"].unique()):
 
                 concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
 
-            data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp_custom.csv"), sep=";", index=True)
+            data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_imp_{name}.csv"), sep=";", index=True)
+
+constly_compute_cached = memory.cache(constly_compute)
+
+def data_processing_using_cache(data, exp_id):
+    return constly_compute_cached(data, exp_id)
+
+results = Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
+
+print(results)
+
+#for exp_id in tqdm(data["experimentID"].unique()):
 
             #ind_data += 1
 
 #data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_imp.csv"), sep=";", index=True)
 
-data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)
+#data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)

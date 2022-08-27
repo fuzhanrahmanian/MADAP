@@ -22,16 +22,27 @@ from madap.plotting import plotting
 from madap.echem.arrhenius import arrhenius as arr
 from madap.data_acquisition import data_acquisition as da
 
+analysis_type = "custom" #["default", "custom", "default_with_initial_value", "calculated"]
+
+from joblib import Parallel, delayed
+from joblib import Memory
+location = fr"figures_creation/cache_dir_arr_{analysis_type}"
+memory = Memory(location, verbose=True)
+
+
 plotting.Plots()
 save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/arrhenius_default")
 
 plot_type = ["arrhenius", "arrhenius_fit"]
-analysis_type = "default"  # ["calculated", "custom", "default"]
+#analysis_type = "default"  # ["calculated", "custom", "default"]
 # load the data
 data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
 del data['Unnamed: 0']
 
-for exp_id in tqdm(data["experimentID"].unique()):
+
+
+def constly_compute(data, exp_id):
+
     # get the data for the current experiment
     temp_exp = data["temperature [°C]"][data["experimentID"] == exp_id]
     cond_exp = data["madap_conductivity_default [S/cm]"][data["experimentID"] == exp_id]
@@ -56,6 +67,17 @@ for exp_id in tqdm(data["experimentID"].unique()):
     # 7 fitted conductivity
     data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity_{analysis_type} [ln(S/cm)]"] = Arr.ln_conductivity_fit
 
-    data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_arr_default.csv"), sep=";", index=True)
+    data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_arr_{analysis_type}.csv"), sep=";", index=True)
 
-data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True, mode='w+')
+constly_compute_cached = memory.cache(constly_compute)
+
+
+def data_processing_using_cache(data, exp_id):
+    return constly_compute_cached(data, exp_id)
+
+results = Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
+
+print(results)
+
+# for exp_id in tqdm(data["experimentID"].unique()):
+#data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True, mode='w+')
