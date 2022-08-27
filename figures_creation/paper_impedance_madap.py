@@ -12,9 +12,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import re
 from tqdm import tqdm
 import pandas as pd
+
+name = "custom" #["default", "custom", "default_with_initial_value"]
+
 from joblib import Parallel, delayed
 from joblib import Memory
-location = r"figure_creation/cache_dir"
+location = fr"figure_creation/cache_dir_{name}"
 memory = Memory(location, verbose=True)
 
 
@@ -35,7 +38,6 @@ CUSTOMTRAIN = True
 # 1. train with custom circuit and no initial value
 # 2. train with default circuit and no initial value
 # 3. train with default circuit and with initial value
-name = "custom" #["default", "custom", "default_with_initial_value"]
 
 plotting.Plots()
 save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/impedance_{name}")
@@ -135,7 +137,7 @@ def constly_compute(data, exp_id):
 
                 concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
 
-            data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_imp_{name}.csv"), sep=";", index=True)
+            #data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_imp_{name}.csv"), sep=";", index=True)
 
 constly_compute_cached = memory.cache(constly_compute)
 

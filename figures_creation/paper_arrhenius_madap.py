@@ -39,7 +39,7 @@ plot_type = ["arrhenius", "arrhenius_fit"]
 data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
 del data['Unnamed: 0']
 
-
+## write an empty dataset and append the train stuff to the main after parallel training.
 
 def constly_compute(data, exp_id):
 
@@ -67,7 +67,7 @@ def constly_compute(data, exp_id):
     # 7 fitted conductivity
     data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity_{analysis_type} [ln(S/cm)]"] = Arr.ln_conductivity_fit
 
-    data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_arr_{analysis_type}.csv"), sep=";", index=True)
+    #data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_arr_{analysis_type}.csv"), sep=";", index=True)
 
 constly_compute_cached = memory.cache(constly_compute)
 
@@ -75,9 +75,9 @@ constly_compute_cached = memory.cache(constly_compute)
 def data_processing_using_cache(data, exp_id):
     return constly_compute_cached(data, exp_id)
 
-results = Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
+Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
 
-print(results)
+#print(results)
 
 # for exp_id in tqdm(data["experimentID"].unique()):
 #data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True, mode='w+')
