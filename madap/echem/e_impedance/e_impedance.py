@@ -7,6 +7,7 @@ import numpy as np
 import warnings
 from attrs import define, field
 from attrs.setters import frozen
+import random
 
 import impedance.validation as validation
 import impedance.preprocessing as preprocessing
@@ -117,7 +118,9 @@ class EIS(EChemProcedure):
 
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
-                custom_circuit_guess = circuits.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit, global_opt=True)
+                guess_value = self._initialize_random_guess(guess_value, min(self.impedance.real_impedance))
+                # fit the data with random circuit and its randomly guessed elements
+                custom_circuit_guess = circuits.CustomCircuit(initial_guess=guess_value, circuit=guess_circuit)
 
                 try:
                     custom_circuit_guess.fit(f_circuit, z_circuit)
@@ -253,7 +256,7 @@ class EIS(EChemProcedure):
         """ Calculate the chi value of the fit.
 
         Returns:
-            float: chi value of the fit
+            float: chi square value of the fit
         """
         return np.sum(np.square(self.res_imag) + np.square(self.res_real))
 
@@ -281,6 +284,25 @@ class EIS(EChemProcedure):
         phase_shift_in_rad = np.arctan(da.format_data(
                              abs(-self.impedance.imaginary_impedance)/da.format_data(abs(self.impedance.real_impedance))))
         return np.rad2deg(phase_shift_in_rad)
+
+    def _initialize_random_guess(self, guess_value, guess_initial_resistance):
+        """Initialize the random guess for the circuit's resistace.
+
+        Args:
+            guess_value (list): list of initial guessed value without any guess for resistance.
+            guess_initial_resistance (float): Value for the initial resistance guess.
+        """
+        if "x" in guess_value:
+            guess_value = list(map(lambda x: x.replace("x", guess_initial_resistance), guess_value))
+        if "y" in guess_value:
+            guess_value = list(map(lambda x: x.replace("y", random.randint(guess_initial_resistance, 2*guess_initial_resistance), guess_value)))
+        if "z" in guess_value:
+            guess_value = list(map(lambda x: x.replace("z", random.randint(2*guess_initial_resistance, 3*guess_initial_resistance), guess_value)))
+        if "t" in guess_value:
+            guess_value = list(map(lambda x: x.replace("t", random.randint(3*guess_initial_resistance, 4*guess_initial_resistance), guess_value)))
+        return guess_value
+
+
 
 
 class Mottschotcky(EIS, EChemProcedure):

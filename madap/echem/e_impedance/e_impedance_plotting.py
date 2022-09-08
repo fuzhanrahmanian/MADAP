@@ -122,7 +122,7 @@ class ImpedancePlotting(Plots):
             norm_color (bool, optional): If True, normalizes the colorbar. Defaults to None.
         """
         log.info("Creating a fitted Nyquist plot")
-        nyquist_label = fr" v = {voltage}[V], $\chi$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi$ = {np.format_float_scientific(chi, 3)}"
+        nyquist_label = fr" v = {voltage}[V], $\chi_{2}$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi_{2}$ = {np.format_float_scientific(chi, 3)}"
 
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
         nyquist_plot = subplot_ax.scatter(real_impedance, -imaginary_impedance,
