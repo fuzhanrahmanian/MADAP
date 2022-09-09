@@ -292,14 +292,10 @@ class EIS(EChemProcedure):
             guess_value (list): list of initial guessed value without any guess for resistance.
             guess_initial_resistance (float): Value for the initial resistance guess.
         """
-        if "x" in guess_value:
-            guess_value = list(map(lambda x: x.replace("x", guess_initial_resistance), guess_value))
-        if "y" in guess_value:
-            guess_value = list(map(lambda x: x.replace("y", random.randint(guess_initial_resistance, 2*guess_initial_resistance), guess_value)))
-        if "z" in guess_value:
-            guess_value = list(map(lambda x: x.replace("z", random.randint(2*guess_initial_resistance, 3*guess_initial_resistance), guess_value)))
-        if "t" in guess_value:
-            guess_value = list(map(lambda x: x.replace("t", random.randint(3*guess_initial_resistance, 4*guess_initial_resistance), guess_value)))
+        guess_value = [guess_initial_resistance if element == 'x' else element for element in guess_value]
+        guess_value = [guess_initial_resistance if element == 'y' else element for element in guess_value]
+        guess_value = [guess_initial_resistance if element == 'z' else element for element in guess_value]
+        guess_value = [guess_initial_resistance if element == 't' else element for element in guess_value]
         return guess_value
 
 
