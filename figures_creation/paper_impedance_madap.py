@@ -27,7 +27,7 @@ from madap.data_acquisition import data_acquisition as da
 # 5. train with custom circuit and outlier detection
 
 
-name = "custom" #["default", "custom", "default_initial", "defualt_initial_outliers", "custom_outliers"]
+name = "default_initial" #["default", "custom", "default_initial", "defualt_initial_outliers", "custom_outliers"]
 
 # cache the function
 location = fr"figures_creation/cache_dir_{name}"
@@ -37,9 +37,9 @@ memory = Memory(location, verbose=True)
 matplotlib.rcParams["figure.max_open_warning"] = 1500
 
 DEFAULTTRAIN = False
-DEFAULTTRAINWITHINITIALVALUE = False
+DEFAULTTRAINWITHINITIALVALUE = True
 DEFAULTTRAINWITHOUTLIER = False
-CUSTOMTRAIN = True
+CUSTOMTRAIN = False
 
 plotting.Plots()
 save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/impedance_{name}")
@@ -68,7 +68,7 @@ def get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False):
     return freq_data, real_data, imag_data, cell_constant, phase_shift_data
 
 
-def eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit, initial_value, cell_constant,plot_type, exp_id):
+def eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit, initial_value, cell_constant,plot_type, exp_id, temp):
 
     # initialize the Impedance class
     Im = imp.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), phase_shift_data)
@@ -77,7 +77,7 @@ def eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_c
     Eis  = imp.EIS(Im, voltage=None, suggested_circuit=suggested_circuit,
                             initial_value=initial_value, cell_constant = cell_constant)
     # analyze the data
-    Eis.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
+    Eis.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=f"{exp_id}_{temp}")
 
     return Eis
 
@@ -115,24 +115,6 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
 # initial_value=[800,1e+14,1e-9,0.8]
 # PVA_30032021_BM072_1
 # ind_data = 246
-data_analysis = {f"madap_conductivity_{name} [S/cm]": [], f"madap_fit_params_{name}": [],
-                f"madap_rmse_{name}": [], f"madap_num_rc_linKK_{name}": [], f"madap_eval_fit_linKK_{name}": [], f"madap_resistance_{name} [Ohm]": [],
-                f"madap_chi_square_{name}": [], f"predicted_impedance_{name} [Ohm]": [], f"residual_real_{name} [Ohm]": [],
-                f"residual_imaginary_{name} [Ohm]": [], f"custom_circuit_{name}": []}
-
-def concat_dict(name, Eis):
-    data_analysis[f"madap_conductivity_{name} [S/cm]"].append(Eis.conductivity)
-    data_analysis[f"madap_fit_params_{name}"].append(str([(val, err) for val, err in zip(Eis.custom_circuit.parameters_, Eis.custom_circuit.conf_)]))
-    data_analysis[f"madap_rmse_{name}"].append(Eis.rmse_calc)
-    data_analysis[f"madap_num_rc_linKK_{name}"].append(Eis.num_rc_linkk)
-    data_analysis[f"madap_eval_fit_linKK_{name}"].append(Eis.eval_fit_linkk)
-    data_analysis[f"madap_resistance_{name} [Ohm]"].append(Eis.custom_circuit.parameters_[0])
-    data_analysis[f"madap_chi_square_{name}"].append(Eis.chi_val)
-    data_analysis[f"predicted_impedance_{name} [Ohm]"].append(str(Eis.z_fit.tolist()))
-    data_analysis[f"residual_real_{name} [Ohm]"].append(str(Eis.res_real))
-    data_analysis[f"residual_imaginary_{name} [Ohm]"].append(str(Eis.res_imag))
-    data_analysis[f"custom_circuit_{name}"].append(str(Eis.custom_circuit))
-
 
 
 def constly_compute(data, exp_id):
@@ -149,28 +131,19 @@ def constly_compute(data, exp_id):
 
                 Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-p(R1,CPE1)",
                                         initial_value = [800,1e+14,1e-9,0.8], cell_constant = cell_constant,
-                                        plot_type = plot_type, exp_id= exp_id)
-                # initialize the Impedance class & initialis the EIS procedure
-                #concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_shift = False)
+                                        plot_type = plot_type, exp_id= exp_id, temp = temp)
 
             if CUSTOMTRAIN:
                 Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = None,
                                         initial_value = None, cell_constant = cell_constant,
-                                        plot_type = plot_type, exp_id = exp_id)
+                                        plot_type = plot_type, exp_id = exp_id, temp = temp)
 
             if DEFAULTTRAINWITHINITIALVALUE:
                 r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
                 r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
                 Eis = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-p(R1,CPE1)",
                                         initial_value = [r0_guess,1e+14,1e-9,0.8], cell_constant = cell_constant,
-                                        plot_type = plot_type, exp_id = exp_id)
-                #r0_index += 1
-
-                #concat_new_data(Eis, data, exp_id, temp, analysis_type = "custom", phase_shift = False)
-            # due to joblib issue, data can be concatenated in a seperate dictionary first
-
-            concat_dict(name, Eis)
-            #data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_imp_{name}.csv"), sep=";", index=True)
+                                        plot_type = plot_type, exp_id = exp_id, temp = temp)
 
 constly_compute_cached = memory.cache(constly_compute)
 
@@ -178,15 +151,3 @@ def data_processing_using_cache(data, exp_id):
     return constly_compute_cached(data, exp_id)
 
 results = Parallel(n_jobs=30)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
-# for exp_id in tqdm(data["experimentID"].unique()[:2]):
-#    constly_compute(data, exp_id)
-
-#print(results)
-df1  = pd.DataFrame(data_analysis, columns=data_analysis.keys())
-
-
-local_data = pd.concat([local_data, df1], ignore_index=True)
-
-local_data.to_csv(os.path.join(os.getcwd(),fr"data/imp_{name}.csv"), sep=";", index=True)
-
-#data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True)

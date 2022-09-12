@@ -22,36 +22,28 @@ from madap.plotting import plotting
 from madap.echem.arrhenius import arrhenius as arr
 from madap.data_acquisition import data_acquisition as da
 
-analysis_type = "custom" #["default", "custom", "default_with_initial_value", "calculated"]
+name = "default_initial" #["default", "custom", "default_initial", "defualt_initial_outliers", "custom_outliers"]
+
+#analysis_type = "default_with_initial_value" #["default", "custom", "default_with_initial_value", "calculated"]
 
 from joblib import Parallel, delayed
 from joblib import Memory
-location = fr"figures_creation/cache_dir_arr_{analysis_type}"
+location = fr"figures_creation/cache_dir_arr_{name}"
 memory = Memory(location, verbose=True)
 
 
 plotting.Plots()
-save_dir = os.path.join(os.getcwd(), r"electrolyte_figures/arrhenius_default")
+save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/arrhenius_{name}")
 
 plot_type = ["arrhenius", "arrhenius_fit"]
 #analysis_type = "default"  # ["calculated", "custom", "default"]
 # load the data
-data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
+data = pd.read_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{name}.csv"), sep=";")
 del data['Unnamed: 0']
 
 ## write an empty dataset and append the train stuff to the main after parallel training.
 
-def constly_compute(data, exp_id):
-
-    # get the data for the current experiment
-    temp_exp = data["temperature [°C]"][data["experimentID"] == exp_id]
-    cond_exp = data["madap_conductivity_default [S/cm]"][data["experimentID"] == exp_id]
-
-    # initialize the Arrhenius class
-    Arr = arr.Arrhenius(da.format_data(temp_exp), da.format_data(cond_exp))
-    # analyze the data
-    Arr.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
-
+def concat_new_data(data, exp_id, Arr, analysis_type):
     # 1. activation
     data.loc[data["experimentID"] == exp_id, f"activation_energy_{analysis_type} [mJ/mol]"] = Arr.activation
     # 2. cell constant
@@ -67,17 +59,31 @@ def constly_compute(data, exp_id):
     # 7 fitted conductivity
     data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity_{analysis_type} [ln(S/cm)]"] = Arr.ln_conductivity_fit
 
+
+def constly_compute(data, exp_id, name):
+
+    # get the data for the current experiment
+    temp_exp = data["temperature [°C]"][data["experimentID"] == exp_id]
+    cond_exp = data[f"madap_eis_conductivity_{name} [S/cm]"][data["experimentID"] == exp_id]
+
+    # initialize the Arrhenius class
+    Arr = arr.Arrhenius(da.format_data(temp_exp), da.format_data(cond_exp))
+    # analyze the data
+    Arr.perform_all_actions(save_dir, plots = da.format_plots(plot_type), optional_name=exp_id)
+
+
     #data.to_csv(os.path.join(os.getcwd(), fr"data/Dataframe_STRUCTURED_all508_arr_{analysis_type}.csv"), sep=";", index=True)
 
 constly_compute_cached = memory.cache(constly_compute)
 
 
-def data_processing_using_cache(data, exp_id):
-    return constly_compute_cached(data, exp_id)
+def data_processing_using_cache(data, exp_id, analysis_type):
+    return constly_compute_cached(data, exp_id, analysis_type)
 
-Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(data["experimentID"].unique()))
+Parallel(n_jobs=30)(delayed(data_processing_using_cache)(data, exp_id, name) for exp_id in tqdm(data["experimentID"].unique()))
+# for exp_id in tqdm(data["experimentID"].unique()):
+#     constly_compute(data, exp_id, name)
 
-#print(results)
 
 # for exp_id in tqdm(data["experimentID"].unique()):
 #data.to_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";", index=True, mode='w+')
