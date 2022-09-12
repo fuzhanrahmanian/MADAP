@@ -221,7 +221,7 @@ class EIS(EChemProcedure):
 
         self.custom_circuit.save(os.path.join(save_dir, f"{name}"))
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
-                      "conductivity [S/cm]": self.conductivity}
+                      "conductivity [S/cm]": self.conductivity, "chi_square": self.chi_val}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # Save the dataset
         data = utils.assemble_data_frame(**{"frequency [Hz]": self.impedance.frequency,
