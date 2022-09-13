@@ -47,6 +47,7 @@ def _analyze_parser_args():
                             help="initial values for the suggested circuit. \
                                 \n format: element1, element2, ... \
                                 \n it will be used just if the suggested_circuit is available.")
+
         elif proc.impedance_procedure == "Mottschotcky":
             # TODO
             pass
@@ -102,6 +103,7 @@ def call_impedance(data, result_dir, args):
         result_dir (str): the directory for saving results
         args (parser.args): Parsed arguments
     """
+    _, nan_indices = da.remove_outlier_specifying_quantile(df = data, columnns = [data.columns[1], data.columns[2]])
 
     if args.header_list:
         # Check if args header is a list
@@ -112,15 +114,24 @@ def call_impedance(data, result_dir, args):
 
         phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
 
+        # remove nan rows
+        data = da.remove_nan_rows(data, nan_indices)
+        # extracting the data
         freq_data, real_data, imag_data = data[header_names[0]],\
                                           data[header_names[1]],\
                                           data[header_names[2]]
+
     if args.specific:
-        row_col = args.specific.split(";")
+        row_col = args.specific[0].split(", ")
+
+        selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
+        data = da.remove_nan_rows(selected_data, nan_indices)
+
         phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
         freq_data, real_data, imag_data = da.select_data(data, row_col[0]), \
                                           da.select_data(data, row_col[1]), \
                                           da.select_data(data, row_col[2])
+
 
     Im = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
 
@@ -209,6 +220,7 @@ def start_procedure(args):
     """
 
     data = da.acquire_data(args.file)
+    da.remove_unnamed_col(data)
     log.info(f"the header of your data is: \n {data.head()}")
     result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 

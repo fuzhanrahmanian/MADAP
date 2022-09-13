@@ -59,8 +59,9 @@ def format_data(data):
 def select_data(data, select_data:str):
     # this can be use when the user wants to select a subset of the data
     numbers = list(map(int, select_data.split(",")))
-    data = data.iloc[numbers[0]:numbers[1], numbers[2]:numbers[3]].values.reshape(-1)
+    data = data.iloc[:, numbers[2]: numbers[3]].values.reshape(-1)
     return data
+
 
 def choose_options(data):
     data_index = input("Choose 1 if you are selecting the header of your column, 2 if you are selecting the index of the rows/columns and 3 if is not available. \n Your selection is: ")
@@ -82,3 +83,44 @@ def format_plots(plots):
         plots = list(plots)
     return plots
 
+def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.1, high_quantile = 0.95):
+    """removing the outliers from the data by specifying the quantile
+
+    Args:
+        df (dataframe): original dataframe
+        columnns (list): colummns for which the outliers are to be removed
+        low_quantile (float): lower quantile
+        high_quantile (float): upper quantile
+
+    Returns:
+        data: the cleaned dataframe
+    """
+    # select the columns that needs to be studied for outliers
+    detect_search = df[columnns]
+    # get the lower quantile of the corresponding columns
+    q_low = detect_search.quantile(low_quantile)
+    # get the upper quantile of the corresponding columns
+    q_high = detect_search.quantile(high_quantile)
+    # detect the outliiers in the data and replace those values with nan
+    detect_search = detect_search[(detect_search < q_high) & (detect_search > q_low)]
+    # find the index of the outliers
+    nan_indices = [*set(np.where(np.asanyarray(np.isnan(detect_search)))[0].tolist())]
+    log.info(f"The outliers are remove from dataset {detect_search} \n and the indeces are {nan_indices}.")
+
+    return detect_search, nan_indices
+
+def remove_nan_rows(df, nan_indices):
+    # check if the index of the outliers is present in the dataframe
+    available_nan_indices = [i for i in nan_indices if i in df.index.values]
+    # removing the rows with nan and reset their indeces
+    df = df.drop(df.index[[available_nan_indices]]).reset_index()
+    # delete the columns
+    if "index" in df.columns:
+        del df["index"]
+    remove_unnamed_col(df)
+    return df
+
+
+def remove_unnamed_col(df):
+    if "Unnamed: 0" in df.columns:
+        del df["Unnamed: 0"]
