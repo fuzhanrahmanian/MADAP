@@ -44,7 +44,7 @@ class ImpedancePlotting(Plots):
         nyquist_plot = subplot_ax.scatter(real_impedance, -imaginary_impedance,
                                           c=frequency, norm=norm, s=10,
                                           cmap=color_map, rasterized=True,
-                                          label=f"v = {voltage}[V]")
+                                          label=f"v = {voltage} [V]")
 
         nyquist_plot.set_clim(min(frequency), max(frequency))
 
@@ -123,7 +123,7 @@ class ImpedancePlotting(Plots):
         """
         log.info("Creating a fitted Nyquist plot")
         linKK = "linKK"
-        nyquist_label = fr" v = {voltage}[V], $\chi_{{linKK}}^{2}$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi^{2}$ = {np.format_float_scientific(chi, 3)}"
+        nyquist_label = fr" v = {voltage} [V], $\chi_{{linKK}}^{2}$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi^{2}$ = {np.format_float_scientific(chi, 3)}"
 
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
         nyquist_plot = subplot_ax.scatter(real_impedance, -imaginary_impedance,

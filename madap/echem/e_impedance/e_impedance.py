@@ -20,6 +20,7 @@ from madap.echem.procedure import EChemProcedure
 from madap.echem.e_impedance.e_impedance_plotting import ImpedancePlotting as iplt
 
 warnings.warn("deprecated", DeprecationWarning)
+np.seterr(divide='ignore', invalid='ignore')
 # reference the impedance library
 log = logger.get_logger("impedance")
 
@@ -152,24 +153,28 @@ class EIS(EChemProcedure):
             self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
             log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_calc}")
 
-        # re-evaluating the fit
-        iteration = 0
-        # get the sum of root mean square of the truth values
-        rms = np.linalg.norm(z_circuit) / np.sqrt(len(z_circuit))
-        while iteration < self.max_iterations:
-            # fit again if the threshold error is not satisfied
-            if self.rmse_calc > (self.threshold_error * rms):
-                # get the initial values according to previous fit and its uncertainty
-                initial_guess_trial = [i+j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
-                # refit
-                self.custom_circuit = circuits.CustomCircuit(initial_guess=initial_guess_trial,\
-                                                             circuit=self.suggested_circuit).fit(f_circuit, z_circuit)
-                self.z_fit = self.custom_circuit.predict(f_circuit)
-                self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
-                log.info(f"With re-evaluating the circuit {self.suggested_circuit} the RMSE error is now {self.rmse_calc}")
+            # re-evaluating the fit
+            iteration = 0
+            # get the sum of root mean square of the truth values
+            rms = np.linalg.norm(z_circuit) / np.sqrt(len(z_circuit))
+            while iteration < self.max_iterations:
                 iteration += 1
-            else:
-                break
+                try:
+                    # fit again if the threshold error is not satisfied
+                    if self.rmse_calc > (self.threshold_error * rms):
+                        # get the initial values according to previous fit and its uncertainty
+                        initial_guess_trial = [i+j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
+                        # refit
+                        self.custom_circuit = circuits.CustomCircuit(initial_guess=initial_guess_trial,\
+                                                                    circuit=self.suggested_circuit).fit(f_circuit, z_circuit, method="trf")
+                        self.z_fit = self.custom_circuit.predict(f_circuit)
+                        self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
+                        log.info(f"With re-evaluating the circuit {self.suggested_circuit} the RMSE error is now {self.rmse_calc}")
+
+
+                except Exception as e:
+                    log.error(e)
+                    continue
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available

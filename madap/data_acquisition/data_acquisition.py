@@ -113,7 +113,7 @@ def remove_nan_rows(df, nan_indices):
     # check if the index of the outliers is present in the dataframe
     available_nan_indices = [i for i in nan_indices if i in df.index.values]
     # removing the rows with nan and reset their indeces
-    df = df.drop(df.index[[available_nan_indices]]).reset_index()
+    df = df.drop(df.index[available_nan_indices]).reset_index()
     # delete the columns
     if "index" in df.columns:
         del df["index"]
