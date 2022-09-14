@@ -83,7 +83,7 @@ def format_plots(plots):
         plots = list(plots)
     return plots
 
-def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.1, high_quantile = 0.95):
+def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.05, high_quantile = 0.95):
     """removing the outliers from the data by specifying the quantile
 
     Args:
