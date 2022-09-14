@@ -1,6 +1,7 @@
 """Impedance Analysis module."""
-# for EIS analysis, impedance python package has been used.
+# for fit the EIS experiments, impedance python package has been used.
 # RefMurbach, M., Gerwe, B., Dawson-Elli, N., & Tsui, L. (2020). impedance.py: A Python package for electrochemical impedance analysis. Journal of Open Source Software, 5(). https://doi.org/10.21105/joss.02349
+# cite for EIS fitting: https://github.com/ECSHackWeek/impedance.py
 import os
 import json
 import numpy as np
@@ -56,7 +57,8 @@ class EIS(EChemProcedure):
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None,
                 initial_value = None, max_rc_element: int = 50,
                 cut_off: float = 0.85, fit_type: str = 'complex',
-                val_low_freq: bool = True, cell_constant="n"):
+                val_low_freq: bool = True, cell_constant="n", max_iterations: int = 10,
+                threshold_error:float = 0.009):
         """ Initialize the EIS class.
 
         Args:
@@ -69,6 +71,7 @@ class EIS(EChemProcedure):
             fit_type (str, optional): Fit type. Defaults to 'complex'.
             val_low_freq (bool, optional): If True, the low frequency is used for the fit. Defaults to True.
             cell_constant (str, optional): Cell constant. Defaults to "n".
+            max_iterations (int, optional): Maximum number of iterations for evaluating the accuarcy of fit. Defaults to 10.
         """
         self.impedance = impedance
         self.voltage = voltage
@@ -79,6 +82,8 @@ class EIS(EChemProcedure):
         self.fit_type = fit_type
         self.val_low_freq = val_low_freq
         self.cell_constant = cell_constant
+        self.max_iterations = max_iterations
+        self.threshold_error = threshold_error
         self.conductivity = None
         self.rmse_calc = None
         self.num_rc_linkk = None
@@ -146,6 +151,25 @@ class EIS(EChemProcedure):
             self.z_fit = self.custom_circuit.predict(f_circuit)
             self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
             log.info(f"With the guessed circuit {self.suggested_circuit} the RMSE error is {self.rmse_calc}")
+
+        # re-evaluating the fit
+        iteration = 0
+        # get the sum of root mean square of the truth values
+        rms = np.linalg.norm(z_circuit) / np.sqrt(len(z_circuit))
+        while iteration < self.max_iterations:
+            # fit again if the threshold error is not satisfied
+            if self.rmse_calc > (self.threshold_error * rms):
+                # get the initial values according to previous fit and its uncertainty
+                initial_guess_trial = [i+j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
+                # refit
+                self.custom_circuit = circuits.CustomCircuit(initial_guess=initial_guess_trial,\
+                                                             circuit=self.suggested_circuit).fit(f_circuit, z_circuit)
+                self.z_fit = self.custom_circuit.predict(f_circuit)
+                self.rmse_calc = circuits.fitting.rmse(z_circuit, self.z_fit)
+                log.info(f"With re-evaluating the circuit {self.suggested_circuit} the RMSE error is now {self.rmse_calc}")
+                iteration += 1
+            else:
+                break
 
         if self.cell_constant:
             # calculate the ionic conductivity if cell constant is available
