@@ -2,7 +2,7 @@ import os, json
 import pandas as pd
 
 # path can be changed
-analysis_type = "default_initial" #["default", "custom", "default_initial", "defualt_initial_outliers", "custom_outliers"]
+analysis_type = "default_type1" #["default_type1", "default_type2", "default_type3", "custom"]
 
 path_to_json = fr"C:\Users\Fuzhan\Repositories\MADAP\electrolyte_figures\arrhenius_{analysis_type}\data"
 json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
