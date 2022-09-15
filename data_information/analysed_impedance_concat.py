@@ -2,7 +2,7 @@ import os, json
 import pandas as pd
 import numpy as np
 
-analysis_type = "default_type1" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random"]
+analysis_type = "default_type4_random" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random"]
 
 #analysis_type =  "default_type1" #["default_type1", "default_type2", "default_type3", "custom"]
 
@@ -40,9 +40,9 @@ def concat_new_data(data, exp_id, temp, json_file, csv_file, analysis_type = "de
     # predicted datafit_impedance
     data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == float(temp)), f"madap_eis_predicted_impedance_{analysis_type} [Ohm]"] = str([eval(csv_file["fit_impedance [Ω]"][i]) for i, _ in enumerate(csv_file["fit_impedance [Ω]"][~csv_file["fit_impedance [Ω]"].isnull()])])
     # real residual
-    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == float(temp)), f"madap_eis_residual_real_{analysis_type} [Ohm]"] = str([eval(csv_file["residual_real"][i]) for i, _ in enumerate(csv_file["residual_real"])])
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == float(temp)), f"madap_eis_residual_real_{analysis_type} [Ohm]"] = str([csv_file["residual_real"][i] for i, _ in enumerate(csv_file["residual_real"])])
     # imaginary residual
-    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == float(temp)), f"madap_eis_residual_imaginary_{analysis_type} [Ohm]"] = str([eval(csv_file["residual_real"][i]) for i, _ in enumerate(csv_file["residual_imag"])])
+    data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == float(temp)), f"madap_eis_residual_imaginary_{analysis_type} [Ohm]"] = str([csv_file["residual_real"][i] for i, _ in enumerate(csv_file["residual_imag"])])
 
     return data
 
@@ -61,4 +61,4 @@ for i, file in enumerate(zip(json_files, csv_files)):
     processed_data = concat_new_data(processed_data, experimentid_name, temperature, json_file, csv_file, analysis_type)
 
 
-processed_data.to_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{analysis_type}.csv"), sep=";", index=True, mode='w+')
+processed_data.to_csv(os.path.join(os.getcwd(),fr"data/imp_data/processed_data_impedance_{analysis_type}.csv"), sep=";", index=True, mode='w+')

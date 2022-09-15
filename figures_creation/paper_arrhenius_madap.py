@@ -22,8 +22,8 @@ from madap.plotting import plotting
 from madap.echem.arrhenius import arrhenius as arr
 from madap.data_acquisition import data_acquisition as da
 
-name = "default_initial" #["default", "custom", "default_initial", "defualt_initial_outliers", "custom_outliers"]
-
+name = "default_christian" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random", default_christian]
+# , "default_christian" should be try separately
 #analysis_type = "default_with_initial_value" #["default", "custom", "default_with_initial_value", "calculated"]
 
 from joblib import Parallel, delayed
@@ -38,7 +38,10 @@ save_dir = os.path.join(os.getcwd(), fr"electrolyte_figures/arrhenius_{name}")
 plot_type = ["arrhenius", "arrhenius_fit"]
 #analysis_type = "default"  # ["calculated", "custom", "default"]
 # load the data
-data = pd.read_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{name}.csv"), sep=";")
+if name == "default_christian":
+    data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
+if name != "default_christian":
+    data = pd.read_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{name}.csv"), sep=";")
 del data['Unnamed: 0']
 
 ## write an empty dataset and append the train stuff to the main after parallel training.
@@ -61,11 +64,12 @@ def concat_new_data(data, exp_id, Arr, analysis_type):
 
 
 def constly_compute(data, exp_id, name):
-
     # get the data for the current experiment
     temp_exp = data["temperature [°C]"][data["experimentID"] == exp_id]
-    cond_exp = data[f"madap_eis_conductivity_{name} [S/cm]"][data["experimentID"] == exp_id]
-
+    if name != "default_christian":
+        cond_exp = data[f"madap_eis_conductivity_{name} [S/cm]"][data["experimentID"] == exp_id]
+    if name == "default_christian":
+        cond_exp = data[f"conductivity [S/cm]"][data["experimentID"] == exp_id]
     # initialize the Arrhenius class
     Arr = arr.Arrhenius(da.format_data(temp_exp), da.format_data(cond_exp))
     # analyze the data
