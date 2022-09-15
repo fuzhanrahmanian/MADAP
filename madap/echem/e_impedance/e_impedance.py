@@ -58,7 +58,7 @@ class EIS(EChemProcedure):
     def __init__(self, impedance, voltage: float = None, suggested_circuit: str = None,
                 initial_value = None, max_rc_element: int = 50,
                 cut_off: float = 0.85, fit_type: str = 'complex',
-                val_low_freq: bool = True, cell_constant="n", max_iterations: int = 10,
+                val_low_freq: bool = True, cell_constant="n", max_iterations: int = 5,
                 threshold_error:float = 0.009):
         """ Initialize the EIS class.
 
@@ -72,7 +72,7 @@ class EIS(EChemProcedure):
             fit_type (str, optional): Fit type. Defaults to 'complex'.
             val_low_freq (bool, optional): If True, the low frequency is used for the fit. Defaults to True.
             cell_constant (str, optional): Cell constant. Defaults to "n".
-            max_iterations (int, optional): Maximum number of iterations for evaluating the accuarcy of fit. Defaults to 10.
+            max_iterations (int, optional): Maximum number of iterations for evaluating the accuarcy of fit. Defaults to 5.
         """
         self.impedance = impedance
         self.voltage = voltage
