@@ -27,7 +27,7 @@ from madap.data_acquisition import data_acquisition as da
 # 5. train with custom circuit and outlier detection
 
 
-name = "default_type4_random" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random"]
+name = "default_type2" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random"]
 #0.5, 0.95 -> type 1, 0.1, 0.90 -> type 2, 0.15,0.9 -> type 3
 # 0.1, 0.9 -> type 4 (random selection between add and subtract)
 LOWERLIM = 0.10
@@ -167,6 +167,6 @@ exp_ids = data["experimentID"].unique()
 # print(exp_ids)
 #print(exp_ids_1)
 # 508
-results = Parallel(n_jobs=28)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(exp_ids))
-# for exp_id in tqdm(data["experimentID"].unique()):
-#    constly_compute(data, exp_id)
+#results = Parallel(n_jobs=28)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(exp_ids))
+for exp_id in tqdm(data["experimentID"].unique()):
+   constly_compute(data, exp_id)
