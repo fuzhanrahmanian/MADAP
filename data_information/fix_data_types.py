@@ -1,19 +1,19 @@
 import os
 import pandas as pd
 
-data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508_editted.csv"), sep=";")
-PHASESHIFT = False
-NULLVARIABLES= True
+data = pd.read_csv(os.path.join(os.getcwd(),r"data/finalized_version.csv"), sep=";")
+PHASESHIFT = True
+NULLVARIABLES= False
 
 
 if PHASESHIFT:
     # Correct the phase shift data type:
     for i in range(len(data)):
-        data[data.columns[19]].iloc[i] = data[data.columns[19]].iloc[i].replace(" ", ",").replace(",,", ",").replace("\r\n", "").replace("[,", "[")
+        data[data.columns[14]].iloc[i] = data[data.columns[14]].iloc[i].replace(" ", ",").replace(",,", ",").replace("\r\n", "").replace("[,", "[")
 
-    print(data[data.columns[19]].iloc[0])
+    print(data[data.columns[14]].iloc[0])
 
-    data.to_csv(os.path.join(os.getcwd(),fr"data/Dataframe_STRUCTURED_all508_editted.csv"), sep=";", index=True, mode='w+')
+    data.to_csv(os.path.join(os.getcwd(),fr"data/final_version_4.csv"), sep=";", index=True, mode='w+')
 
 if NULLVARIABLES:
     # remove the amplitude, bias, error, GD and range from the original data as they contain of zero values
@@ -23,4 +23,4 @@ if NULLVARIABLES:
     del data["error"]
     del data["range"]
     del data["Unnamed: 0"]
-    data.to_csv(os.path.join(os.getcwd(),fr"data/Dataframe_STRUCTURED_all508_editted_nozero.csv"), sep=";", index=True, mode='w+')
+    data.to_csv(os.path.join(os.getcwd(),fr"data/final_version_4.csv"), sep=";", index=True, mode='w+')
