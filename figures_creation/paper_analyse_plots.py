@@ -155,4 +155,4 @@ Ec_PC_ratio, EC_PC_EMC_ratio, marker_sign, data = calc_ratio_between_electrolyte
 if expriment_type == "arrhenius":
     analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data[f"activation_energy_{analysis_type} [mJ/mol]"], y_label = r"$E$ $[mJ/mol]$", fig_size = (5.7, 4.8), plot_name = f"arr_{analysis_type}.svg", experiment_type= expriment_type)
 if expriment_type == "impedance":
-    analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data["conductivity [S/cm]"], y_label = r"$\sigma$ $[mS/cm]$", fig_size = (5.7, 4.8), plot_name = f"imp_{analysis_type}.svg", experiment_type = expriment_type)
+    analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis= data["madap_eis_conductivity [S/cm]"], y_label = r"$\sigma$ $[mS/cm]$", fig_size = (5.7, 4.8), plot_name = f"imp_{analysis_type}.svg", experiment_type = expriment_type)
