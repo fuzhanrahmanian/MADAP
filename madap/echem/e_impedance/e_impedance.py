@@ -155,6 +155,7 @@ class EIS(EChemProcedure):
 
             # re-evaluating the fit
             iteration = 0
+            random_choice = ["add", "subtract"]
             # get the sum of root mean square of the truth values
             rms = np.linalg.norm(z_circuit) / np.sqrt(len(z_circuit))
             while iteration < self.max_iterations:
@@ -163,7 +164,11 @@ class EIS(EChemProcedure):
                     # fit again if the threshold error is not satisfied
                     if self.rmse_calc > (self.threshold_error * rms):
                         # get the initial values according to previous fit and its uncertainty
-                        initial_guess_trial = [i+j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
+                        random_selection = random.choice(random_choice)
+                        if random_selection == "add":
+                            initial_guess_trial = [i+j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
+                        else:
+                            initial_guess_trial = [i-j for i,j in zip(self.custom_circuit.parameters_.tolist(), self.custom_circuit.conf_.tolist())]
                         # refit
                         self.custom_circuit = circuits.CustomCircuit(initial_guess=initial_guess_trial,\
                                                                     circuit=self.suggested_circuit).fit(f_circuit, z_circuit, method="trf")
