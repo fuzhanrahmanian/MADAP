@@ -97,6 +97,11 @@ def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.05, high_q
     """
     # select the columns that needs to be studied for outliers
     detect_search = df[columnns]
+    # Check if the low_quantile and high_quantile are floats, if not convert them to float
+    if not isinstance(low_quantile, float):
+        low_quantile = float(low_quantile)
+    if not isinstance(high_quantile, float):
+        high_quantile = float(high_quantile)
     # get the lower quantile of the corresponding columns
     q_low = detect_search.quantile(low_quantile)
     # get the upper quantile of the corresponding columns

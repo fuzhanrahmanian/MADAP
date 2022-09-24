@@ -295,6 +295,9 @@ class EIS(EChemProcedure):
         Returns:
             float: conductivity of the circuit
         """
+        # Check if cell_constant is a float, if not make it a float
+        if isinstance(self.cell_constant, str):
+            self.cell_constant = float(self.cell_constant)
         conductivity = self.cell_constant * (1/self.custom_circuit.parameters_[0])
         log.info(f"The calculated conductivity is {conductivity} [S.cm⁻¹]")
         return conductivity

@@ -78,8 +78,8 @@ def _analyze_parser_args():
     # Options for data import
     data = first_parser.add_argument_group("Options for data import")
     data.add_argument("-f", "--file", type=Path, required=True, metavar="FILE", help="Path to the data file")
-    data.add_argument("-u", "--upperquantile", type=float, required=False, default=0.99, help="Upper quantile for detecting the outliers in data")
-    data.add_argument("-l", "--lowerquantile", type=float, required=False, default=0.01, help="Lower quantile for detecting the outliers in data")
+    data.add_argument("-u", "--upper_limit_quantile", type=float, required=False, default=0.99, help="Upper quantile for detecting the outliers in data")
+    data.add_argument("-l", "--lower_limit_quantile", type=float, required=False, default=0.01, help="Lower quantile for detecting the outliers in data")
     data_selection = data.add_mutually_exclusive_group()
     data_selection.add_argument("-sp", "--specific", type=str, nargs="+",
                             help="row and column number of the frequency, real impedance, imaginary_impedance and phase shift \
@@ -101,12 +101,12 @@ def call_impedance(data, result_dir, args):
     """calling the impedance procedure and parse the corresponding arguments
 
     Args:
-        data (class): the given data frame for analysis
+        data (class): the given data frame for analysiswrite
         result_dir (str): the directory for saving results
         args (parser.args): Parsed arguments
     """
     _, nan_indices = da.remove_outlier_specifying_quantile(df = data, columnns = [data.columns[1], data.columns[2]],
-                                                           low_quantile = args.lowerquantile, high_quantile = args.upperquantile)
+                                                           low_quantile = args.lower_limit_quantile, high_quantile = args.upper_limit_quantile)
 
     if args.header_list:
         # Check if args header is a list
