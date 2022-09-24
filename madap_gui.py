@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 import PySimpleGUI as sg
 import io
-import matplotlib
+import time
 from madap.utils import gui_elements
 
 class MadapGui:
@@ -24,6 +24,8 @@ class MadapGui:
        self.cell_constant = None
        self.suggested_circuit = None
        self.initial_values = None
+       self.upper_limit_quantile = None
+       self.lower_limit_quantile = None
 
 
 def draw_figure(element, figure):
@@ -38,7 +40,7 @@ def draw_figure(element, figure):
     plt.close('all')  # erases previously drawn plots
     canv = FigureCanvasAgg(figure)
     buf = io.BytesIO()
-    canv.print_figure(buf, format='png', dpi=100)
+    canv.print_figure(buf, format='png')
     if buf is None:
         return None
     buf.seek(0)
@@ -59,9 +61,9 @@ def validate_fields(madap_gui):
         if madap_gui.header_list and (len(madap_gui.header_list) not in [3,4]):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
                 return False
-        # if madap_gui.specific and (len(madap_gui.specific) not in [3,4]):
-        #         sg.popup_error('Wrong number of specific inputs.', title='Input Error')
-        #        return False
+        if madap_gui.specific and (len(madap_gui.specific) not in [3,4]):
+                sg.popup_error('Wrong number of specific inputs.', title='Input Error')
+                return False
     if madap_gui.procedure == 'Arrhenius':
         if madap_gui.header_list and (len(madap_gui.header_list) != 2):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
@@ -85,7 +87,7 @@ def gui_layout(madap, colors):
     # ----------- Create a layout with a field for a data selection options ----------- #
     layout_data_selection = [[sg.Text('Headers or specific',justification='left', font=("Arial", 13))],
                              [sg.Combo(['Headers', 'Specific Region'], key='-HEADER_OR_SPECIFIC-', default_value='Headers')],
-                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="temp, cond")]]
+                             [sg.InputText(key='-HEADER_OR_SPECIFIC_VALUE-', tooltip=gui_elements.HEADER_OR_SPECIFIC_HELP, default_text="freq, real, imag")]]
 
 
     # ----------- Create tabs for Impedance procedure ----------- #
@@ -94,12 +96,16 @@ def gui_layout(madap, colors):
                     [ sg.InputText(key="-voltage-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True), sg.Text('[V]')],
                     [sg.Text('Cell constant (optional)',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-cell_constant-", tooltip=gui_elements.CELL_CONSTANT_HELP, enable_events=True), sg.Text('[1/cm]')],
+                    [sg.Text("Upper limit of quantile (optional)",justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.InputText(key="-upper_limit_quantile-", tooltip=gui_elements.UPPER_LIMIT_QUANTILE_HELP, enable_events=True, default_text="0.95")],
+                    [sg.Text("Lower limit of quantile (optional)",justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.InputText(key="-lower_limit_quantile-", tooltip=gui_elements.LOWER_LIMIT_QUANTILE_HELP, enable_events=True, default_text="0.05")],
                     [sg.Text('Suggeted Circuit',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP, default_text="R0-p(R1,CPE1)")],
                     [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP, default_text="[800,1e+14,1e-9,0.8]")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-', size=(50,len(madap.eis_plots)+1), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
+                    [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-', size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True, expand_y=True)]]
 
     tab_layout_Liss = [[sg.Text('This is inside Lissajous')],
                 [sg.Input(key='-inLiss-')]]
@@ -130,18 +136,18 @@ def gui_layout(madap, colors):
 
     # ----------- Assemble the left Column Element ----------- #
     col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15), size=(550, 120), expand_y=True)],
-                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 500), expand_y=True)]],
+                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 630), expand_y=True)]],
                       expand_x=True, expand_y=True)
 
     # ----------- Layout the right Column Element ----------- #
-    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], font=("Arial", 15), visible=False, key='-COL_PLOTS-')]])
+    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, key='-COL_PLOTS-')]])
 
     # ----------- Assemble the main layout ----------- #
     layout = [
         [layout_buttons],
         [layout_data],
         [col1, col2],
-        [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-')],
+        [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-', enable_events=True)],
         [sg.Button('RUN'), sg.Button('EXIT')]]
 
     return layout
@@ -181,6 +187,11 @@ def main():
             window['-voltage-'].update(values['-voltage-'][:-1])
         if event == '-cell_constant-' and len(values['-cell_constant-']) and values['-cell_constant-'][-1] not in ('012345678890,.'):
             window['-cell_constant-'].update(values['-cell_constant-'][:-1])
+        if event == '-upper_limit_quantile-' and len(values['-upper_limit_quantile-']) and values['-upper_limit_quantile-'][-1] not in ('012345678890,.'):
+            window['-upper_limit_quantile-'].update(values['-upper_limit_quantile-'][:-1])
+        if event == '-lower_limit_quantile-' and len(values['-lower_limit_quantile-']) and values['-lower_limit_quantile-'][-1] not in ('012345678890,.'):
+            window['-lower_limit_quantile-'].update(values['-lower_limit_quantile-'][:-1])
+
         if event == '-initial_value-' and len(values['-initial_value-']) and values['-initial_value-'][-1] not in ('012345678890,.e-+[]'):
             window['-initial_value-'].update(values['-initial_value-'][:-1])
         if event == 'RUN':
@@ -190,14 +201,18 @@ def main():
             madap_gui.results = values['-RESULT_PATH-']
             madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
             madap_gui.voltage = values['-voltage-']
-            madap_gui.cell_constant = float(values['-cell_constant-']) if values['-cell_constant-'] != '' else None
+            madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] if not values['-suggested_circuit-'] == '' else None
             madap_gui.initial_values = values['-initial_value-'] if not values['-initial_value-'] == '' else None
+            madap_gui.upper_limit_quantile = values['-upper_limit_quantile-'] if not values['-upper_limit_quantile-'] == '' else None
+            madap_gui.lower_limit_quantile = values['-lower_limit_quantile-'] if not values['-lower_limit_quantile-'] == '' else None
+
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
+                madap_gui.specific = list(madap_gui.specific.split(';'))
 
             # Validate the fields
             validation = validate_fields(madap_gui)
