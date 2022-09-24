@@ -5,7 +5,7 @@ HEADER_OR_SPECIFIC_HELP="If the data selection is 'Headers', insert the headers 
                         "\n \n"\
                         "If the data selection is 'Specific' insert the row and column numbers. Order is relevant." \
                         "\nFormat: 'start_row,end_row,start_column,end_column': 1,10,1,2 translates to rows 1 to 10 and columns 1 to 2." \
-                        "Example: '0,40,0,1, 0,40,1,2, 0,40,2,3'"
+                        "Example: '0,40,0,1; 0,40,1,2; 0,40,2,3'"
 
 SUGGESTED_CIRCUIT_HELP="Suggested circuit (optional).\n" \
                         "Available circuit elements are: 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R'," \
@@ -18,10 +18,14 @@ INITIAL_VALUES_HELP="Initial values for the suggested circuit." \
                     "\nIt will be used just if the suggested circuit was defined. " \
                     "\nFormat: [element1, element2, ...], i.e.: [800,1e+14,1e-9,0.8] "
 
+
 VOLTAGE_HELP="Applied voltage (optional)"
 
 CELL_CONSTANT_HELP="Cell constant (optional)"
 
+UPPER_LIMIT_QUANTILE_HELP="Upper limit quantile (optional)."
+
+LOWER_LIMIT_QUANTILE_HELP="Lower limit quantile (optional)."
 
 def plotting_element(subparser, plots):
     """ Adds an element to the GUI for plotting the data.
