@@ -6,6 +6,8 @@
 # cite for EIS fitting: https://github.com/ECSHackWeek/impedance.py
 import os
 import warnings
+import random
+
 import numpy as np
 import impedance.validation as validation
 import impedance.preprocessing as preprocessing

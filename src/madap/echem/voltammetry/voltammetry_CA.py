@@ -24,7 +24,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
     def save_data(self):
         pass
 
-    def perform_all_actions(self):
+    def perform_all_actions(self, result_dir, plots):
         pass
 
     def _calculate_capacity(self):

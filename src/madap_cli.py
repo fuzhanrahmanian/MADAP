@@ -1,5 +1,6 @@
 """ This module is the main entry point for MADAP. It defines the CLI to be used by the user."""
 import os
+import sys
 import argparse
 
 from pathlib import Path
@@ -9,7 +10,7 @@ from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
 from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
-from madap.echem.voltammetry import voltammetry
+from madap.echem.voltammetry import voltammetry_CA
 
 
 
@@ -57,13 +58,13 @@ def _analyze_parser_args():
             pass
 
     elif proc.procedure == "arrhenius":
-        arrhenius = first_parser.add_argument_group("Options for the Arrhenius procedure")
-        arrhenius.add_argument("-pl", "--plots", choices=["arrhenius" ,"arrhenius_fit"],
+        arrhenius_pars = first_parser.add_argument_group("Options for the Arrhenius procedure")
+        arrhenius_pars.add_argument("-pl", "--plots", choices=["arrhenius" ,"arrhenius_fit"],
                                 nargs="+", required=True, help="Plots to be generated")
 
     elif proc.procedure == "voltammetry":
-        voltammetry = first_parser.add_argument_group("Options for the Arrhenius procedure")
-        voltammetry.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
+        voltammetry_pars = first_parser.add_argument_group("Options for the Arrhenius procedure")
+        voltammetry_pars.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
                             choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],)
         proc = first_parser.parse_known_args()[0]
         if proc.voltammetry_procedure == "cyclic_voltammetric":
@@ -79,21 +80,29 @@ def _analyze_parser_args():
     # Options for data import
     data = first_parser.add_argument_group("Options for data import")
     data.add_argument("-f", "--file", type=Path, required=True, metavar="FILE", help="Path to the data file")
-    data.add_argument("-u", "--upper_limit_quantile", type=float, required=False, default=0.99, help="Upper quantile for detecting the outliers in data")
-    data.add_argument("-l", "--lower_limit_quantile", type=float, required=False, default=0.01, help="Lower quantile for detecting the outliers in data")
+    data.add_argument("-u", "--upper_limit_quantile", type=float, required=False,
+                      default=0.99, help="Upper quantile for detecting the outliers in data")
+    data.add_argument("-l", "--lower_limit_quantile", type=float, required=False,
+                      default=0.01, help="Lower quantile for detecting the outliers in data")
     data_selection = data.add_mutually_exclusive_group()
     data_selection.add_argument("-sp", "--specific", type=str, nargs="+",
-                            help="row and column number of the frequency, real impedance, imaginary_impedance and phase shift \
-                            \n write n if it is not applicable \n order is important.\n format: start_row,end_row,start_column,end_column \
+                            help="row and column number of the frequency, real impedance, \
+                            imaginary_impedance and phase shift \
+                            \n write n if it is not applicable \n order is important.\
+                            \n format: start_row,end_row,start_column,end_column \
                             \n 1,10,1,2 means rows 1 to 10 and columns 1 to 2")
     data_selection.add_argument("-hl", "--header_list", type=str, nargs="+",
-                            help="Definitions of the headers for frequency [Hz], real impedance [\u2126],\
-                            imaginary_impedance [\u2126] and phase shift \u03c6 [\u00b0] \n write n if it is not applicable \n order is important.")
+                            help="Definitions of the headers for frequency [Hz], \
+                            real impedance [\u2126],\
+                            imaginary_impedance [\u2126] and phase shift \u03c6 [\u00b0] \
+                            \n write n if it is not applicable \n order is important.")
 
-    parser = argparse.ArgumentParser(description='Use MADAP for electrochemical analysis', parents=[first_parser],
+    parser = argparse.ArgumentParser(description='Use MADAP for electrochemical analysis',
+                                     parents=[first_parser],
                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     # Options for results
-    parser.add_argument("-r", "--results", type=Path, required=True, help="Directory for saving results")
+    parser.add_argument("-r", "--results", type=Path, required=True,
+                        help="Directory for saving results")
 
     return parser
 
@@ -106,13 +115,17 @@ def call_impedance(data, result_dir, args):
         result_dir (str): the directory for saving results
         args (parser.args): Parsed arguments
     """
-    _, nan_indices = da.remove_outlier_specifying_quantile(df = data, columnns = [data.columns[1], data.columns[2]],
-                                                           low_quantile = args.lower_limit_quantile, high_quantile = args.upper_limit_quantile)
+    _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
+                                                           columnns = [data.columns[1],
+                                                                       data.columns[2]],
+                                                           low_quantile = args.lower_limit_quantile,
+                                                           high_quantile = args.upper_limit_quantile)
 
     if args.header_list:
         # Check if args header is a list
         if isinstance(args.header_list, list):
-            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
+            args.header_list
         else:
             header_names = args.header_list
 
@@ -137,15 +150,20 @@ def call_impedance(data, result_dir, args):
                                           da.select_data(data, row_col[2])
 
 
-    Im = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data), da.format_data(imag_data), da.format_data(phase_shift_data))
+    impedance = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data),
+                                da.format_data(imag_data), da.format_data(phase_shift_data))
 
     if args.impedance_procedure == "EIS":
         log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant},\
-                   suggested circuit is {args.suggested_circuit} and initial values are {args.initial_values}.")
+                   suggested circuit is {args.suggested_circuit} \
+                   and initial values are {args.initial_values}.")
 
         # Instantiate the procedure
-        procedure = e_impedance.EIS(Im, voltage=args.voltage, suggested_circuit=args.suggested_circuit,
-                                  initial_value=eval(args.initial_values) if args.initial_values else None, cell_constant=args.cell_constant)
+        procedure = e_impedance.EIS(impedance, voltage=args.voltage,
+                                    suggested_circuit=args.suggested_circuit,
+                                    initial_value=eval(args.initial_values)
+                                    if args.initial_values else None,
+                                    cell_constant=args.cell_constant)
 
     elif args.impedance_procedure == "Mottschotcky":
         #TODO
@@ -176,7 +194,8 @@ def call_arrhenius(data, result_dir, args):
 
     if args.header_list:
         if isinstance(args.header_list, list):
-            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else args.header_list
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
+            args.header_list
         else:
             header_names = args.header_list
 
@@ -186,17 +205,24 @@ def call_arrhenius(data, result_dir, args):
         temp_data, cond_data = da.select_data(data, row_col[0]), da.select_data(data, row_col[1])
 
     # Instantiate the procedure
-    Arr = arrhenius.Arrhenius(da.format_data(temp_data), da.format_data(cond_data))
+    arrhenius_cls = arrhenius.Arrhenius(da.format_data(temp_data), da.format_data(cond_data))
 
     # Format the plots arguments
     plots = da.format_plots(args.plots)
 
     # Perform all actions
-    Arr.perform_all_actions(result_dir, plots = plots)
+    arrhenius_cls.perform_all_actions(result_dir, plots = plots)
 
-    return Arr
+    return arrhenius_cls
 
 def call_voltammetry(data, result_dir, plots):
+    """ Calling the voltammetry procedure and parse the corresponding arguments
+
+    Args:
+        data (class): the given data frame for analysis
+        result_dir (str): the directory for saving results
+        plots (list): list of plots to be generated
+    """
     log.info("What is the name (or index) of the column of voltage (v [V]) ?")
     # TODO
     voltage_idx = "voltage" #input()
@@ -207,13 +233,14 @@ def call_voltammetry(data, result_dir, plots):
     log.info("What is the name (or index) of the column of time (t [s]) ?")
     time_idx = "time" #input()
 
-    Arr = voltammetry.Voltammetry(da.format_data(data[voltage_idx]), da.format_data(data[current_idx]),
+    voltammetry_cls = voltammetry_CA.Voltammetry_CA(da.format_data(data[voltage_idx]),
+                                  da.format_data(data[current_idx]),
                                 da.format_data(data[time_idx]))
     if isinstance(plots, str):
         plots = [plots]
     if isinstance(plots, tuple):
         plots = list(plots)
-    Arr.perform_all_actions(result_dir, plots=plots)
+    voltammetry_cls.perform_all_actions(result_dir, plots=plots)
 
 def start_procedure(args):
     """Function to prepare the data for analysis.
@@ -236,11 +263,13 @@ def start_procedure(args):
 
     elif args.procedure == "voltammetry":
         log.info("Voltammetrys is not supported at the moment. Exiting ...")
-        exit()
+        sys.exit()
 
     return procedure
 
 def main():
+    """Main function to start the program.
+    """
     log.info("==================================WELCOME TO MADAP==================================")
     # Create the parser
     parser = _analyze_parser_args()

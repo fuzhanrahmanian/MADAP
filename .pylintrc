@@ -144,7 +144,12 @@ disable=print-statement,
         unsubscriptable-object,
         no-self-use,
         signature-differs,
-        expression-not-assigned
+        expression-not-assigned,
+        eval-used,
+        logging-fstring-interpolation,
+        too-many-statements,
+        broad-except,
+        len-as-condition
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -530,7 +535,7 @@ max-attributes=25
 max-bool-expr=5
 
 # Maximum number of branch for function / method body.
-max-branches=12
+max-branches=15
 
 # Maximum number of locals for function / method body.
 max-locals=25
