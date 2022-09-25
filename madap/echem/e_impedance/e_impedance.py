@@ -14,6 +14,7 @@ import impedance.validation as validation
 import impedance.preprocessing as preprocessing
 import impedance.models.circuits as circuits
 from madap.utils import utils
+from madap.utils.suggested_circuits import suggested_circuits
 from madap.data_acquisition import data_acquisition as da
 from madap import logger
 from madap.echem.procedure import EChemProcedure
@@ -119,8 +120,6 @@ class EIS(EChemProcedure):
 
         # if the user did not choose any circuit, some default suggestions will be applied.
         if (self.suggested_circuit and self.initial_value) is None:
-            with open(os.path.join("madap", "utils", "suggested_circuits.json"), "r") as file:
-                suggested_circuits = json.load(file)
 
             for guess_circuit, guess_value in suggested_circuits.items():
                 # apply some random guess
