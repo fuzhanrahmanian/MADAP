@@ -16,6 +16,9 @@ class ImpedancePlotting(Plots):
     Args:
         Plots (class): Parent class for plotting all methods.
     """
+    def __init__(self) -> None:
+        super().__init__()
+        self.plot_type = "impedance"
 
     def nyquist(self, subplot_ax, frequency, real_impedance, imaginary_impedance,
                 colorbar:bool=True, ax_sci_notation = None, scientific_limit=None,
@@ -54,7 +57,7 @@ class ImpedancePlotting(Plots):
                             ax_sci_notation=ax_sci_notation,
                             scientific_limit=scientific_limit)
 
-        if (legend_label and voltage != None):
+        if (legend_label and voltage is not None):
             _, labels = subplot_ax.get_legend_handles_labels()
             new_handles= [Line2D([0], [0], marker='o',
                         markerfacecolor="black",
@@ -122,8 +125,9 @@ class ImpedancePlotting(Plots):
             norm_color (bool, optional): If True, normalizes the colorbar. Defaults to None.
         """
         log.info("Creating a fitted Nyquist plot")
-        linKK = "linKK"
-        nyquist_label = fr" v = {voltage} [V], $\chi_{{linKK}}^{2}$ = {np.format_float_scientific(chi, 3)}" if voltage else fr"$\chi^{2}$ = {np.format_float_scientific(chi, 3)}"
+        nyquist_label = fr" v = {voltage} [V], \
+                          $\chi_{{linKK}}^{2}$ = {np.format_float_scientific(chi, 3)}" \
+                          if voltage else fr"$\chi^{2}$ = {np.format_float_scientific(chi, 3)}"
 
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
         nyquist_plot = subplot_ax.scatter(real_impedance, -imaginary_impedance,
@@ -197,7 +201,7 @@ class ImpedancePlotting(Plots):
             ax = fig.add_subplot(spec[0,0])
             return fig, [ax]
 
-        elif len(plots) == 2:
+        if len(plots) == 2:
             fig_size = 9 if ("nyquist" and "nyquist_fit") in plots else 8.5
             fig = plt.figure(figsize=(fig_size, 4))
             spec = fig.add_gridspec(1, 2)
@@ -205,7 +209,7 @@ class ImpedancePlotting(Plots):
             ax2= fig.add_subplot(spec[0, 1])
             return fig, [ax1, ax2]
 
-        elif len(plots) == 3:
+        if len(plots) == 3:
             fig_size= 7 if ("nyquist" and "nyquist_fit" and "bode") in plots else 6.5
             fig = plt.figure(figsize=(fig_size, 5))
             spec = fig.add_gridspec(2, 2)
@@ -219,7 +223,7 @@ class ImpedancePlotting(Plots):
                 ax3 = fig.add_subplot(spec[:, 1])
             return fig, [ax1, ax2, ax3]
 
-        elif len(plots) == 4:
+        if len(plots) == 4:
             fig = plt.figure(figsize=(7.5, 6))
             spec = fig.add_gridspec(2, 2)
             ax1 = fig.add_subplot(spec[0, 0])
@@ -228,7 +232,9 @@ class ImpedancePlotting(Plots):
             ax4 = fig.add_subplot(spec[1, 1])
             return fig, [ax1, ax2, ax3, ax4]
 
-        elif len(plots) == 0:
+        if len(plots) == 0:
             log.error("No plots for EIS were selected.")
-        else:
-            log.error("Maximum plots for EIS is exceeded.")
+            return Exception(f"No plots for EIS were selected for plot {self.plot_type}.")
+
+        log.error("Maximum plots for EIS is exceeded.")
+        return Exception(f"Maximum plots for EIS is exceeded for plot {self.plot_type}.")

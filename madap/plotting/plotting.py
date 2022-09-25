@@ -23,6 +23,7 @@ class Plots():
         plt.rcParams['text.usetex'] = False
         plt.rcParams['xtick.direction'] = 'in'
         plt.rcParams['ytick.direction'] = 'in'
+        self.plot_type = ""
 
     def plot_identity(self, ax, xlabel:str=None, ylabel:str=None, x_lim:list=None, y_lim:list=None, rotation:float=0,
                       ax_sci_notation=None, scientific_limit=0, log_scale=None, base10:bool=False,

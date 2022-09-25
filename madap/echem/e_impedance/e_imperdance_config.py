@@ -1,4 +1,4 @@
-# Here there are some configurations for some suggested circuits
+"""This module takes care some configurations for some suggested circuits"""
 import json
 
 suggested_circuits = dict()
@@ -42,4 +42,3 @@ suggested_circuits['p(CPE1,R1-p(R2,CPE2))'] = [2, 0.8, 50, 50, 1.5, 0.9]
 
 with open("suggested_circuits.json", "w") as outfile:
     json.dump(suggested_circuits, outfile)
-

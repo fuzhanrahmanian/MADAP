@@ -1,5 +1,7 @@
-from madap import logger
+"""This module handles the plotting of the Arrhenius procedure"""
 from matplotlib import pyplot as plt
+
+from madap import logger
 from madap.plotting import Plots
 
 
@@ -11,6 +13,9 @@ class ArrheniusPlotting(Plots):
     Args:
         Plots (class): Parent class for plotting all methods.
     """
+    def __init__(self) -> None:
+        super().__init__()
+        self.plot_type = "Arrhenius"
 
     def arrhenius(self, subplot_ax, temperatures, log_conductivity, inverted_scale_temperatures,
             ax_sci_notation = None, scientific_limit: int = 3):
@@ -85,10 +90,11 @@ class ArrheniusPlotting(Plots):
             ax = fig.add_subplot(spec[0,0])
             return fig, [ax]
 
-        elif len(plots) == 2:
+        if len(plots) == 2:
             fig = plt.figure(figsize=(6, 3))
             spec = fig.add_gridspec(1, 2)
             ax1 = fig.add_subplot(spec[0, 0])
             ax2 = fig.add_subplot(spec[0, 1])
             return fig, [ax1, ax2]
 
+        return Exception(f"Number of plots not supported for plot type {self.plot_type}")

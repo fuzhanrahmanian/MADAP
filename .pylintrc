@@ -138,7 +138,12 @@ disable=print-statement,
         xreadlines-attribute,
         deprecated-sys-function,
         exception-escape,
-        comprehension-escape
+        comprehension-escape,
+        function-redefined,
+        fixme,
+        unsubscriptable-object,
+        no-self-use,
+        signature-differs
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -248,9 +253,12 @@ function-naming-style=snake_case
 good-names=i,
            j,
            k,
+           e,
            ex,
            Run,
            df,
+           ax,
+           linKK,
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,
@@ -511,7 +519,7 @@ valid-metaclass-classmethod-first-arg=cls
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=10
+max-args=25
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=25
@@ -523,7 +531,7 @@ max-bool-expr=5
 max-branches=12
 
 # Maximum number of locals for function / method body.
-max-locals=15
+max-locals=25
 
 # Maximum number of parents for a class (see R0901).
 max-parents=7
@@ -538,7 +546,7 @@ max-returns=6
 max-statements=50
 
 # Minimum number of public methods for a class (see R0903).
-min-public-methods=2
+min-public-methods=1
 
 
 [IMPORTS]

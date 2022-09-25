@@ -1,15 +1,18 @@
+"""This module defines the Arrhenius procedure"""
 import os
+import math
+import numpy as np
+
 from attrs import define, field
 from attrs.setters import frozen
-import numpy as np
-import math
-from madap.utils import utils
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+
+from madap import logger
+from madap.utils import utils
 from madap.echem.procedure import EChemProcedure
 from madap.echem.arrhenius.arrhenius_plotting import ArrheniusPlotting as aplt
-from madap import logger
-import matplotlib.pyplot as plt
+
 
 log = logger.get_logger("arrhenius")
 @define
@@ -55,7 +58,9 @@ class Arrhenius(EChemProcedure):
         self.ln_conductivity_fit = reg.predict(self.inverted_scale_temperatures.values.reshape(-1,1))
         self.mse_calc = mean_squared_error(self._log_conductivity(), self.ln_conductivity_fit)
 
-        log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)}   [S.cm⁻¹] and activation is {round(self.activation,4)} [mJ/mol] with the score {self.fit_score}")
+        log.info(f"Arrhenius constant is {round(self.arrhenius_constant,4)} [S.cm⁻¹] \
+                 and activation is {round(self.activation,4)} [mJ/mol] \
+                 with the score {self.fit_score}")
 
 
     def plot(self, save_dir:str, plots:list, optional_name:str = None):
@@ -109,7 +114,7 @@ class Arrhenius(EChemProcedure):
         utils.save_data_as_json(directory=save_dir, name=name, data=meta_data)
         # Save the dataset
         data = utils.assemble_data_frame(**{"temperatures [\u00b0C]": self.temperatures,
-                                            "conductivity [S\cm]": self.conductivity,
+                                            "conductivity [S/cm]": self.conductivity,
                                             "inverted_scale_temperatures [1000/K]": self.inverted_scale_temperatures,
                                             "log_conductivty [ln(S/cm)]": self._log_conductivity(),
                                             "log_conductivity_fit [ln(S/cm)]":self.ln_conductivity_fit})
@@ -136,10 +141,20 @@ class Arrhenius(EChemProcedure):
 
     @property
     def figure(self):
+        """Get the figure of the analysis.
+
+        Returns:
+            obj: matplotlib.figure.Figure
+        """
         return self._figure
 
     @figure.setter
     def figure(self, figure):
+        """Setter for the figure attribute.
+
+        Args:
+            figure (obj): matplotlib.figure.Figure
+        """
         self._figure = figure
 
     def _log_conductivity(self):

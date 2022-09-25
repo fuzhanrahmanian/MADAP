@@ -1,22 +1,23 @@
 """Impedance Analysis module."""
 # for fit the EIS experiments, impedance python package has been used.
-# RefMurbach, M., Gerwe, B., Dawson-Elli, N., & Tsui, L. (2020). impedance.py: A Python package for electrochemical impedance analysis. Journal of Open Source Software, 5(). https://doi.org/10.21105/joss.02349
+# RefMurbach, M., Gerwe, B., Dawson-Elli, N., & Tsui, L. (2020). impedance.py:
+# A Python package for electrochemical impedance analysis.
+# Journal of Open Source Software, 5(). https://doi.org/10.21105/joss.02349
 # cite for EIS fitting: https://github.com/ECSHackWeek/impedance.py
 import os
-import json
-import numpy as np
 import warnings
-from attrs import define, field
-from attrs.setters import frozen
-import random
-
+import numpy as np
 import impedance.validation as validation
 import impedance.preprocessing as preprocessing
 import impedance.models.circuits as circuits
+
+from attrs import define, field
+from attrs.setters import frozen
+
+from madap import logger
 from madap.utils import utils
 from madap.utils.suggested_circuits import suggested_circuits
 from madap.data_acquisition import data_acquisition as da
-from madap import logger
 from madap.echem.procedure import EChemProcedure
 from madap.echem.e_impedance.e_impedance_plotting import ImpedancePlotting as iplt
 
@@ -25,12 +26,13 @@ np.seterr(divide='ignore', invalid='ignore')
 # reference the impedance library
 log = logger.get_logger("impedance")
 
-# pylint: disable=unsubscriptable-object
+
 @define
 class EImpedance:
     """Class for data definition that will be used during the Impedance analysis.
         The data includes the following: frequency, real impedance, imaginary impedance,
-        and the phase shift. These attributes are all pandas.Series. and will stay immutable except the phase shift.
+        and the phase shift. These attributes are all pandas.Series
+        and will stay immutable except the phase shift.
     """
     frequency : list[float] = field(on_setattr=frozen)
     real_impedance : list[float] = field(on_setattr=frozen)
@@ -41,14 +43,6 @@ class EImpedance:
         """Returns a string representation of the object."""
         return f"Impedance(frequency={self.frequency}, real_impedance={self.real_impedance}, \
                 imaginary_impedance={self.imaginary_impedance}, phase_shift={self.phase_shift})"
-
-    # def __post_init__(self):
-    #     """Initialize the object."""
-    #     self.phase_shift = self.calculate_phase_shift() if self.phase_shift is None else self.phase_shift
-
-    # def __call__(self):
-    #     if self.phase_shift is None:
-    #         self.phase_shift = self.calculate_phase_shift()
 
 class EIS(EChemProcedure):
     """General EIS class for the analysis of the EIS data.
@@ -107,11 +101,16 @@ class EIS(EChemProcedure):
         """General function for performing the impedance analysis.
         This will fit the circuit and calculate the conductivity if is applicable.
         """
-        f_circuit, z_circuit = np.array(self.impedance.frequency), np.array(self.impedance.real_impedance +
+        f_circuit, z_circuit = np.array(self.impedance.frequency), \
+                               np.array(self.impedance.real_impedance +
                1j*self.impedance.imaginary_impedance)
 
-        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, self.res_real, self.res_imag = validation.linKK(f_circuit, z_circuit, c=self.cut_off, max_M=self.max_rc_element,
-                                                                        fit_type=self.fit_type, add_cap=self.val_low_freq)
+        self.num_rc_linkk, self.eval_fit_linkk , self.z_linkk, \
+        self.res_real, self.res_imag = validation.linKK(f_circuit, z_circuit,
+                                                        c=self.cut_off,
+                                                        max_M=self.max_rc_element,
+                                                        fit_type=self.fit_type,
+                                                        add_cap=self.val_low_freq)
         self.chi_val = self._chi_calculation()
         log.info(f"Chi value from lin_KK method is {self.chi_val}")
 
@@ -171,7 +170,7 @@ class EIS(EChemProcedure):
                         log.info(f"With re-evaluating the circuit {self.suggested_circuit} the RMSE error is now {self.rmse_calc}")
 
 
-                except Exception as e:
+                except RuntimeError as e:
                     log.error(e)
                     continue
 
@@ -274,10 +273,20 @@ class EIS(EChemProcedure):
 
     @property
     def figure(self):
+        """Get the figure of the plot.
+
+        Returns:
+            obj: Figure object for e_impendance plot.
+        """
         return self._figure
 
     @figure.setter
     def figure(self, figure):
+        """Set the figure of the plot.
+
+        Args:
+            figure (obj): Figure object for e_impendance plot.
+        """
         self._figure = figure
 
     def _chi_calculation(self):
@@ -329,9 +338,6 @@ class EIS(EChemProcedure):
         guess_value = [guess_initial_resistance if element == 't' else element for element in guess_value]
         return guess_value
 
-
-
-
 class Mottschotcky(EIS, EChemProcedure):
     """ Class for performing the Mottschotcky procedure.
 
@@ -341,35 +347,41 @@ class Mottschotcky(EIS, EChemProcedure):
     """
     def __init__(self, impedance, suggested_circuit: str = None, initial_value=None,
                  max_rc_element: int = 20, cut_off: float = 0.85, fit_type: str = 'complex', val_low_freq=True):
-        EIS().__init__(impedance, suggested_circuit, initial_value, max_rc_element, cut_off, fit_type, val_low_freq)
+        EIS.__init__(impedance, suggested_circuit, initial_value, max_rc_element, cut_off, fit_type, val_low_freq)
 
-    def analysis(self):
-        EIS.analyze()
+    def analyze(self):
+        pass
 
-    def plot(self, save_dir, plots): pass
+    def plot(self, save_dir:str, plots:list, optional_name:str):
+        pass
     # TODO
     # nyquist
     # fit nyquist
     # bode
     # mott v vs 1/cp_2
-    def save_data(self, save_dir: str):pass
+    def save_data(self, save_dir:str, optional_name:str):
+        pass
 
-    def perform_all_actions(self, save_dir: str, plots: list):pass
+    def perform_all_actions(self, save_dir:str, plots:list, optional_name:str):
+        pass
 
 class Lissajous(EChemProcedure):
+    """ Class for performing the Lissajous procedure."""
     def __init__(self) -> None:
-        pass
-    def analyze():
+        return None
+
+    def analyze(self):
         pass
 
-    def plot():
-        pass
+    def plot(self, save_dir:str, plots:list, optional_name:str):
+        return None
     # TODO
     # legend is the frequency
     # i vs t
     # v vs t
     # i vs E
-    def save_data():
+    def save_data(self, save_dir:str, optional_name:str):
         pass
-    def perform_all_actions():
+
+    def perform_all_actions(self, save_dir:str, plots:list, optional_name:str):
         pass
