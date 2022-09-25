@@ -1,5 +1,6 @@
-# This is a helper file that contains a dictionary with all the suggested circuits
-# for the different types of devices. The dictionary is called suggested_circuits
+"""This is a helper file that contains a dictionary with all the suggested circuits
+for the different types of devices. The dictionary is called suggested_circuits
+"""
 
 suggested_circuits = {"R1-CPE1": ["x", 1, 1],
                       "R1-C1": ["x", 1e-06],

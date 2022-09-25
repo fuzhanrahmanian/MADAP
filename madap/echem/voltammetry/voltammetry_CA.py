@@ -1,6 +1,6 @@
 from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
-from madap import logger
+from madap.logger import logger
 
 log = logger.get_logger("cyclic_amperometry")
 

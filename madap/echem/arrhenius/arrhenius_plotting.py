@@ -1,7 +1,7 @@
 """This module handles the plotting of the Arrhenius procedure"""
 from matplotlib import pyplot as plt
 
-from madap import logger
+from madap.logger import logger
 from madap.plotting.plotting import Plots
 
 

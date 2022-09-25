@@ -1,4 +1,4 @@
-from madap import logger
+from madap.logger import logger
 from plotting import Plots
 
 

@@ -14,7 +14,7 @@ import impedance.models.circuits as circuits
 from attrs import define, field
 from attrs.setters import frozen
 
-from madap import logger
+from madap.logger import logger
 from madap.utils import utils
 from madap.utils.suggested_circuits import suggested_circuits
 from madap.data_acquisition import data_acquisition as da

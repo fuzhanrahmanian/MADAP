@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-from madap import logger
+from madap.logger import logger
 
 
 mpl.use('svg')

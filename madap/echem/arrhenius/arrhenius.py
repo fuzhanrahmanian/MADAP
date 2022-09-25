@@ -8,7 +8,7 @@ from attrs.setters import frozen
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
-from madap import logger
+from madap.logger import logger
 from madap.utils import utils
 from madap.echem.procedure import EChemProcedure
 from madap.echem.arrhenius.arrhenius_plotting import ArrheniusPlotting as aplt

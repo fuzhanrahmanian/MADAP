@@ -4,7 +4,7 @@ import matplotlib.colors as mcl
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
-from madap import logger
+from madap.logger import logger
 from madap.plotting.plotting import Plots
 
 
