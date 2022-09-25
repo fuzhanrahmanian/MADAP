@@ -1,7 +1,10 @@
+"""This module is responsible for handaling the data acquisition and data cleaning into MADAP"""
 import os
-from madap.logger import logger
 import pandas as pd
 import numpy as np
+
+from madap.logger import logger
+
 
 log = logger.get_logger("data_acquisition")
 EXTENSIONS = [".txt", ".csv", ".json", ".xlsx", ".hdf5", ".h5", ".pkl"]
@@ -23,15 +26,15 @@ def acquire_data(data_path):
         log.error(f"Datatype not supported. Supported datatypes are: {EXTENSIONS}")
         raise ValueError("Datatype not supported")
 
-    elif extension == ".csv" or extension ==".txt":
+    if extension in (".csv", ".txt"):
         df = pd.read_csv(data_path, sep=None, engine="python")
-    elif extension == ".xlsx":
+    if extension == ".xlsx":
         df = pd.read_excel(data_path)
-    elif extension == ".json":
+    if extension == ".json":
         df = pd.read_json(data_path)
-    elif extension == ".hdf5" or extension == ".h5":
+    if extension in (".hdf5", ".h5"):
         df = pd.read_hdf(data_path)
-    elif extension == ".pkl":
+    if extension == ".pkl":
         df = pd.read_pickle(data_path)
 
     return df
@@ -56,27 +59,30 @@ def format_data(data):
     return data
 
 
-def select_data(data, select_data:str):
-    # this can be use when the user wants to select a subset of the data
-    numbers = list(map(int, select_data.split(",")))
+def select_data(data, selected_data:str):
+    """ Function to subselect the data from the dataframe
+
+    Args:
+        data (DataFrame): The dataframe from which the data is to be selected
+        select_data (str): The string containing the start and end row and column
+
+    Returns:
+        DataFrame: The subselected dataframe
+    """
+    numbers = list(map(int, selected_data.split(",")))
     data = data.iloc[:, numbers[2]: numbers[3]].values.reshape(-1)
     return data
 
 
-def choose_options(data):
-    data_index = input("Choose 1 if you are selecting the header of your column, 2 if you are selecting the index of the rows/columns and 3 if is not available. \n Your selection is: ")
-    if data_index == '1':
-        ind = input(f"Name of the column of your choice (e.g. freq): ")
-        data = data[ind]
-    elif data_index == '2':
-        ind = input(f"Number of rows and columns you are selecting (start_row,end_row,start_column,end_column  e.g. 1,10,2,3): ")
-        data = select_data(data, ind)
-    else:
-        data = None
-    return data
-
-
 def format_plots(plots):
+    """ Format the selection plots into a list
+
+    Args:
+        plots (obj): The plots selected by the user
+
+    Returns:
+        list: The list of plots selected by the user
+    """
     if isinstance(plots, str):
         plots = [plots]
     if isinstance(plots, tuple):
@@ -110,11 +116,21 @@ def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.05, high_q
     detect_search = detect_search[(detect_search < q_high) & (detect_search > q_low)]
     # find the index of the outliers
     nan_indices = [*set(np.where(np.asanyarray(np.isnan(detect_search)))[0].tolist())]
-    log.info(f"The outliers are remove from dataset {detect_search} \n and the indeces are {nan_indices}.")
+    log.info(f"The outliers are remove from dataset {detect_search} \
+               \n and the indeces are {nan_indices}.")
 
     return detect_search, nan_indices
 
 def remove_nan_rows(df, nan_indices):
+    """ Remove the rows with nan values
+
+    Args:
+        df (DataFramo): The dataframe from which the rows are to be removed
+        nan_indices (list): The list of indices of the rows to be removed
+
+    Returns:
+        DataFrame: The dataframe with the rows removed
+    """
     # check if the index of the outliers is present in the dataframe
     available_nan_indices = [i for i in nan_indices if i in df.index.values]
     # removing the rows with nan and reset their indeces
@@ -127,5 +143,10 @@ def remove_nan_rows(df, nan_indices):
 
 
 def remove_unnamed_col(df):
+    """ Remove the unnamed columns from the dataframe
+
+    Args:
+        df (DataFrame): The dataframe from which unnamed cloums were removed
+    """
     if "Unnamed: 0" in df.columns:
         del df["Unnamed: 0"]
