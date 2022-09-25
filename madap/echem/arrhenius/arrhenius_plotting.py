@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 
 from madap import logger
-from madap.plotting import Plots
+from madap.plotting.plotting import Plots
 
 
 log = logger.get_logger("arrhenius_plotting")

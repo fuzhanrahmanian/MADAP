@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
 from madap import logger
-from madap.plotting import Plots
+from madap.plotting.plotting import Plots
 
 
 log = logger.get_logger("impedance_plotting")
