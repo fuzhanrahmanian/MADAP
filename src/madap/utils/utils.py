@@ -45,7 +45,7 @@ def assemble_data_frame(**kwargs):
     try:
         df = pd.DataFrame.from_dict(kwargs, orient = "index")
         df = df.transpose()
-    except ValueError:
+    except AttributeError:
         df = pd.DataFrame(data=kwargs)
     return df
 

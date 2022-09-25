@@ -1,15 +1,16 @@
-import argparse
-from secrets import choice
-import sys
-from ast import arguments
+""" This module is the main entry point for MADAP. It defines the CLI to be used by the user."""
 import os
+import argparse
+
+from pathlib import Path
+
 from madap.utils import utils
 from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
 from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
 from madap.echem.voltammetry import voltammetry
-from pathlib import Path
+
 
 
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')

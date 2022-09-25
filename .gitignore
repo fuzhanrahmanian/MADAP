@@ -93,13 +93,10 @@ ENV/
 .history/
 
 # Logs
-madap/logs/
+src/madap/logs/
 
 # VSCopde
 .vscode/
-
-# impedance configuration
-echem/impedance_config.py
 
 # Generated results
 results/
@@ -107,6 +104,13 @@ electrolyte_figures/
 
 #Datasets
 data/
+data_information/
 
 # cache
 figures_creation/
+
+# Unsued testfiles
+test/gui_test/
+test/testfile/procedure_test/
+test/testfile/other test
+

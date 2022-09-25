@@ -12,9 +12,9 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join("..","..")))
-sys.path.insert(0, os.path.abspath(os.path.join("..","..","madap", "logger")))
-sys.path.insert(0, os.path.abspath(os.path.join("..","..","madap", "echem")))
+sys.path.insert(0, os.path.abspath(os.path.join("..","..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join("..","..","src","madap", "logger")))
+sys.path.insert(0, os.path.abspath(os.path.join("..","..","src","madap", "echem")))
 # -- Project information -----------------------------------------------------
 
 project = 'MADAP'
@@ -22,7 +22,7 @@ copyright = '2022, Fuzhan Rahmanian'
 author = 'Fuzhan Rahmanian'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
