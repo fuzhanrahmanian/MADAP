@@ -43,26 +43,26 @@ if name == "default_christian":
 if (name != "default_christian") and (name != "madap"):
     data = pd.read_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{name}.csv"), sep=";")
 if name == "madap":
-    data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_3.csv"), sep=";")
+    data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_8.csv"), sep=";")
 del data['Unnamed: 0']
 
 ## write an empty dataset and append the train stuff to the main after parallel training.
 
-def concat_new_data(data, exp_id, Arr, analysis_type):
+def concat_new_data(data, exp_id, Arr):#, analysis_type):
     # 1. activation
-    data.loc[data["experimentID"] == exp_id, f"activation_energy_{analysis_type} [mJ/mol]"] = Arr.activation
+    data.loc[data["experimentID"] == exp_id, f"activation_energy [mJ/mol]"] = Arr.activation
     # 2. cell constant
-    data.loc[data["experimentID"] == exp_id, f"activation_constant_{analysis_type}"] = Arr.arrhenius_constant
+    data.loc[data["experimentID"] == exp_id, f"activation_constant"] = Arr.arrhenius_constant
     # 3. r2 score
-    data.loc[data["experimentID"] == exp_id, f"activation_r2_score_{analysis_type}"] = Arr.fit_score
+    data.loc[data["experimentID"] == exp_id, f"activation_r2_score"] = Arr.fit_score
     # 4. mse score
-    data.loc[data["experimentID"] == exp_id, f"activation_mse_{analysis_type}"] = Arr.mse_calc
+    data.loc[data["experimentID"] == exp_id, f"activation_mse"] = Arr.mse_calc
     # 5. log conductivity
     #data.loc[data["experimentID"] == exp_id, f"log_conductivity_{analysis_type}"] = Arr._log_conductivity()
     # 6. inverted scale temperature
     #data.loc[data["experimentID"] == exp_id, f"inverted_scale_temperature_{analysis_type} [1000/K]"] = Arr.inverted_scale_temperatures
     # 7 fitted conductivity
-    data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity_{analysis_type} [ln(S/cm)]"] = Arr.ln_conductivity_fit
+    data.loc[data["experimentID"] == exp_id, f"fitted_log_conductivity [ln(S/cm)]"] = Arr.ln_conductivity_fit
 
 
 def constly_compute(data, exp_id, name):
@@ -88,7 +88,7 @@ constly_compute_cached = memory.cache(constly_compute)
 def data_processing_using_cache(data, exp_id, analysis_type):
     return constly_compute_cached(data, exp_id, analysis_type)
 
-Parallel(n_jobs=30)(delayed(data_processing_using_cache)(data, exp_id, name) for exp_id in tqdm(data["experimentID"].unique()))
+Parallel(n_jobs=10)(delayed(data_processing_using_cache)(data, exp_id, name) for exp_id in tqdm(data["experimentID"].unique()))
 # for exp_id in tqdm(data["experimentID"].unique()):w
 #     constly_compute(data, exp_id, name)
 
