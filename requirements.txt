@@ -1,7 +1,8 @@
 attrs==21.4.0
-impedance==1.4.0
-matplotlib==3.5.2
+matplotlib==3.5.3
 numpy==1.22.4
 pandas==1.4.2
 PySimpleGUI==4.60.3
+pytest==7.1.2
 scikit_learn==1.1.2
+impedance==1.4.1
