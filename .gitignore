@@ -107,6 +107,7 @@ electrolyte_figures/
 
 #Datasets
 data/
+!data/final_version_10.csv
 
 # cache
 figures_creation/

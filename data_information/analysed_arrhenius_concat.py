@@ -14,8 +14,8 @@ if (analysis_type != "default_christian") and (analysis_type != "madap"):
 if analysis_type == "default_christian":
     processed_data_imp = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
 if analysis_type == "madap":
-    processed_data_imp = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_8.csv"), sep=";")
-del processed_data_imp['Unnamed: 0']
+    processed_data_imp = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_9.csv"), sep=";")
+# del processed_data_imp['Unnamed: 0']
 
 processed_data = processed_data_imp.copy()
 
@@ -51,4 +51,4 @@ for i, file in enumerate(zip(json_files, csv_files)):
     concat_new_data(data = processed_data, exp_id = experimentid_name, json_file = json_file, csv_file = csv_file, analysis_type = analysis_type)
 
 
-processed_data.to_csv(os.path.join(os.getcwd(),fr"data/final_version_9.csv"), sep=";", index=True, mode='w+')
+processed_data.to_csv(os.path.join(os.getcwd(),fr"data/final_version_10.csv"), sep=";", index=True, mode='w+')

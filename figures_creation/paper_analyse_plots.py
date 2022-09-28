@@ -20,9 +20,9 @@ plotting.Plots()
 expriment_type = "arrhenius" #["impedance", "arrhenius"]
 analysis_type = "madap" #["calculated,", "default", "custom"]
 
-save_dir = r"C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data\figures"
+save_dir = r"C:\Users\lucaz\OneDrive\Fuzhi\KIT\madap\data\figures"
 
-data = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_9.csv"), sep=";")
+data = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_10.csv"), sep=";")
 del data['Unnamed: 0']
 
 MAPPED = False
@@ -113,7 +113,7 @@ def analysis_plot_creation(data, EC_PC_EMC_ratio, save_dir, y_analysis = data["m
     # plot the activation vs. (EC/PC) colorbar (LiPF6) scatter point circle and triangle for different EMC concentrationS
     fig, ax = plt.subplots(figsize=fig_size)
     if experiment_type == "arrhenius":
-        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis)*1000, edge_color = data["edgecolor"], linewidth = 0.38,\
+        scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis), edge_color = data["edgecolor"], linewidth = 0.38,\
                             c= np.array(data["LiPF6 [g]"]), s=9, m=data["marker"], ax=ax)
     if experiment_type == "impedance":
         scatter = mscatter(x=np.array(data["EC/PC [gr/gr]"]) , y=  np.array(y_analysis)*1000, edge_color = data["edgecolor"], linewidth = 0.38,\

@@ -43,8 +43,8 @@ if name == "default_christian":
 if (name != "default_christian") and (name != "madap"):
     data = pd.read_csv(os.path.join(os.getcwd(),fr"data/processed_data_impedance_{name}.csv"), sep=";")
 if name == "madap":
-    data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_8.csv"), sep=";")
-del data['Unnamed: 0']
+    data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_9.csv"), sep=";")
+#del data['Unnamed: 0']
 
 ## write an empty dataset and append the train stuff to the main after parallel training.
 

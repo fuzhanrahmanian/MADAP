@@ -30,8 +30,8 @@ from madap.data_acquisition import data_acquisition as da
 name = "trials" #["default_type1", "default_type2", "default_type3", "customtype1", "default_type4_random"]
 #0.5, 0.95 -> type 1, 0.1, 0.90 -> type 2, 0.15,0.9 -> type 3
 # 0.1, 0.9 -> type 4 (random selection between add and subtract)
-LOWERLIM = 0.16
-UPPERLIM = 0.88
+LOWERLIM = 0.26
+UPPERLIM = 0.99
 DEFAULTTRAIN = True
 # DEFAULTTRAINWITHINITIALVALUE = True
 # DEFAULTTRAINWITHOUTLIER = False
@@ -52,10 +52,10 @@ plot_type = ["nyquist" ,"nyquist_fit", "residual", "bode"]
 
 # load the data
 #data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
-# data = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_6.csv"), sep=";")
-# del data['Unnamed: 0']
-# temperatures = data["temperature [°C]"].unique().tolist()
-# temperatures.sort()
+data = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_6.csv"), sep=";")
+del data['Unnamed: 0']
+temperatures = data["temperature [°C]"].unique().tolist()
+temperatures.sort()
 
 # retrain the failed model for checking the results
 #non_refein_index = data[["experimentID", "temperature [°C]"]].loc[data[data.columns[22]] < 0.65]
@@ -139,33 +139,40 @@ def concat_new_data(Eis, data, exp_id, temp, analysis_type = "default", phase_sh
 # ind_data = 246
 
 
-def constly_compute(data, exp_id, temp, params, circuit):
+def constly_compute(data, exp_id):#, temp, params, circuit):
     #r0_index = 0
-    #for temp in temperatures:
+    for temp in [60.0]:#temperatures:
 
-    if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
+        if len(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"]) != 0:
 
-        ind_data = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"].index[0]
-        print(f"The index is {ind_data} and exp_id is {exp_id} and temperature is {temp}")
-        freq_data, real_data, imag_data, cell_constant, phase_shift_data = get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False,\
-                                                                                lower_qunatile = LOWERLIM, upper_quantile = UPPERLIM)
+            ind_data = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "frequency [Hz]"].index[0]
+            print(f"The index is {ind_data} and exp_id is {exp_id} and temperature is {temp}")
+            freq_data, real_data, imag_data, cell_constant, phase_shift_data = get_data_from_dataframe(data, exp_id, temp, ind_data, phase_shift = False,\
+                                                                                    lower_qunatile = LOWERLIM, upper_quantile = UPPERLIM)
 
-        if CUSTOMTRAIN:
-            _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = None,
-                                    initial_value = None, cell_constant = cell_constant,
-                                    plot_type = plot_type, exp_id = exp_id, temp = temp)
+            if CUSTOMTRAIN:
+                _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = None,
+                                        initial_value = None, cell_constant = cell_constant,
+                                        plot_type = plot_type, exp_id = exp_id, temp = temp)
 
-        if DEFAULTTRAIN:
-            r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
-            r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
-            _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = circuit,
-                                    initial_value = params , cell_constant = cell_constant,
-                                    plot_type = plot_type, exp_id = exp_id, temp = temp)
-            # r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
-            # r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
-            # _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-CPE1",
-            #                         initial_value = [1214.7652108842362, 2.461910668493229e-08, 0.9471004853645184] , cell_constant = cell_constant,
-            #                         plot_type = plot_type, exp_id = exp_id, temp = temp)
+            if DEFAULTTRAIN:
+                # r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
+                # r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
+                # _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = circuit,
+                #                         initial_value = params , cell_constant = cell_constant,
+                #                         plot_type = plot_type, exp_id = exp_id, temp = temp)
+
+                r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
+                r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
+                _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-p(R1,CPE1)",
+                                        initial_value = [r0_guess +200, 7306211.228201269, 6.225970492138481e-08, 0.8581626875317045], cell_constant = cell_constant,
+                                        plot_type = plot_type, exp_id = exp_id, temp = temp)
+
+                # r0_index = data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"].index[0]
+                # r0_guess = eval(data.loc[(data["experimentID"] == exp_id) & (data["temperature [°C]"] == temp), "real impedance Z' [Ohm]"][r0_index])[0]
+                # _ = eis_procedure(freq_data, real_data, imag_data, phase_shift_data, suggested_circuit = "R0-CPE1",
+                #                         initial_value = [r0_guess+250, 2.2920207904668043e-08, 0.83] , cell_constant = cell_constant,
+                #                         plot_type = plot_type, exp_id = exp_id, temp = temp)
 
 # [r0_guess-300,49e-08, 0.94]
 # "R0-CPE1"
@@ -180,9 +187,9 @@ def data_processing_using_cache(data, exp_id):
 #print(exp_ids_1)
 # 508
 #results = Parallel(n_jobs=28)(delayed(data_processing_using_cache)(data, exp_id) for exp_id in tqdm(exp_ids))
-# for exp_id in tqdm(data["experimentID"].unique()[500:504]):
-#     constly_compute(data, exp_id)
+for exp_id in ["WOC_23032021_BM065_1"]: #tqdm(data["experimentID"].unique()[500:501]):
+    constly_compute(data, exp_id)
 # for ind_num in range(len(non_refein_index)):
 #     constly_compute(data, exp_id = non_refein_index["experimentID"].iloc[ind_num], temp = non_refein_index["temperature [°C]"].iloc[ind_num])
 
-# constly_compute(data, exp_id = "PYA_30032021_BM073_1", temp = -20.0)
+#constly_compute(data, exp_id = "PYA_30032021_BM073_1", temp = -20.0)

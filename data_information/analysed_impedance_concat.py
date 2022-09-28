@@ -7,14 +7,14 @@ import numpy as np
 #analysis_type =  "default_type1" #["default_type1", "default_type2", "default_type3", "custom"]
 
 #path_to_json = fr"C:\Users\Fuzhan\Repositories\MADAP\electrolyte_figures\impedance_{analysis_type}\data"
-path_to_json = r"C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data\polished\data"
+path_to_json = r"C:\Users\lucaz\OneDrive\Fuzhi\KIT\madap\data\polished_final\impedance_polished_final\data"
 
 json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
 csv_files = [pos_csv for pos_csv in os.listdir(path_to_json) if pos_csv.endswith('.csv')]
 #
 # open the raw_data
 #raw_data = pd.read_csv(os.path.join(os.getcwd(),r"data/Dataframe_STRUCTURED_all508.csv"), sep=";")
-raw_data = pd.read_csv(os.path.join(os.getcwd(),r"data/final_version_7.csv"), sep=";")
+raw_data = pd.read_csv(os.path.join(os.getcwd(),r"data\final_version_7.csv"), sep=";")
 
 del raw_data['Unnamed: 0']
 
@@ -51,7 +51,6 @@ def concat_new_data(data, exp_id, temp, json_file, csv_file):#, analysis_type = 
     return data
 
 for i, file in enumerate(zip(json_files, csv_files)):
-    print(i)
     # open the json file
     json_file = json.load(open(fr"{path_to_json}/{file[0]}"))
     # open the csv file
@@ -66,4 +65,4 @@ for i, file in enumerate(zip(json_files, csv_files)):
 
 
 #processed_data.to_csv(os.path.join(os.getcwd(),fr"data/imp_data/processed_data_impedance_{analysis_type}.csv"), sep=";", index=True, mode='w+')
-processed_data.to_csv(os.path.join(os.getcwd(),fr"data/final_version_8.csv"), sep=";", index=True, mode='w+')
+processed_data.to_csv(os.path.join(os.getcwd(),fr"data\final_version_8.csv"), sep=";", index=True, mode='w+')

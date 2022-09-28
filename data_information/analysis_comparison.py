@@ -18,7 +18,7 @@ extracted_conductivity = []
 extracted_resistance = []
 
 for analysis in analysis_type:
-    processed_data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_9.csv"), sep=";")
+    processed_data = pd.read_csv(os.path.join(os.getcwd(),fr"data/final_version_10.csv"), sep=";")
     if analysis != "default_christian":
         extracted_conductivity.append(processed_data[f"madap_eis_conductivity [S/cm]"])
         extracted_resistance.append(processed_data[f"madap_eis_resistance [Ohm]"])
@@ -41,5 +41,5 @@ analysis_type.insert(1, "temperature [°C]")
 result_conductivity.columns, result_resistance.columns = analysis_type, analysis_type
 
 # save the comparison data
-result_conductivity.to_csv(os.path.join(os.getcwd(),fr"data/comparison_data/conductivity_final_version_9.csv"), sep=";")
-result_resistance.to_csv(os.path.join(os.getcwd(),fr"data/comparison_data/resistance_final_version_9.csv"), sep=";")
+result_conductivity.to_csv(os.path.join(os.getcwd(),fr"data/conductivity_final_version_10.csv"), sep=";")
+result_resistance.to_csv(os.path.join(os.getcwd(),fr"data/resistance_final_version_10.csv"), sep=";")
