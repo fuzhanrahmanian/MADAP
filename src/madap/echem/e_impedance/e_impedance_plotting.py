@@ -157,6 +157,7 @@ class ImpedancePlotting(Plots):
             self.add_colorbar(nyquist_plot, subplot_ax, scientific_label_colorbar,
                               scientific_limit=scientific_limit,
                               colorbar_label=r"f $[Hz]$")
+        self.ax = subplot_ax
 
     def residual(self, subplot_ax, frequency, res_real, res_imag,
                 log_scale='x', ax_sci_notation = None,
