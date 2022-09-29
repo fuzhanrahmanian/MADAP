@@ -7,11 +7,11 @@ from tqdm import tqdm # https://tqdm.github.io/
 import json
 import os
 
-os.chdir(r'C:\Users\MonikaVogler\Documents\BIG-MAP\WP6\CoopFZJ_ElectrolyteData\elec_opt')
+os.chdir(r'C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data')
 
 ## Define savepath for dataframe of raw data
-dataFolder = r"C:\Users\MonikaVogler\Documents\BIG-MAP\WP6\CoopFZJ_ElectrolyteData\Data3"
-savepath = r'C:\Users\MonikaVogler\Documents\BIG-MAP\WP6\CoopFZJ_ElectrolyteData\elec_opt\analysisExperimentalData'
+dataFolder = r"C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data"
+savepath = r'C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data'
 
 
 # # #######################################################################
@@ -346,7 +346,7 @@ savepath = r'C:\Users\MonikaVogler\Documents\BIG-MAP\WP6\CoopFZJ_ElectrolyteData
 #############################################
 
 ## Load the dataframe containing the data
-filepath = r'C:\Users\MonikaVogler\Documents\BIG-MAP\WP6\CoopFZJ_ElectrolyteData\MADAP\data\final_version_6.csv' # f'{savepath}/Dataframe_STRUCTURED_all508.csv'
+filepath = r'C:\Repositories\MADAP\data\final_version_10.csv' # f'{savepath}/Dataframe_STRUCTURED_all508.csv'
 table = pd.read_csv(filepath, sep=';', index_col='Unnamed: 0')
 # table.to_hdf(f'{savepath}/Dataframe_STRUCTURED_all508.hdf', key='electrolyte_data')
 # table = pd.read_hdf(f'{savepath}/Dataframe_STRUCTURED_all508.hdf')
@@ -400,6 +400,8 @@ for i in range(len(colLabels)):
              colLabels[i] = 'Arrhenius_MSE'
         elif 'fitted_log_conductivity' in colLabels[i]:
              colLabels[i] = 'Arrhenius_logConductivity'
+        elif 'custom_circuit' in colLabels[i]:
+            colLabels[i] = 'EIS_circuit'
 symbolsDict = {'temperature': 'T', 'resistance': 'R', 'conductivity': r'\sigma', 'frequency': 'f', 'real_impedance': "Z'", 'imaginary_impedance': "Z''", 'phase_shift': 'φ'}
 colSymbols = [symbolsDict[c] if c in symbolsDict.keys() else '-' for c in colLabels]
 colUnits = [c.split(' ')[-1].strip('[').strip(']') if '[' in c.split(' ')[-1] else '-' for c in table.columns]
@@ -421,6 +423,7 @@ for c in table.columns.get_level_values('label'):
                 del table[cTotal]
         except IndexError:
             pass
+
 # save the reduced dataframe as csv for checking
 table.to_csv(f'{savepath}/finalised_reduced.csv', sep=';')
 
@@ -563,7 +566,7 @@ tableDescription.reset_index(inplace=True)
 
 with pd.option_context('max_colwidth', None):   # https://stackoverflow.com/questions/67419916/pandas-df-to-latex-output-gets-truncated
     tableDescription.to_latex(f'{savepath}/Dataframe_description.tex', label='tab:dataTableDescription', caption=('This table describes the data comprised in the dataset presented here.', 'Description of the dataset.'), position='htb', index=False)   # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_latex.html
-with open(r'analysisExperimentalData\Dataframe_description.tex', 'r') as texFile:
+with open(r'C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data\Dataframe_description.tex', 'r') as texFile:
     tex = texFile.read()
 
 tex = tex.replace(r'\begin{tabular}{llllll}', r'')
@@ -580,5 +583,5 @@ tex = tex.replace(r'\}', r'}')
 tex = tex.replace(r'\textasciitilde', r'~')
 tex = tex.replace(r' \textbackslash cite', r'\cite')
 
-with open(r'analysisExperimentalData\Dataframe_description.tex', 'w') as texFile:
+with open(r'C:\Users\fuzha\OneDrive\Fuzhi\KIT\madap\data\Dataframe_description.tex', 'w') as texFile:
     tex = texFile.write(tex)

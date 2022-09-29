@@ -89,7 +89,7 @@ def find_quartile_label(data, quantile_column, column_name = "quantile_sign", CO
 
 
 
-def random_selection(data, column_name = "quantile_sign", num_random_data = 4, condition= "Q1", random_state = 42):
+def random_selection(data, column_name = "quantile_sign", num_random_data = 4, condition= "Q1", random_state = 7):
     selected_data = data.loc[data[column_name]== condition].sample(n=num_random_data, random_state = random_state)
     # need to return list of indeces
     return selected_data.index.values
@@ -107,11 +107,11 @@ for i, quantile in enumerate(["Q1", "Q2", "Q3"]):
         if experiment_type == "impedance":
             # the required columns are:
             # Make all subplot square
-            
+            data_len = len(eval(data[fit_data][num_random]))
             im = eplot.nyquist_fit(subplot_ax = ax[i, j],
-                                frequency = eval(data["frequency [Hz]"][num_random]),
-                                real_impedance = np.array(eval(data["real impedance Z' [Ohm]"][num_random])),
-                                imaginary_impedance = np.array(eval(data["imaginary impedance Z'' [Ohm]"][num_random])),
+                                frequency = eval(data["frequency [Hz]"][num_random])[:data_len+5],
+                                real_impedance = np.array(eval(data["real impedance Z' [Ohm]"][num_random]))[:data_len+5],
+                                imaginary_impedance = np.array(eval(data["imaginary impedance Z'' [Ohm]"][num_random]))[:data_len+5],
                                 fitted_impedance= eval(data[fit_data][num_random]),
                                 chi = data[chi][num_random],
                                 suggested_circuit = data[custom_cicuit][num_random],
@@ -145,12 +145,12 @@ for i, quantile in enumerate(["Q1", "Q2", "Q3"]):
             # aplot.ax2.axes.get_xaxis().set_ticks([])
             aplot.ax2.axes.get_yticklabels()[0].set_visible(False)
             aplot.ax2.axes.get_xticklabels()[0].set_visible(False)
-            
+
 
 fig.tight_layout()
-fig.text(-0.02, 0.85, 'Q1', va='center', rotation='vertical')
-fig.text(-0.02, 0.5, 'Q2', va='center', rotation='vertical')
-fig.text(-0.02, 0.15, 'Q3', va='center', rotation='vertical')
-fig.text(0.5, -0.02, r"$\frac{1000}{T}$ $[K^{-1}]$", ha='center')
+fig.text(-0.02, 0.85, 'Q1', va='center', rotation='vertical', fontsize=10)
+fig.text(-0.02, 0.5, 'Q2', va='center', rotation='vertical', fontsize=10)
+fig.text(-0.02, 0.15, 'Q3', va='center', rotation='vertical', fontsize = 10)
+fig.text(0.5, -0.02, r"$\frac{1000}{T}$ $[K^{-1}]$", ha='center', fontsize = 10)
 plt.savefig(os.path.join(os.getcwd(), fr"electrolyte_figures\error_{experiment_type}.svg"))
 
