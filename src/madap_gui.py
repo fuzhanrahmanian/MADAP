@@ -33,26 +33,34 @@ class MadapGui:
         """ This function validates the fields in the GUI
 
         Returns:
-            bool: Returns fals if any of the fields are invalid.
+            bool: Returns false if any of the fields are invalid.
         """
         if self.file == '':
             sg.popup_error('The data path is empty. Select a supported dataset file.', title='Input Error')
+            return False
         if self.results == '':
             sg.popup_error('The result path is empty. Select a location for the results.', title='Input Error')
+            return False
         if self.plots == []:
             sg.popup_error('Select the desired plot(s).', title='Input Error')
+            return False
         if self.procedure == 'Impedance':
             if self.header_list and (len(self.header_list) not in [3,4]):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
+                return False
             if self.specific and (len(self.specific) not in [3,4]):
                 sg.popup_error('Wrong number of specific inputs.', title='Input Error')
+                return False
         if self.procedure == 'Arrhenius':
             if self.header_list and (len(self.header_list) != 2):
                 sg.popup_error('Wrong number of header inputs.', title='Input Error')
+                return False
             if self.specific and (len(self.specific) != 2):
                 sg.popup_error('Wrong number of specific inputs.', title='Input Error')
+                return False
+        else:
+            return True
 
-        return False
 
 def draw_figure(element, figure):
     """
