@@ -27,6 +27,7 @@ class Plots():
         plt.rcParams['xtick.direction'] = 'in'
         plt.rcParams['ytick.direction'] = 'in'
         self.plot_type = ""
+        self.ax = None
 
     def plot_identity(self, ax, xlabel:str=None, ylabel:str=None, x_lim:list=None, y_lim:list=None,
                       rotation:float=0, ax_sci_notation:bool=False, scientific_limit=0,
