@@ -1,15 +1,12 @@
 """ Just a file containing some lengthy text used for the GUI helpers. """
 
 HEADER_OR_SPECIFIC_HELP="If the data selection is 'Headers', insert the headers for: " \
-                        "\nfrequency [Hz], real impedance [\u2126], imaginary impedance,\
-                        phase shift \u03c6[\u00b0] (optional). Order is relevant.\n" \
+                        "\nfrequency [Hz], real impedance [\u2126], imaginary impedance, phase shift \u03c6[\u00b0] (optional).Order is relevant.\n"\
                         "Example: 'freq, real, imag'" \
                         "\n \n"\
-                        "If the data selection is 'Specific' insert the row and column numbers.\
-                            Order is relevant." \
-                        "\nFormat: 'start_row,end_row,start_column,end_column': 1,10,1,2 \
-                            translates to rows 1 to 10 and columns 1 to 2." \
-                        "Example: '0,40,0,1; 0,40,1,2; 0,40,2,3'"
+                        "If the data selection is 'Specific' insert the row and column numbers. Order is relevant." \
+                        "\nFormat: 'start_row,end_row,start_column,end_column': 1,10,1,2  translates to rows 1 to 10 and columns 1 to 2."\
+                        "\nExample: '0,40,0,1; 0,40,1,2; 0,40,2,3'"
 
 SUGGESTED_CIRCUIT_HELP="Suggested circuit (optional).\n" \
                         "Available circuit elements are: 's', 'C', 'Ws', 'K', 'W', 'Wo', 'R'," \

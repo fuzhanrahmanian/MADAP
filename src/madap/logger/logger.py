@@ -18,7 +18,7 @@ def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
 
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
-    formatter = logging.Formatter(u"%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setFormatter(formatter)
     logger.handlers.clear()

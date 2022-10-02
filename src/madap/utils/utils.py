@@ -70,7 +70,7 @@ def save_data_as_json(directory, data, name):
         name (str): The name of the file
     """
     log.info(f"Saving data in {directory} as json")
-    with open(os.path.join(directory, name), 'w') as file:
+    with open(os.path.join(directory, name), 'w', encoding="utf-8") as file:
         json.dump(data, file)
     log.info(f"Saving data in {directory} as json")
     with open(os.path.join(directory, name), 'w', encoding="utf8") as f:
@@ -84,7 +84,7 @@ def load_data_as_json(directory, name):
         name (str): The name of the file
     """
     log.info(f"Loading data from {directory} as json")
-    with open(os.path.join(directory, name), 'r') as file:
+    with open(os.path.join(directory, name), 'r', encoding="utf-8") as file:
         data = json.load(file)
     return data
 
