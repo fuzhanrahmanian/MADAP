@@ -43,19 +43,41 @@ MADAP can be used in a python script as follows:
 
 .. code:: python
 
-   from madap import MADAP
+    from madap.echem.arrhenius import arrhenius
+    from madap.echem.e_impedance import e_impedance
+    from madap.data_acquisition import data_acquisition as da
 
-   madap = MADAP()
-   madap.load_data('data.csv')
-   madap.voltammetry_analysis()
-   madap.eis_analysis()
-   madap.arrhenius_analysis()
+
+    # Load the data
+    data = da.acquire_data('data.csv')
+    # Define the desired plots for Arrhenius analysis
+    plots_arr = ["arrhenius", "arrhenius_fit"]
+    # Define the desired plots for impedance analysis
+    plots_eis = ["nyquist", "nyquist_fit", "bode", "residual"]
+    # Define a save location#
+    save_dir = "/results"
+
+    ### Arrhenius
+    # Instantiate the Arrhenius class for analysis (column names do not have to match exactly, this is just an example)
+    Arr = arrhenius.Arrhenius(da.format_data(data["temperature"], da.format_data(data["conductivity"])))
+    # Perform analysis and plotting
+    Arr.perform_all_actions(save_dir, plots = plots_arr)
+
+    ### Impedance
+    # Initialize the Impedance class for analysis (column names do not have to match exactly, this is just an example)
+    Im = e_impedance.EImpedance(da.format_data(data["freq"]), da.format_data(data["real"]), da.format_data(data["img"]))
+    # Initialis the EIS procedure. The initial value is the initial guess for the equivalent circuit (can also be left empty)
+    Eis  = e_impedance.EIS(Im, suggested_circuit = "R0-p(R1,CPE1)",initial_value =[860, 3e+5, 1e-09, 0.90])
+    # Analyze the data
+    Eis.perform_all_actions(save_dir, plots = plots_eis)
+
+    # More usages and options can be found in the documentation.
 
 MADAP can also be used via command line:
 
 .. code:: bash
 
-   madap -f data.csv -v -e -a
+   python -m madap_cli --file <path_to_file> --procedure <procedure> --results <path_to_results> --header_list <header_list> --plot <list_of_plots>
 
 MADAP can also be used via a GUI:
 
@@ -80,5 +102,6 @@ If you use MADAP in your research, please cite the following paper:
 References
 ~~~~~~~~~~
 
-This package is based relies on the following packages:
--  Impedance GitHub repository by Matthew D. Murbach and Brian Gerwe and Neal Dawson-Elli and Lok-kun Tsui: `link https://github.com/ECSHackWeek/impedance.py`
+This package is based relies on the following packages and papers:
+- Impedance GitHub repository by Matthew D. Murbach and Brian Gerwe and Neal Dawson-Elli and Lok-kun Tsui: `link <https://github.com/ECSHackWeek/impedance.py>`__
+- A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests DOI: https://doi.org/10.1016/j.electacta.2014.01.034

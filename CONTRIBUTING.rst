@@ -106,13 +106,13 @@ Before you submit a pull request, check that it meets these guidelines:
 Releasing
 ---------
 
-To create a new release of Luna, update the verion number in setup.cfg and tag your release accordingly with git tag <version_number>. Make sure to push your tag with 
+To create a new release of Luna, update the verion number in setup.cfg and tag your release accordingly with git tag <version_number>. Make sure to push your tag with:
 
-    $ git push --tags.
+    $ git push --tags
 
 Once your commit is merged, it will automatically be deployed.
 
 Docs
 ----
-To also deploy the documentation if something has changed there, use the update script.
+To also deploy the documentation if something has changed there, use the `update script <https://github.com/fuzhanrahmanian/MADAP/blob/master/pages-publish.sh>`__
 
