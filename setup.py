@@ -26,15 +26,20 @@ setup(
     author_email='fuzhanrahmanian@gmail.com',
     python_requires='>=3.6',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Topic :: Scientific/Engineering :: Chemistry',
+        'Topic :: Scientific/Engineering :: Physics',
+        'Topic :: Scientific/Engineering :: Visualization',
     ],
     description="This is MADAP, a software package for the analysis of electrochemical data.",
     entry_points={
@@ -43,7 +48,7 @@ setup(
             'gui=src.madap_gui:main',
         ],
     },
-    extra_requires={
+    extras_require={
         "dev": ["pytest>=3", ],
     },
     install_requires=requirements,
