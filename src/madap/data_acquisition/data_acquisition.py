@@ -83,7 +83,7 @@ def select_data(data, selected_data:str):
         if len(data) == 1:
             data = np.array(eval(data[0]))
         else:
-            for i in range(len(data)):
+            for i, _ in enumerate(data):
                 data[i] = eval(data[i])
 
     return data
