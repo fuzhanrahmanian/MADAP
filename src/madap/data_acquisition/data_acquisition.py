@@ -27,7 +27,11 @@ def acquire_data(data_path):
         raise ValueError("Datatype not supported")
 
     if extension in (".csv", ".txt"):
-        df = pd.read_csv(data_path, sep=None, engine="python")
+        try:
+            df = pd.read_csv(data_path, sep=None, engine="python")
+        except:
+            df = pd.read_csv(data_path, sep=";", engine="python")
+
     if extension == ".xlsx":
         df = pd.read_excel(data_path)
     if extension == ".json":
@@ -71,6 +75,17 @@ def select_data(data, selected_data:str):
     """
     numbers = list(map(int, selected_data.split(",")))
     data = data.iloc[:, numbers[2]: numbers[3]].values.reshape(-1)
+
+    # check datatype
+    if not isinstance(data, np.ndarray):
+        data = np.array(data)
+    if isinstance(data[0], str):
+        if len(data) == 1:
+            data = np.array(eval(data[0]))
+        else:
+            for i in range(len(data)):
+                data[i] = eval(data[i])
+
     return data
 
 
@@ -89,12 +104,12 @@ def format_plots(plots):
         plots = list(plots)
     return plots
 
-def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.05, high_quantile = 0.95):
+def remove_outlier_specifying_quantile(df, columns, low_quantile = 0.05, high_quantile = 0.95):
     """removing the outliers from the data by specifying the quantile
 
     Args:
         df (dataframe): original dataframe
-        columnns (list): colummns for which the outliers are to be removed
+        columns (list): colummns for which the outliers are to be removed
         low_quantile (float): lower quantile
         high_quantile (float): upper quantile
 
@@ -102,7 +117,7 @@ def remove_outlier_specifying_quantile(df, columnns, low_quantile = 0.05, high_q
         data: the cleaned dataframe
     """
     # select the columns that needs to be studied for outliers
-    detect_search = df[columnns]
+    detect_search = df[columns]
     # Check if the low_quantile and high_quantile are floats, if not convert them to float
     if not isinstance(low_quantile, float):
         low_quantile = float(low_quantile)
