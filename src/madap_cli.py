@@ -2,8 +2,10 @@
 import os
 import sys
 import argparse
+import re
 
 from pathlib import Path
+import pandas as pd
 
 from madap.utils import utils
 from madap.logger import logger
@@ -115,11 +117,6 @@ def call_impedance(data, result_dir, args):
         result_dir (str): the directory for saving results
         args (parser.args): Parsed arguments
     """
-    _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
-                                                           columnns = [data.columns[1],
-                                                                       data.columns[2]],
-                                                           low_quantile = args.lower_limit_quantile,
-                                                           high_quantile = args.upper_limit_quantile)
 
     if args.header_list:
         # Check if args header is a list
@@ -131,6 +128,11 @@ def call_impedance(data, result_dir, args):
 
         phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
 
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
+                                                           columns = [header_names[1],
+                                                                       header_names[2]],
+                                                           low_quantile = args.lower_limit_quantile,
+                                                           high_quantile = args.upper_limit_quantile)
         # remove nan rows
         data = da.remove_nan_rows(data, nan_indices)
         # extracting the data
@@ -139,16 +141,36 @@ def call_impedance(data, result_dir, args):
                                           data[header_names[2]]
 
     if args.specific:
-        row_col = args.specific[0].split(", ")
+
+        try:
+            if len(args.specific) >= 3:
+                row_col = args.specific
+            else:
+                row_col = re.split('; |;', args.specific[0])
+
+        except ValueError as e:
+            log.error("The format of the specific data is not correct. Please check the help.")
+            raise e
 
         selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
-        data = da.remove_nan_rows(selected_data, nan_indices)
+
 
         phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
-        freq_data, real_data, imag_data = da.select_data(data, row_col[0]), \
-                                          da.select_data(data, row_col[1]), \
-                                          da.select_data(data, row_col[2])
 
+
+        freq_data, real_data, imag_data = da.select_data(selected_data, row_col[0]), \
+                                          da.select_data(selected_data, row_col[1]), \
+                                          da.select_data(selected_data, row_col[2])
+
+        unprocessed_data = pd.DataFrame({"freq": freq_data, "real": real_data, "imag": imag_data})
+
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
+                                            columns = ["real", "imag"],
+                                            low_quantile = args.lower_limit_quantile,
+                                            high_quantile = args.upper_limit_quantile)
+
+        data = da.remove_nan_rows(unprocessed_data, nan_indices)
+        freq_data, real_data, imag_data = data["freq"], data["real"], data["imag"]
 
     impedance = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data),
                                 da.format_data(imag_data), da.format_data(phase_shift_data))
@@ -201,9 +223,25 @@ def call_arrhenius(data, result_dir, args):
 
         temp_data, cond_data = data[header_names[0]], data[header_names[1]]
     if args.specific:
-        row_col = args.specific[0].split(", ")
-        temp_data, cond_data = da.select_data(data, row_col[0]), da.select_data(data, row_col[1])
 
+        try:
+            if len(args.specific) == 2:
+                row_col = args.specific
+            else:
+                row_col = re.split('; |;', args.specific[0])
+
+        except ValueError as e:
+            log.error("The format of the specific data is not correct. Please check the help.")
+            raise e
+
+        selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
+
+        #row_col = args.specific[0].split(", ")
+
+        temp_data, cond_data = da.select_data(selected_data, row_col[0]), \
+                               da.select_data(selected_data, row_col[1])
+        if (not isinstance(temp_data, pd.Series)) and (not isinstance(cond_data, pd.Series)):
+            temp_data, cond_data = pd.Series(temp_data).astype(float), pd.Series(cond_data).astype(float)
     # Instantiate the procedure
     arrhenius_cls = arrhenius.Arrhenius(da.format_data(temp_data), da.format_data(cond_data))
 
