@@ -39,7 +39,7 @@ class ArrheniusPlotting(Plots):
 
         subplot_ax2.scatter(temperatures, log_conductivity, s=10, c="#20a387ff", rasterized=True)
         self.plot_identity(subplot_ax2, xlabel="$T$ [\u00b0C]")
-        self.set_xtick_for_two_axes(subplot_ax, subplot_ax2, ["%.1f" % ct for ct in inverted_scale_temperatures], temperatures, invert_axes=True)
+        self.set_xtick_for_two_axes(subplot_ax, subplot_ax2, [f"{ct:.1f}" for ct in inverted_scale_temperatures], temperatures, invert_axes=True)
 
     def arrhenius_fit(self, subplot_ax, temperatures, log_conductivity, inverted_scale_temperatures,
                     ln_conductivity_fit, activation, arrhenius_constant, r2_score,
