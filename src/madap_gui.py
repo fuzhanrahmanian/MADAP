@@ -29,6 +29,7 @@ class MadapGui:
         self.upper_limit_quantile = None
         self.lower_limit_quantile = None
 
+    # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
         """ This function validates the fields in the GUI
 
@@ -58,8 +59,7 @@ class MadapGui:
             if self.specific and (len(self.specific) != 2):
                 sg.popup_error('Wrong number of specific inputs.', title='Input Error')
                 return False
-        else:
-            return True
+        return True
 
 
 def draw_figure(element, figure):
@@ -72,6 +72,7 @@ def draw_figure(element, figure):
     """
 
     plt.close('all')  # erases previously drawn plots
+    figure.set_dpi(120)
     canv = FigureCanvasAgg(figure)
     buf = io.BytesIO()
     canv.print_figure(buf, format='png')
@@ -130,18 +131,18 @@ def gui_layout(madap, colors):
                     [sg.Text("Upper limit of quantile (optional)",justification='left',
                              font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-upper_limit_quantile-", tooltip=gui_elements.UPPER_LIMIT_QUANTILE_HELP,
-                                  enable_events=True, default_text="0.95")],
+                                  enable_events=True, default_text="0.99")],
                     [sg.Text("Lower limit of quantile (optional)",justification='left',
                              font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-lower_limit_quantile-", tooltip=gui_elements.LOWER_LIMIT_QUANTILE_HELP,
-                                  enable_events=True, default_text="0.05")],
+                                  enable_events=True, default_text="0.01")],
                     [sg.Text('Suggeted Circuit',justification='left', font=("Arial", 13),
                              pad=(1,(20,0)))],
                     [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP,
                                   default_text="R0-p(R1,CPE1)")],
                     [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP,
-                                  default_text="[800,1e+14,1e-9,0.8]")],
+                                  default_text="[860, 3e+5, 1e-09, 0.90]")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-',
                                 size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
@@ -273,9 +274,11 @@ def main():
                                           if not values['-lower_limit_quantile-'] == '' else None
 
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
+                madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.header_list = list(madap_gui.header_list.split(','))
             else:
+                madap_gui.header_list = None
                 madap_gui.specific = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
                 madap_gui.specific = list(madap_gui.specific.split(';'))
 
