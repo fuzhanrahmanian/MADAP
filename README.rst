@@ -33,7 +33,7 @@ MADAP can be installed via pip:
 
 .. code:: bash
 
-   pip install madap
+   pip install MADAP
 
 
 Usage
@@ -96,7 +96,7 @@ details.
 Citation
 ~~~~~~~~
 
-If you use MADAP in your research, please cite the following paper:
+If you use MADAP in your research, please cite this GitHub repository https://github.com/fuzhanrahmanian/MADAP.
 
 
 References
