@@ -9,9 +9,12 @@ import warnings
 import random
 
 import numpy as np
-import impedance.validation as validation
-import impedance.preprocessing as preprocessing
-import impedance.models.circuits as circuits
+from impedance import validation
+from impedance import preprocessing
+from impedance.models import circuits
+#import impedance.validation as validation
+#import impedance.preprocessing as preprocessing
+#import impedance.models.circuits as circuits
 
 from attrs import define, field
 from attrs.setters import frozen
@@ -177,7 +180,7 @@ class EIS(EChemProcedure):
                         log.info(f"With re-evaluating the circuit {self.suggested_circuit} the RMSE error is now {self.rmse_calc}")
 
 
-                except RuntimeError as e:
+                except Exception as e:
                     log.error(e)
                     continue
 

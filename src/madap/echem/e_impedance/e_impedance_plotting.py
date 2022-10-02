@@ -44,10 +44,11 @@ class ImpedancePlotting(Plots):
         log.info("Creating Nyquist plot")
         norm = mcl.LogNorm(vmin=min(frequency), vmax=max(frequency)) if norm_color else None
 
+        label = f"v = {voltage} [V]" if (voltage and voltage != "")  else None
         nyquist_plot = subplot_ax.scatter(real_impedance, -imaginary_impedance,
                                           c=frequency, norm=norm, s=10,
                                           cmap=color_map, rasterized=True,
-                                          label=f"v = {voltage} [V]")
+                                          label=label)
 
         nyquist_plot.set_clim(min(frequency), max(frequency))
 
