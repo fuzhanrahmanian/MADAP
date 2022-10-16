@@ -2,6 +2,14 @@
 History
 =======
 
+0.11.0 (2022-10-16)
+-------------------
+
+* Fixed bugs concering the package installation.
+* Improved the documentation.
+* Imrpoved the file structure.
+* madap_gui and madap_cli are now in the same package and can be used as standalone scripts/commands.
+
 0.10.0 (2022-10-03)
 -------------------
 

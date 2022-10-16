@@ -95,7 +95,7 @@ MADAP can also be used via command line:
 
 .. code:: bash
 
-   python -m madap_cli --file <path_to_file> --procedure <procedure> --results <path_to_results> --header_list <header_list> --plot <list_of_plots>
+   madap_cli --file <path_to_file> --procedure <procedure> --results <path_to_results> --header_list <header_list> --plot <list_of_plots>
 
 Note that when using the argument "impedance" for the option --procedure, another option --impedance_procedure is necessary to be specified.
 At the moment, the only possible impedance procedure is "EIS". Mottschotcky and Lissajous are not yet implemented.
@@ -115,7 +115,7 @@ MADAP can also be used via a GUI:
 
 .. code:: bash
 
-   python -m madap_gui
+   madap_gui
 
 An example of the GUI for impedance is shown below:
 

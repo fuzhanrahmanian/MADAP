@@ -41,8 +41,8 @@ setup(
     description="This is MADAP, a software package for the analysis of electrochemical data.",
     entry_points={
         'console_scripts': [
-            'cli=src.madap_cli:main',
-            'gui=src.madap_gui:main',
+            'madap_cli=madap_cli:main',
+            'madap_gui=madap_gui:main',
         ],
     },
     extras_require={
@@ -54,11 +54,12 @@ setup(
     include_package_data=True,
     keywords='madap',
     name='MADAP',
-    packages=find_packages(include=['src', 'src.*']),
-    #package_dir = {'': 'src'},
+    packages=find_packages(),
+    py_modules=['madap_cli', 'madap_gui'],
+    package_data={'madap/plotting/styles': ['*.mplstyle']},
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/fuzhanrahmanian/MADAP',
-    version='0.10.0',
+    version='0.11.0',
     zip_safe=False,
 )
