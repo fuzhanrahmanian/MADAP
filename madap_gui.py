@@ -136,7 +136,7 @@ def gui_layout(madap, colors):
                              font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.InputText(key="-lower_limit_quantile-", tooltip=gui_elements.LOWER_LIMIT_QUANTILE_HELP,
                                   enable_events=True, default_text="0.01")],
-                    [sg.Text('Suggeted Circuit',justification='left', font=("Arial", 13),
+                    [sg.Text('Suggested Circuit',justification='left', font=("Arial", 13),
                              pad=(1,(20,0)))],
                     [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP,
                                   default_text="R0-p(R1,CPE1)")],
