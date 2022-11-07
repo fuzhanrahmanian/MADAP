@@ -38,8 +38,8 @@ MADAP can be installed via pip:
 
 Usage
 ~~~~~
-
-MADAP can be used in a python script as follows:
+A brief tutorial video of the basic of MADAP usage can found here  `here <https://youtu.be/nL-eJpb1AxI>`__
+MADAP can be used in a python script as follows: 
 
 .. code:: python
 
