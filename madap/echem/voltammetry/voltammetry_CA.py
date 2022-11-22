@@ -6,7 +6,7 @@ log = logger.get_logger("cyclic_amperometry")
 
 
 class Voltammetry_CA(Voltammetry, EChemProcedure):
-    def __init__(self, voltage, current, time, capacity:list[float]=None, cycle=None) -> None:
+    def __init__(self, voltage, current, time, capacity:list[float]=None) -> None:
         super().__init__(voltage, current, time)
         self.capacity = self._calculate_capacity() if capacity is None else capacity
         self.cycle = cycle
@@ -16,9 +16,10 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
     def plot(self):
         # TODO plots
         # TODO i vs t
-        # TODO i vs Q
-        # TODO currentDensity vs time
-        # TODO Q vs cycle
+        # TODO i density vs t
+        # TODO Q vs t
+        # TODO i vs t^(-0.5)
+        # TODO Q vs time^(0.5)
         pass
 
     def save_data(self):
