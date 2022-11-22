@@ -72,9 +72,21 @@ def _analyze_parser_args():
         if proc.voltammetry_procedure == "cyclic_voltammetric":
             # TODO
             pass
+
         elif proc.voltammetry_procedure == "cyclic_amperometric":
-            # TODO
-            pass
+            ca = first_parser.add_argument_group("Options for the cyclic amperometric procedure")
+            # Add the arguments for the cyclic amperometric procedure
+            ca.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry" ,"chronocoulometry", "cotrell", "anson"],
+                            nargs="+", help="plots to be generated")
+            ca.add_argument("-v", "--voltage", type=float, required=False, default=None,
+                            help="applied voltage [V] if applicable")
+            ca.add_argument("-i", "--current", type=list, required=True, default=None,
+                            help="measure current [A]")
+            ca.add_argument("-t", "--time", type=list, required=True, default=None,
+                            help="measure time [s]")
+            ca.add_argument("-a", "--area", type=float, required=False, default=None,
+                            help="electrode area [cm^2] if applicable")
+
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
             # TODO
             pass
@@ -279,6 +291,8 @@ def call_voltammetry(data, result_dir, plots):
     if isinstance(plots, tuple):
         plots = list(plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
+    return "voltammetry"
+
 
 def start_procedure(args):
     """Function to prepare the data for analysis.
@@ -299,9 +313,8 @@ def start_procedure(args):
     elif args.procedure in ["arrhenius", "Arrhenius"]:
         procedure = call_arrhenius(data, result_dir, args)
 
-    elif args.procedure == "voltammetry":
-        log.info("Voltammetrys is not supported at the moment. Exiting ...")
-        sys.exit()
+    elif args.procedure == ["voltammetry", "Voltammetry"]:
+        procedure = call_voltammetry(data, result_dir, args.plots)
 
     return procedure
 
