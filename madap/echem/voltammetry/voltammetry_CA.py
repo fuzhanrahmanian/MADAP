@@ -5,11 +5,12 @@ from madap.logger import logger
 log = logger.get_logger("cyclic_amperometry")
 
 
-class Voltammetry_CA(Voltammetry, EChemProcedure):
-    def __init__(self, voltage, current, time, capacity:list[float]=None) -> None:
-        super().__init__(voltage, current, time)
-        self.capacity = self._calculate_capacity() if capacity is None else capacity
-        self.cycle = cycle
+class Voltammetry_CA(EChemProcedure):
+    def __init__(self, voltage, current, time, active_area=None): #, capacity:list[float]=None) -> None:
+        pass
+        #super().__init__(voltage, current, time)
+        #self.capacity = self._calculate_capacity() if capacity is None else capacity
+        #self.cycle = cycle
     def analyze(self):
         pass
 

@@ -14,8 +14,6 @@ from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
 from madap.echem.voltammetry import voltammetry_CA
 
-
-
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')
 
 def _analyze_parser_args():
@@ -84,7 +82,7 @@ def _analyze_parser_args():
                             help="measure current [A]")
             ca.add_argument("-t", "--time", type=list, required=True, default=None,
                             help="measure time [s]")
-            ca.add_argument("-a", "--area", type=float, required=False, default=None,
+            ca.add_argument("-aa", "--active_area", type=float, required=False, default=None,
                             help="electrode area [cm^2] if applicable")
 
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
@@ -265,33 +263,82 @@ def call_arrhenius(data, result_dir, args):
 
     return arrhenius_cls
 
-def call_voltammetry(data, result_dir, plots):
+def call_voltammetry(data, result_dir, args):
     """ Calling the voltammetry procedure and parse the corresponding arguments
 
     Args:
         data (class): the given data frame for analysis
         result_dir (str): the directory for saving results
-        plots (list): list of plots to be generated
+        args (parser.args): Parsed arguments
     """
-    log.info("What is the name (or index) of the column of voltage (v [V]) ?")
-    # TODO
-    voltage_idx = "voltage" #input()
-    # TODO
-    log.info("What is the name (or index) of the column of current (I [A]) ?")
-    current_idx = "current" #input()
-    # TODO
-    log.info("What is the name (or index) of the column of time (t [s]) ?")
-    time_idx = "time" #input()
+    if args.header_list:
+        if isinstance(args.header_list, list):
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
+            args.header_list
+        else:
+            header_names = args.header_list
 
-    voltammetry_cls = voltammetry_CA.Voltammetry_CA(da.format_data(data[voltage_idx]),
-                                  da.format_data(data[current_idx]),
-                                da.format_data(data[time_idx]))
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
+                                                           columns = [header_names[1],
+                                                                       header_names[2]],
+                                                           low_quantile = args.lower_limit_quantile,
+                                                           high_quantile = args.upper_limit_quantile)
+        # remove nan rows
+        data = da.remove_nan_rows(data, nan_indices)
+        param_one, param_two = data[header_names[0]], data[header_names[1]]
+
+    if args.specific:
+        try:
+            if len(args.specific) == 2:
+                row_col = args.specific
+            else:
+                row_col = re.split('; |;', args.specific[0])
+        except ValueError as e:
+            log.error("The format of the specific data is not correct. Please check the help.")
+            raise e
+
+        selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
+
+        param_one, param_two = da.select_data(selected_data, row_col[0]), \
+                                 da.select_data(selected_data, row_col[1])
+
+        unprocessed_data = pd.DataFrame({"data_one": param_one, "data_two": param_two})
+
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
+                                    columns = ["data_one", "data_two"],
+                                    low_quantile = args.lower_limit_quantile,
+                                    high_quantile = args.upper_limit_quantile)
+
+        data = da.remove_nan_rows(unprocessed_data, nan_indices)
+        param_one, param_two = data["data_one"], data["data_two"]
+
+    # Instantiate the procedure
+    if args.voltammetry_procedure == "cyclic_voltammetric":
+        #TODO
+        pass
+    elif args.voltammetry_procedure == "cyclic_potentiometric":
+        #TODO
+        pass
+    elif args.voltammetry_procedure == "cyclic_amperometric":
+        log.info(f"Performing cyclic amperometric procedure at potential {args.voltage} V. \
+            ")
+        #area = args.area if args.area else None
+        #TODO why pylint is not working here?
+        #pylint: disable=E1123
+        voltammetry_cls = voltammetry_CA.Voltammetry_CA(voltage = args.voltage,
+                                        current = da.format_data(param_one),
+                                        time = da.format_data(param_two),
+                                        active_area = args.active_area)
+
+    # voltammetry_cls = voltammetry_CA.Voltammetry_CA(da.format_data(data[voltage_idx]),
+    #                               da.format_data(data[current_idx]),
+    #                             da.format_data(data[time_idx]))
     if isinstance(plots, str):
         plots = [plots]
     if isinstance(plots, tuple):
         plots = list(plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
-    return "voltammetry"
+    return voltammetry_cls
 
 
 def start_procedure(args):

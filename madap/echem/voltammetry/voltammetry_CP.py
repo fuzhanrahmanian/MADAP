@@ -7,7 +7,10 @@ log = logger.get_logger("cyclic_potentiometry")
 
 class Voltammetry_CP(Voltammetry, EChemProcedure):
     def __init__(self, voltage, current, time) -> None:
-        super().__init__(voltage, current, time)
+        self.voltage = voltage
+        self.current = current
+        self.time = time
+        #super().__init__(voltage, current, time)
 
     def analyze():
         pass

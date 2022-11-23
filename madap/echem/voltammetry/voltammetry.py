@@ -3,6 +3,7 @@ from attrs import define, field
 from attrs.setters import frozen
 from madap.logger import logger
 from madap.echem.procedure import EChemProcedure
+from madap.echem.voltammetry.
 
 
 log = logger.get_logger("voltammetry")
