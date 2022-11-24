@@ -110,3 +110,8 @@ References
 This package is based relies on the following packages and papers:
 - Impedance GitHub repository by Matthew D. Murbach and Brian Gerwe and Neal Dawson-Elli and Lok-kun Tsui: `link <https://github.com/ECSHackWeek/impedance.py>`__
 - A Method for Improving the Robustness of linear Kramers-Kronig Validity Tests DOI: https://doi.org/10.1016/j.electacta.2014.01.034
+
+References
+~~~~~~~~~~
+
+This project has received funding from the European Union’s [Horizon 2020 research and innovation programme](https://ec.europa.eu/programmes/horizon2020/en) under grant agreement [No 957189](https://cordis.europa.eu/project/id/957189). The project is part of BATTERY 2030+, the large-scale European research initiative for inventing the sustainable batteries of the future.
