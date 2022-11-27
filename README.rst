@@ -1,3 +1,6 @@
+.. image:: logo.png
+    :align: center
+
 MADAP
 ~~~~~
 
