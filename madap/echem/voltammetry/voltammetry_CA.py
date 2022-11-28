@@ -1,3 +1,6 @@
+#adds by leon
+from __future__ import annotations
+
 from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger

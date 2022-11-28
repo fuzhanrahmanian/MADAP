@@ -4,6 +4,9 @@
 # A Python package for electrochemical impedance analysis.
 # Journal of Open Source Software, 5(). https://doi.org/10.21105/joss.02349
 # cite for EIS fitting: https://github.com/ECSHackWeek/impedance.py
+#adds by leon
+from __future__ import annotations
+
 import os
 import warnings
 import random
@@ -30,6 +33,8 @@ warnings.warn("deprecated", DeprecationWarning)
 np.seterr(divide='ignore', invalid='ignore')
 # reference the impedance library
 log = logger.get_logger("impedance")
+
+
 
 
 @define

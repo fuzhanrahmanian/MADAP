@@ -1,4 +1,6 @@
 """This module defines the Arrhenius procedure"""
+#adds by leon
+from __future__ import annotations
 import os
 import math
 import numpy as np

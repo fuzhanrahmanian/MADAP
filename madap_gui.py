@@ -97,7 +97,8 @@ def gui_layout(madap, colors):
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
     layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
                         sg.Button("Arrhenius", key="-BUT_Arrhenius-", button_color=colors),
-                        sg.Button("Voltammetry", key="-BUT_Voltammetry-", button_color=colors)]]
+                        sg.Button("Voltammetry", key="-BUT_Voltammetry-", button_color=colors),
+                        sg.Button("Pulse", key="-BUT_Pulse-", button_color=colors)]]
 
     # ----------- Create a layout with a field for a data path and a result path ----------- #
     layout_data = [[sg.Text('Data Path', size=(10, 1)), sg.InputText(key='-DATA_PATH-',
@@ -175,7 +176,7 @@ def gui_layout(madap, colors):
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_voltammetry = [[sg.Text('This is Voltammetry')]]
 
-
+    layout_pulse = [[sg.Text('This is for Pulsed measurements')]]
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
     procedure_column = [[sg.Column(layout_impedance, key='-COL_Impedance-', scrollable=True,
                                    vertical_scroll_only=True, expand_x=True, expand_y=True),
@@ -184,7 +185,11 @@ def gui_layout(madap, colors):
                                   expand_y=True),
                         sg.Column(layout_voltammetry, visible=False, key='-COL_Voltammetry-',
                                   scrollable=True, vertical_scroll_only=True, expand_x=True,
-                                  expand_y=True)]]
+                                  expand_y=True),
+                        sg.Column(layout_pulse, visible=False, key='-COL_Pulse-',
+                                  scrollable=True, vertical_scroll_only=True, expand_x=True,
+                                  expand_y=True)]]           
+
 
     # ----------- Assemble the left Column Element ----------- #
     col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15),
@@ -230,7 +235,7 @@ def main():
         print(event, values)
         if event in (sg.WIN_CLOSED, 'EXIT'):
             break
-        if event in ['-BUT_Impedance-', '-BUT_Arrhenius-', '-BUT_Voltammetry-']:
+        if event in ['-BUT_Impedance-', '-BUT_Arrhenius-', '-BUT_Voltammetry-', '-BUT_Pulse-']:
             event = event.strip('-BUT_')
             window[f'-COL_{madap_gui.procedure}-'].update(visible=False)
             window[f'-BUT_{madap_gui.procedure}-'].update(button_color=colors)
