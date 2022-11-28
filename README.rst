@@ -103,6 +103,9 @@ Citation
 
 If you use MADAP in your research, please cite this GitHub repository https://github.com/fuzhanrahmanian/MADAP.
 
+.. image:: https://zenodo.org/badge/494354435.svg
+   :target: https://zenodo.org/badge/latestdoi/494354435
+
 
 References
 ~~~~~~~~~~
