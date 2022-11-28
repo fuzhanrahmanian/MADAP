@@ -176,7 +176,22 @@ def gui_layout(madap, colors):
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_voltammetry = [[sg.Text('This is Voltammetry')]]
 
-    layout_pulse = [[sg.Text('This is for Pulsed measurements')]]
+
+    # ----------- TODO Layout the Pulse Options ----------- VOlTAGE_HELP ???#
+    layout_pulse = [[sg.Text('This are the parameters for the GITT procedure')],
+                    [sg.Text('Molar Volume',justification='left', font=("Arial", 13),
+                             pad=(1,(20,0)))],
+                    [ sg.InputText(key="-molarVolume-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
+                     sg.Text('[cm^3/mol]')],
+                    [sg.Text('Charge number of the intercalating species.',justification='left', font=("Arial", 13),
+                             pad=(1,(20,0)))],
+                    [sg.Text("Elektrode/Electrolyte contact area",justification='left',
+                             font=("Arial", 13), pad=(1,(20,0)))],
+                    [ sg.InputText(key="-contactarea-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
+                        sg.Text('[cm^2]')],
+                    [ sg.InputText(key="-chargenumber-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
+                     sg.Text('')]
+                    ]
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
     procedure_column = [[sg.Column(layout_impedance, key='-COL_Impedance-', scrollable=True,
                                    vertical_scroll_only=True, expand_x=True, expand_y=True),
