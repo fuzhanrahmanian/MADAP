@@ -76,8 +76,8 @@ def _analyze_parser_args():
             # Add the arguments for the cyclic amperometric procedure
             ca.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry" ,"chronocoulometry", "cotrell", "anson"],
                             nargs="+", help="plots to be generated")
-            ca.add_argument("-v", "--voltage", type=float, required=False, default=None,
-                            help="applied voltage [V] if applicable")
+            ca.add_argument("-v", "--voltage", type=float, required=True, default=None,
+                            help="applied voltage [V]")
             ca.add_argument("-i", "--current", type=list, required=True, default=None,
                             help="measure current [A]")
             ca.add_argument("-t", "--time", type=list, required=True, default=None,
@@ -86,8 +86,19 @@ def _analyze_parser_args():
                             help="electrode area [cm^2] if applicable")
 
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
-            # TODO
-            pass
+            cp = first_parser.add_argument_group("Options for the cyclic potentiometric procedure")
+            # Add the arguments for the cyclic potentiometric procedure
+            cp.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry"],
+                            nargs="+", help="plots to be generated")
+            cp.add_argument("-i", "--current", type=float, required=True, default=None,
+                                help="measure current [A]")
+            cp.add_argument("-v", "--voltage", type=float, required=False, default=None,
+                                help="applied voltage [V]")
+            cp.add_argument("-t", "--time", type=list, required=True, default=None,
+                                help="measure time [s]")
+            cp.add_argument("-ld", "--loading", type=float, required=False, default=None,
+                                    help="loading [gr] if applicable")
+
 
     # Options for data import
     data = first_parser.add_argument_group("Options for data import")
