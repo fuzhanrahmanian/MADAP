@@ -1,4 +1,4 @@
-from madap.echem.voltammetry.voltammetry import Voltammetry
+#from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
 
@@ -6,11 +6,12 @@ log = logger.get_logger("cyclic_amperometry")
 
 
 class Voltammetry_CA(EChemProcedure):
-    def __init__(self, voltage, current, time, active_area=None): #, capacity:list[float]=None) -> None:
-        pass
-        #super().__init__(voltage, current, time)
-        #self.capacity = self._calculate_capacity() if capacity is None else capacity
-        #self.cycle = cycle
+    def __init__(self,current: list, time: list, voltage: float, active_area: float=None): #, capacity:list[float]=None) -> None:
+        self.voltage = voltage
+        self.current = current
+        self.time = time
+        self.active_area = active_area
+
     def analyze(self):
         pass
 
