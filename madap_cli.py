@@ -350,10 +350,14 @@ def call_voltammetry(data, result_dir, args):
         plots = list(plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
 <<<<<<< HEAD
+<<<<<<< HEAD
     return voltammetry_cls
 =======
     return "voltammetry"
 >>>>>>> fb6cd7c (add the arguments for ca measurement for cli)
+=======
+    return voltammetry_cls
+>>>>>>> b026bd87970eb0a593a537078af286cbe0a24d38
 
 
 def start_procedure(args):
