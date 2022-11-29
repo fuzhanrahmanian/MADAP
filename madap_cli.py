@@ -76,22 +76,13 @@ def _analyze_parser_args():
             # Add the arguments for the cyclic amperometric procedure
             ca.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry" ,"chronocoulometry", "cotrell", "anson"],
                             nargs="+", help="plots to be generated")
-<<<<<<< HEAD
             ca.add_argument("-v", "--voltage", type=float, required=True, default=None,
                             help="applied voltage [V]")
-=======
-            ca.add_argument("-v", "--voltage", type=float, required=False, default=None,
-                            help="applied voltage [V] if applicable")
->>>>>>> fb6cd7c (add the arguments for ca measurement for cli)
             ca.add_argument("-i", "--current", type=list, required=True, default=None,
                             help="measure current [A]")
             ca.add_argument("-t", "--time", type=list, required=True, default=None,
                             help="measure time [s]")
-<<<<<<< HEAD
             ca.add_argument("-aa", "--active_area", type=float, required=False, default=None,
-=======
-            ca.add_argument("-a", "--area", type=float, required=False, default=None,
->>>>>>> fb6cd7c (add the arguments for ca measurement for cli)
                             help="electrode area [cm^2] if applicable")
 
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
