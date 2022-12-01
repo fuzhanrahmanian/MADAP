@@ -181,16 +181,16 @@ def gui_layout(madap, colors):
     layout_pulse = [[sg.Text('This are the parameters for the GITT procedure')],
                     [sg.Text('Molar Volume',justification='left', font=("Arial", 13),
                              pad=(1,(20,0)))],
-                    [ sg.InputText(key="-molarVolume-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
+                    [ sg.InputText(key="-molarVolume-", tooltip=gui_elements.MOLARVOLUME_HELP, enable_events=True),
                      sg.Text('[cm^3/mol]')],
                     [sg.Text('Charge number of the intercalating species.',justification='left', font=("Arial", 13),
                              pad=(1,(20,0)))],
+                    [sg.InputText(key="-chargenumber-", tooltip=gui_elements.CHARGENUMBER_HELP, enable_events=True),
+                        sg.Text('')],
                     [sg.Text("Elektrode/Electrolyte contact area",justification='left',
                              font=("Arial", 13), pad=(1,(20,0)))],
-                    [ sg.InputText(key="-contactarea-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
+                    [ sg.InputText(key="-contactarea-", tooltip=gui_elements.CONTACTAREA_HELP, enable_events=True),
                         sg.Text('[cm^2]')],
-                    [ sg.InputText(key="-chargenumber-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
-                     sg.Text('')]
                     ]
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
     procedure_column = [[sg.Column(layout_impedance, key='-COL_Impedance-', scrollable=True,

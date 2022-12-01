@@ -2,6 +2,7 @@
 import os
 import pandas as pd
 import numpy as np
+import hdfdict
 
 from madap.logger import logger
 
@@ -37,7 +38,9 @@ def acquire_data(data_path):
     if extension == ".json":
         df = pd.read_json(data_path)
     if extension in (".hdf5", ".h5"):
-        df = pd.read_hdf(data_path)
+        #df = pd.read_hdf(data_path)
+        hdf5dict = dict(hdfdict.load(data_path, mode='r+',lazy=False))
+        df = pd.DataFrame.from_dict(hdf5dict)
     if extension == ".pkl":
         df = pd.read_pickle(data_path)
 

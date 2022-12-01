@@ -107,12 +107,6 @@ class GITT(EChemProcedure):
         diffcoefficient = (4/(np.pi))*((self.gittcurrent[0]*self.vmol)/(self.contactarea*self.faraday*self.numberofcharge))**2*(self.coefficientscoulotit/self.coefficientschargevoltage)**2
         
 
-        
-
-
-                
-
-
 
 def plot(self, save_dir:str, plots:list, optional_name:str):
         """Abstract method for the plotting of the data.

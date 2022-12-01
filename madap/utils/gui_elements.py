@@ -28,6 +28,12 @@ UPPER_LIMIT_QUANTILE_HELP="Upper limit quantile (optional)."
 
 LOWER_LIMIT_QUANTILE_HELP="Lower limit quantile (optional)."
 
+MOLARVOLUME_HELP="Molar volume of the electrode in cm^3/mol"
+
+CHARGENUMBER_HELP="Charge number of the intercalating species."
+
+CONTACTAREA_HELP="Contact area of the electrode with the electrolyte in cm^2"
+
 def plotting_element(subparser, plots):
     """ Adds an element to the GUI for plotting the data.
 

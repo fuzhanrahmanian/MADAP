@@ -27,9 +27,10 @@ def _analyze_parser_args():
     first_parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
     # Options for procedure
     procedure = first_parser.add_argument_group("Options for the procedure")
-    procedure.add_argument("-p", "--procedure", type=str, choices=['arrhenius', 'impedance', 'voltammetry'],
+    procedure.add_argument("-p", "--procedure", type=str, choices=['arrhenius', 'impedance', 'voltammetry', 'pulse'],
                           help="Procedure of the analysis")
     proc = first_parser.parse_known_args()[0]
+
     if proc.procedure == "impedance":
         procedure.add_argument("-ip", "--impedance_procedure", type=str, required=True, choices=['EIS', 'Mottschotcky', 'Lissajous'],
                             help="Which of the impedance procedures you want to use?")
@@ -78,6 +79,16 @@ def _analyze_parser_args():
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
             # TODO
             pass
+
+    elif proc.procedure == 'pulse':
+        pulse_pars = first_parser.add_argument_group("Options for the Pulse procedure")
+        pulse_pars.add_argument("-vm", "--molareVolume", type=float,required=True, default = None,
+                                help="molare Volume of electrode")
+        pulse_pars.add_argument("-cn", "--chargenumber", type=int, required=True, default=1,
+                                help="number of charges transferd during intercalation")
+        pulse_pars.add_argument("-ca", "--contactarea", type=float, required=True, default=None,
+                                help="Electrode/Electrolyte area")
+
 
     # Options for data import
     data = first_parser.add_argument_group("Options for data import")
@@ -280,6 +291,107 @@ def call_voltammetry(data, result_dir, plots):
         plots = list(plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
 
+def call_pulse(data, result_dir, args):
+    """calling the pulse procedure and parse the corresponding arguments
+
+    Args:
+        data (class): the given data frame for analysis.
+        result_dir (str): the directory for saving results.
+        args (parser.args): Parsed arguments.
+    """
+    if args.header_list:
+        # Check if args header is a list
+        if isinstance(args.header_list, list):
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
+            args.header_list
+        else:
+            header_names = args.header_list
+
+        phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
+
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
+                                                           columns = [header_names[1],
+                                                                       header_names[2]],
+                                                           low_quantile = args.lower_limit_quantile,
+                                                           high_quantile = args.upper_limit_quantile)
+
+
+
+
+
+        # extracting the data as pd.series and removing Nan from raw and split data
+        try:
+            rawseries, splitseries = data.dropna(subset=['raw'])['raw'],data.dropna(subset=['split'])['split'] 
+        except Exception as e:
+            log.error(f"HDF5 file is not preformated into raw and split key")
+            raise ValueError("HDF5 file is not formated correctly into raw and split")
+
+        
+
+    if args.specific:
+
+        try:
+            if len(args.specific) >= 3:
+                row_col = args.specific
+            else:
+                row_col = re.split('; |;', args.specific[0])
+
+        except ValueError as e:
+            log.error("The format of the specific data is not correct. Please check the help.")
+            raise e
+
+        selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
+
+
+        phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
+
+
+        freq_data, real_data, imag_data = da.select_data(selected_data, row_col[0]), \
+                                          da.select_data(selected_data, row_col[1]), \
+                                          da.select_data(selected_data, row_col[2])
+
+        unprocessed_data = pd.DataFrame({"freq": freq_data, "real": real_data, "imag": imag_data})
+
+        _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
+                                            columns = ["real", "imag"],
+                                            low_quantile = args.lower_limit_quantile,
+                                            high_quantile = args.upper_limit_quantile)
+
+        data = da.remove_nan_rows(unprocessed_data, nan_indices)
+        freq_data, real_data, imag_data = data["freq"], data["real"], data["imag"]
+
+    impedance = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data),
+                                da.format_data(imag_data), da.format_data(phase_shift_data))
+
+    if args.impedance_procedure == "EIS":
+        log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant},\
+                   suggested circuit is {args.suggested_circuit} \
+                   and initial values are {args.initial_values}.")
+
+        # Instantiate the procedure
+        procedure = e_impedance.EIS(impedance, voltage=args.voltage,
+                                    suggested_circuit=args.suggested_circuit,
+                                    initial_value=eval(args.initial_values)
+                                    if args.initial_values else None,
+                                    cell_constant=args.cell_constant)
+
+    elif args.impedance_procedure == "Mottschotcky":
+        #TODO
+        # # Instantiate the procedure
+        pass
+    elif args.impedance_procedure == "Lissajous":
+        #TODO
+        # # Instantiate the procedure
+        pass
+
+    # Format plots arguments
+    plots = da.format_plots(args.plots)
+
+    # Perform all actions
+    procedure.perform_all_actions(result_dir, plots=plots)
+
+    return procedure
+
 def start_procedure(args):
     """Function to prepare the data for analysis.
     It also prepares folder for results and plots.
@@ -302,6 +414,10 @@ def start_procedure(args):
     elif args.procedure == "voltammetry":
         log.info("Voltammetrys is not supported at the moment. Exiting ...")
         sys.exit()
+    
+    elif args.procedure == 'pulse':
+        log.info(f'Pulse procedure will be applied')
+        result_dir = utils.create_dir(os.path.join(args.results, args.procedure))
 
     return procedure
 
