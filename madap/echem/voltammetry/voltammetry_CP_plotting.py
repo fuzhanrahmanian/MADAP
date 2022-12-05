@@ -10,7 +10,7 @@ from madap.plotting.plotting import Plots
 
 log = logger.get_logger("voltammetry_CP_plotting")
 
-class VoltammetryCP(Plots):
+class CpPlotting(Plots):
     """General Plotting class for galvanostatic chrono potentiostatic method.
 
     Args:
@@ -19,8 +19,14 @@ class VoltammetryCP(Plots):
     def __init__(self) -> None:
         super().__init__()
         self.plot_type = "voltammetry"
+        self.ax_cp = None
+        self.ax_cp_der = None
+        self.ax_galv = None
+        self.ax_diff = None
 
     def chrono_potentiometric(self):pass
+
+    def chrono_potentiometric_derivation(self): pass
 
 
     def galvanostatic_charge(self):pass
@@ -47,7 +53,8 @@ class VoltammetryCP(Plots):
             return fig, [ax]
 
         if len(plots) == 2:
-            fig_size = 9 if ("nyquist" and "nyquist_fit") in plots else 8.5
+            #TODO plot size
+            fig_size = 9 if ("chrono_potentiometric" and "chrono_potentiometric_derivation") in plots else 8.5
             fig = plt.figure(figsize=(fig_size, 4))
             spec = fig.add_gridspec(1, 2)
             ax1 = fig.add_subplot(spec[0, 0])
@@ -55,6 +62,7 @@ class VoltammetryCP(Plots):
             return fig, [ax1, ax2]
 
         if len(plots) == 3:
+            #TODO plot size
             fig_size= 7 if ("nyquist" and "nyquist_fit" and "bode") in plots else 6.5
             fig = plt.figure(figsize=(fig_size, 5))
             spec = fig.add_gridspec(2, 2)
@@ -78,8 +86,8 @@ class VoltammetryCP(Plots):
             return fig, [ax1, ax2, ax3, ax4]
 
         if len(plots) == 0:
-            log.error("No plots for EIS were selected.")
-            return Exception(f"No plots for EIS were selected for plot {self.plot_type}.")
+            log.error("No plots for CP were selected.")
+            return Exception(f"No plots for CP were selected for plot {self.plot_type}.")
 
-        log.error("Maximum plots for EIS is exceeded.")
-        return Exception(f"Maximum plots for EIS is exceeded for plot {self.plot_type}.")
+        log.error("Maximum plots for CP is exceeded.")
+        return Exception(f"Maximum plots for CP is exceeded for plot {self.plot_type}.")
