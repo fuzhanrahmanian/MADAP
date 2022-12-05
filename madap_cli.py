@@ -12,7 +12,7 @@ from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
 from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
-from madap.echem.voltammetry import voltammetry_CA
+from madap.echem.voltammetry import voltammetry_CA, voltammetry_CP
 
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')
 
@@ -74,7 +74,8 @@ def _analyze_parser_args():
         elif proc.voltammetry_procedure == "cyclic_amperometric":
             ca = first_parser.add_argument_group("Options for the cyclic amperometric procedure")
             # Add the arguments for the cyclic amperometric procedure
-            ca.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry" ,"chronocoulometry", "cotrell", "anson"],
+            ca.add_argument("-pl", "--plots", required=True, choices=["chorono_amperometry" ,
+                                                    "chrono_coulometry", "cotrell", "anson"],
                             nargs="+", help="plots to be generated")
             ca.add_argument("-v", "--voltage", type=float, required=True, default=None,
                             help="applied voltage [V]")
@@ -88,11 +89,12 @@ def _analyze_parser_args():
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
             cp = first_parser.add_argument_group("Options for the cyclic potentiometric procedure")
             # Add the arguments for the cyclic potentiometric procedure
-            cp.add_argument("-pl", "--plots", required=True, choices=["choronoamperometry"],
+            cp.add_argument("-pl", "--plots", required=True, choices=["chrono_potentiometry",
+                            "galvanostatic_charge", "differential_capacity"],
                             nargs="+", help="plots to be generated")
             cp.add_argument("-i", "--current", type=float, required=True, default=None,
                                 help="measure current [A]")
-            cp.add_argument("-v", "--voltage", type=float, required=False, default=None,
+            cp.add_argument("-v", "--voltage", type=list, required=False, default=None,
                                 help="applied voltage [V]")
             cp.add_argument("-t", "--time", type=list, required=True, default=None,
                                 help="measure time [s]")
@@ -150,10 +152,9 @@ def call_impedance(data, result_dir, args):
         phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
 
         _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
-                                                           columns = [header_names[1],
-                                                                       header_names[2]],
-                                                           low_quantile = args.lower_limit_quantile,
-                                                           high_quantile = args.upper_limit_quantile)
+                                                    df_columns = [header_names[1], header_names[2]],
+                                                    low_quantile = args.lower_limit_quantile,
+                                                    high_quantile = args.upper_limit_quantile)
         # remove nan rows
         data = da.remove_nan_rows(data, nan_indices)
         # extracting the data
@@ -186,7 +187,7 @@ def call_impedance(data, result_dir, args):
         unprocessed_data = pd.DataFrame({"freq": freq_data, "real": real_data, "imag": imag_data})
 
         _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
-                                            columns = ["real", "imag"],
+                                            df_columns = ["real", "imag"],
                                             low_quantile = args.lower_limit_quantile,
                                             high_quantile = args.upper_limit_quantile)
 
@@ -282,6 +283,7 @@ def call_voltammetry(data, result_dir, args):
         result_dir (str): the directory for saving results
         args (parser.args): Parsed arguments
     """
+    #TODO define the order of the voltammetry headers
     if args.header_list:
         if isinstance(args.header_list, list):
             header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
@@ -290,10 +292,9 @@ def call_voltammetry(data, result_dir, args):
             header_names = args.header_list
 
         _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
-                                                           columns = [header_names[1],
-                                                                       header_names[2]],
-                                                           low_quantile = args.lower_limit_quantile,
-                                                           high_quantile = args.upper_limit_quantile)
+                                                df_columns = [header_names[1], header_names[2]],
+                                                low_quantile = args.lower_limit_quantile,
+                                                high_quantile = args.upper_limit_quantile)
         # remove nan rows
         data = da.remove_nan_rows(data, nan_indices)
         param_one, param_two = data[header_names[0]], data[header_names[1]]
@@ -316,7 +317,7 @@ def call_voltammetry(data, result_dir, args):
         unprocessed_data = pd.DataFrame({"data_one": param_one, "data_two": param_two})
 
         _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
-                                    columns = ["data_one", "data_two"],
+                                    df_columns = ["data_one", "data_two"],
                                     low_quantile = args.lower_limit_quantile,
                                     high_quantile = args.upper_limit_quantile)
 
@@ -328,8 +329,11 @@ def call_voltammetry(data, result_dir, args):
         #TODO
         pass
     elif args.voltammetry_procedure == "cyclic_potentiometric":
-        #TODO
-        pass
+        #TODO headers should have the order of voltage and time as list
+        voltammetry_cls = voltammetry_CP.Voltammetry_CP(voltage = da.format_data(param_one),
+                                                        time = da.format_data(param_two),
+                                                        current=args.current,
+                                                        loading=args.loading)
     elif args.voltammetry_procedure == "cyclic_amperometric":
         log.info(f"Performing cyclic amperometric procedure at potential {args.voltage} V. \
             ")
@@ -349,16 +353,7 @@ def call_voltammetry(data, result_dir, args):
     if isinstance(plots, tuple):
         plots = list(plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
-<<<<<<< HEAD
-<<<<<<< HEAD
     return voltammetry_cls
-=======
-    return "voltammetry"
->>>>>>> fb6cd7c (add the arguments for ca measurement for cli)
-=======
-    return voltammetry_cls
->>>>>>> b026bd87970eb0a593a537078af286cbe0a24d38
-
 
 def start_procedure(args):
     """Function to prepare the data for analysis.

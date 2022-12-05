@@ -104,7 +104,7 @@ def format_plots(plots):
         plots = list(plots)
     return plots
 
-def remove_outlier_specifying_quantile(df, columns, low_quantile = 0.05, high_quantile = 0.95):
+def remove_outlier_specifying_quantile(df, df_columns, low_quantile = 0.05, high_quantile = 0.95):
     """removing the outliers from the data by specifying the quantile
 
     Args:
@@ -117,7 +117,7 @@ def remove_outlier_specifying_quantile(df, columns, low_quantile = 0.05, high_qu
         data: the cleaned dataframe
     """
     # select the columns that needs to be studied for outliers
-    detect_search = df[columns]
+    detect_search = df[df_columns]
     # Check if the low_quantile and high_quantile are floats, if not convert them to float
     if not isinstance(low_quantile, float):
         low_quantile = float(low_quantile)

@@ -15,6 +15,7 @@ class Voltammetry_CP(EChemProcedure):
         current: float = field(on_setattr=frozen)        # [A]
         loading: float = field(default=None)             # [gr]
         charge = None
+
     def analyze(self):
         pass
 
