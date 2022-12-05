@@ -62,9 +62,11 @@ def _analyze_parser_args():
                                 nargs="+", required=True, help="Plots to be generated")
 
     elif proc.procedure == "voltammetry":
-        voltammetry_pars = first_parser.add_argument_group("Options for the Arrhenius procedure")
-        voltammetry_pars.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
-                            choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],)
+
+        procedure.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
+                            choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],
+                            help="Which of the voltammetry procedures you want to use?")
+
         proc = first_parser.parse_known_args()[0]
         if proc.voltammetry_procedure == "cyclic_voltammetric":
             # TODO
@@ -87,7 +89,7 @@ def _analyze_parser_args():
             cyclic_potentiometric.add_argument("-pl", "--plots", required=True, choices=["chrono_potentiometry",
                             "galvanostatic_charge", "differential_capacity"],
                             nargs="+", help="plots to be generated")
-            cyclic_potentiometric.add_argument("-i", "--current", type=float, required=True, default=None,
+            cyclic_potentiometric.add_argument("-i", "--current", type=float, required=True,
                                 help="measure current [A]")
             cyclic_potentiometric.add_argument("-ld", "--loading", type=float, required=False, default=None,
                                     help="loading [gr] if applicable")
@@ -283,7 +285,7 @@ def call_voltammetry(data, result_dir, args):
             header_names = args.header_list
 
         _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
-                                                df_columns = [header_names[1], header_names[2]],
+                                                df_columns = [header_names[0], header_names[1]],
                                                 low_quantile = args.lower_limit_quantile,
                                                 high_quantile = args.upper_limit_quantile)
         # remove nan rows
@@ -325,8 +327,8 @@ def call_voltammetry(data, result_dir, args):
         # headers should have the order of voltage and time as list
         voltammetry_cls = voltammetry_CP.Voltammetry_CP(voltage = da.format_data(param_one),
                                                         time = da.format_data(param_two),
-                                                        current=args.current,
-                                                        loading=args.loading)
+                                                        current = args.current,
+                                                        loading = args.loading)
 
     elif args.voltammetry_procedure == "cyclic_amperometric":
 
@@ -365,8 +367,8 @@ def start_procedure(args):
     elif args.procedure in ["arrhenius", "Arrhenius"]:
         procedure = call_arrhenius(data, result_dir, args)
 
-    elif args.procedure == ["voltammetry", "Voltammetry"]:
-        procedure = call_voltammetry(data, result_dir, args.plots)
+    elif args.procedure in ["voltammetry", "Voltammetry"]:
+        procedure = call_voltammetry(data, result_dir, args)
 
     return procedure
 
