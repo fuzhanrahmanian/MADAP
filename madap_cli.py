@@ -1,6 +1,5 @@
 """ This module is the main entry point for MADAP. It defines the CLI to be used by the user."""
 import os
-import sys
 import argparse
 import re
 
@@ -72,33 +71,25 @@ def _analyze_parser_args():
             pass
 
         elif proc.voltammetry_procedure == "cyclic_amperometric":
-            ca = first_parser.add_argument_group("Options for the cyclic amperometric procedure")
+            cyclic_amperometric = first_parser.add_argument_group("Options for the cyclic amperometric procedure")
             # Add the arguments for the cyclic amperometric procedure
-            ca.add_argument("-pl", "--plots", required=True, choices=["chorono_amperometry" ,
+            cyclic_amperometric.add_argument("-pl", "--plots", required=True, choices=["chorono_amperometry" ,
                                                     "chrono_coulometry", "cotrell", "anson"],
                             nargs="+", help="plots to be generated")
-            ca.add_argument("-v", "--voltage", type=float, required=True, default=None,
+            cyclic_amperometric.add_argument("-v", "--voltage", type=float, required=True, default=None,
                             help="applied voltage [V]")
-            ca.add_argument("-i", "--current", type=list, required=True, default=None,
-                            help="measure current [A]")
-            ca.add_argument("-t", "--time", type=list, required=True, default=None,
-                            help="measure time [s]")
-            ca.add_argument("-aa", "--active_area", type=float, required=False, default=None,
+            cyclic_amperometric.add_argument("-aa", "--active_area", type=float, required=False, default=None,
                             help="electrode area [cm^2] if applicable")
 
         elif proc.voltammetry_procedure == "cyclic_potentiometric":
-            cp = first_parser.add_argument_group("Options for the cyclic potentiometric procedure")
+            cyclic_potentiometric = first_parser.add_argument_group("Options for the cyclic potentiometric procedure")
             # Add the arguments for the cyclic potentiometric procedure
-            cp.add_argument("-pl", "--plots", required=True, choices=["chrono_potentiometry",
+            cyclic_potentiometric.add_argument("-pl", "--plots", required=True, choices=["chrono_potentiometry",
                             "galvanostatic_charge", "differential_capacity"],
                             nargs="+", help="plots to be generated")
-            cp.add_argument("-i", "--current", type=float, required=True, default=None,
+            cyclic_potentiometric.add_argument("-i", "--current", type=float, required=True, default=None,
                                 help="measure current [A]")
-            cp.add_argument("-v", "--voltage", type=list, required=False, default=None,
-                                help="applied voltage [V]")
-            cp.add_argument("-t", "--time", type=list, required=True, default=None,
-                                help="measure time [s]")
-            cp.add_argument("-ld", "--loading", type=float, required=False, default=None,
+            cyclic_potentiometric.add_argument("-ld", "--loading", type=float, required=False, default=None,
                                     help="loading [gr] if applicable")
 
 
@@ -329,31 +320,31 @@ def call_voltammetry(data, result_dir, args):
         #TODO
         pass
     elif args.voltammetry_procedure == "cyclic_potentiometric":
-        #TODO headers should have the order of voltage and time as list
+
+        log.info(f"Performing cyclic potentiometric voltammetry analysis at current {args.current} A.")
+        # headers should have the order of voltage and time as list
         voltammetry_cls = voltammetry_CP.Voltammetry_CP(voltage = da.format_data(param_one),
                                                         time = da.format_data(param_two),
                                                         current=args.current,
                                                         loading=args.loading)
+
     elif args.voltammetry_procedure == "cyclic_amperometric":
+
         log.info(f"Performing cyclic amperometric procedure at potential {args.voltage} V. \
             ")
         #area = args.area if args.area else None
         #TODO why pylint is not working here?
-        #pylint: disable=E1123
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(voltage = args.voltage,
                                         current = da.format_data(param_one),
                                         time = da.format_data(param_two),
                                         active_area = args.active_area)
 
-    # voltammetry_cls = voltammetry_CA.Voltammetry_CA(da.format_data(data[voltage_idx]),
-    #                               da.format_data(data[current_idx]),
-    #                             da.format_data(data[time_idx]))
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
+    # Format the plots arguments
+    plots = da.format_plots(args.plots)
+
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
     return voltammetry_cls
+
 
 def start_procedure(args):
     """Function to prepare the data for analysis.
