@@ -249,7 +249,7 @@ class EIS(EChemProcedure):
 
         Args:
             save_dir (str): Directory where the data should be saved.
-            optional_name (None): Optional name for the data.
+            optional_name (str, optional): Optional name for the data.
         """
         save_dir = utils.create_dir(os.path.join(save_dir, "data"))
         # Save the fitted circuit
@@ -276,6 +276,7 @@ class EIS(EChemProcedure):
         Args:
             save_dir (str): Directory where the data should be saved.
             plots (list): List of plot types to be plotted.
+            optional_name (str, optional): Optional name for the data. Defaults to None.
         """
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
