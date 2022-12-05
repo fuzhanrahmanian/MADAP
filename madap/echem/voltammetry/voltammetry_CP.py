@@ -8,7 +8,7 @@ log = logger.get_logger("cyclic_potentiometry")
 
 @define
 class Voltammetry_CP(EChemProcedure):
-    """Class for data definition that will be used during the Cyclic Potentiometric analysis.
+    """Class for data definition that will be used during the galvanostatic Cyclic Potentiometric analysis.
        The data includes the following: voltage, time, current, loading and charge.
     """
     voltage: list[float] = field(on_setattr=frozen)  # [V]
