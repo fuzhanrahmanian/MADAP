@@ -13,6 +13,7 @@ from madap.data_acquisition import data_acquisition as da
 from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
 from madap.echem.voltammetry import voltammetry_CA
+from madap.echem.pulse.pulse_gitt import pulse, pseudo_GITT
 
 
 
@@ -299,90 +300,45 @@ def call_pulse(data, result_dir, args):
         result_dir (str): the directory for saving results.
         args (parser.args): Parsed arguments.
     """
-    if args.header_list:
-        # Check if args header is a list
-        if isinstance(args.header_list, list):
-            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
-            args.header_list
-        else:
-            header_names = args.header_list
-
-        phase_shift_data = None if len(header_names) == 3 else data[header_names[3]]
-
-        _, nan_indices = da.remove_outlier_specifying_quantile(df = data,
-                                                           columns = [header_names[1],
-                                                                       header_names[2]],
-                                                           low_quantile = args.lower_limit_quantile,
-                                                           high_quantile = args.upper_limit_quantile)
-
-
-
-
-
-        # extracting the data as pd.series and removing Nan from raw and split data
+    def atof(text):
         try:
-            rawseries, splitseries = data.dropna(subset=['raw'])['raw'],data.dropna(subset=['split'])['split'] 
-        except Exception as e:
-            log.error(f"HDF5 file is not preformated into raw and split key")
-            raise ValueError("HDF5 file is not formated correctly into raw and split")
-
-        
-
-    if args.specific:
-
-        try:
-            if len(args.specific) >= 3:
-                row_col = args.specific
-            else:
-                row_col = re.split('; |;', args.specific[0])
-
-        except ValueError as e:
-            log.error("The format of the specific data is not correct. Please check the help.")
-            raise e
-
-        selected_data = data.iloc[int(row_col[0].split(',')[0]): int(row_col[0].split(',')[1]), :]
+            retval = float(text)
+        except ValueError:
+            retval = text
+        return retval
+    def natural_keys(text):
+        return [ atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', text) ]
 
 
-        phase_shift_data = None if len(row_col) == 3 else da.select_data(data, row_col[3])
+    # extracting the data as pd.series and removing Nan from raw and split data
+    try:
+        rawseries, splitseries = data.dropna(subset=['raw'])['raw'],data.dropna(subset=['split'])['split'] 
+    except Exception as e:
+        log.error(f"HDF5 file is not preformated into raw and split key")
+        raise ValueError("HDF5 file is not formated correctly into raw and split")
 
+    # safe sorted cyclenames for loop
+    dict_split = splitseries.to_dict()
+    sorted_cycles = []
+    for i in dict_split.keys():
+        if re.search('Cycle_' +'.+',i) != None:
+            sorted_cycles.append(i)
+    sorted_cycles.sort(key=natural_keys)
+    
+    gittcurrent_cycles = []
+    gitttime_cycles = []
+    gittvoltage_cycles = []
+    # save parameter lists in sorted way
+    for i in sorted_cycles:
+        gittcurrent_cycles.append(dict_split[i]['I'])
+        gitttime_cycles.append(dict_split[i]['t'])
+        gittvoltage_cycles.append(dict_split[i]['V'])
 
-        freq_data, real_data, imag_data = da.select_data(selected_data, row_col[0]), \
-                                          da.select_data(selected_data, row_col[1]), \
-                                          da.select_data(selected_data, row_col[2])
+    # Initiate the pulse class
+    pulse_data = pulse(gitttime_cycles,gittvoltage_cycles,gittcurrent_cycles)
 
-        unprocessed_data = pd.DataFrame({"freq": freq_data, "real": real_data, "imag": imag_data})
-
-        _, nan_indices = da.remove_outlier_specifying_quantile(df = unprocessed_data,
-                                            columns = ["real", "imag"],
-                                            low_quantile = args.lower_limit_quantile,
-                                            high_quantile = args.upper_limit_quantile)
-
-        data = da.remove_nan_rows(unprocessed_data, nan_indices)
-        freq_data, real_data, imag_data = data["freq"], data["real"], data["imag"]
-
-    impedance = e_impedance.EImpedance(da.format_data(freq_data), da.format_data(real_data),
-                                da.format_data(imag_data), da.format_data(phase_shift_data))
-
-    if args.impedance_procedure == "EIS":
-        log.info(f"The given voltage is {args.voltage} [V], cell constant is {args.cell_constant},\
-                   suggested circuit is {args.suggested_circuit} \
-                   and initial values are {args.initial_values}.")
-
-        # Instantiate the procedure
-        procedure = e_impedance.EIS(impedance, voltage=args.voltage,
-                                    suggested_circuit=args.suggested_circuit,
-                                    initial_value=eval(args.initial_values)
-                                    if args.initial_values else None,
-                                    cell_constant=args.cell_constant)
-
-    elif args.impedance_procedure == "Mottschotcky":
-        #TODO
-        # # Instantiate the procedure
-        pass
-    elif args.impedance_procedure == "Lissajous":
-        #TODO
-        # # Instantiate the procedure
-        pass
+    #Initiate the procedure
+    procedure = pseudo_GITT(pulse_data, args.vmol,args.numberofcharge, args.contactarea )
 
     # Format plots arguments
     plots = da.format_plots(args.plots)
