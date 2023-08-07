@@ -95,8 +95,10 @@ class EIS(EChemProcedure):
         self.chi_val = None
         self.custom_circuit = None
         self.z_fit = None
+        self.z_fit_clean = None
         self.impedance.phase_shift = self._calculate_phase_shift() if self.impedance.phase_shift is None else self.impedance.phase_shift
         self.figure = None
+        self.pos_img_index = None
 
 
     # Schönleber, M. et al. A Method for Improving the Robustness of
@@ -120,6 +122,8 @@ class EIS(EChemProcedure):
         log.info(f"Chi value from lin_KK method is {self.chi_val}")
 
         if any(x < 0 for x in self.impedance.imaginary_impedance):
+            # Find the indexes of the positive values
+            self.pos_img_index = np.where(self.impedance.imaginary_impedance > 0)
             f_circuit, z_circuit = preprocessing.ignoreBelowX(f_circuit, z_circuit)
 
         # if the user did not choose any circuit, some default suggestions will be applied.
@@ -260,10 +264,17 @@ class EIS(EChemProcedure):
         added_data = {'rc_linKK': self.num_rc_linkk, "eval_fit_linKK": self.eval_fit_linkk, "RMSE_fit_error": self.rmse_calc,
                       "conductivity [S/cm]": self.conductivity, "chi_square": self.chi_val}
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
+        # check if the positive index is available
+        if self.pos_img_index is not None:
+            self._insert_nan_values()
+        else:
+            self.z_fit_clean = self.z_fit
+
+
         # Save the dataset
         data = utils.assemble_data_frame(**{"frequency [Hz]": self.impedance.frequency,
                                             "impedance [\u03a9]": self.impedance.real_impedance + 1j*self.impedance.imaginary_impedance,
-                                            "fit_impedance [\u03a9]": self.z_fit, "residual_real":self.res_real, "residual_imag":self.res_imag,
+                                            "fit_impedance [\u03a9]": self.z_fit_clean, "residual_real":self.res_real, "residual_imag":self.res_imag,
                                             "Z_linKK [\u03a9]": self.z_linkk})
         data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
                         optional_name else  utils.assemble_file_name(self.__class__.__name__, "data.csv")
@@ -347,6 +358,18 @@ class EIS(EChemProcedure):
         guess_value = [guess_initial_resistance if element == 'z' else element for element in guess_value]
         guess_value = [guess_initial_resistance if element == 't' else element for element in guess_value]
         return guess_value
+
+    def _insert_nan_values(self):
+        """Insert nan values in the fit for the positive imaginary impedance values.
+        """
+        self.z_fit_clean = np.empty(len(self.z_fit) + len(self.pos_img_index[0]), dtype=np.complex128)
+        self.z_fit_clean[:] = np.nan
+        j = 0
+        for i in range(len(self.z_fit_clean)):
+            if i in self.pos_img_index[0].tolist():
+                continue
+            self.z_fit_clean[i] = self.z_fit[j]
+            j += 1
 
 class Mottschotcky(EIS, EChemProcedure):
     """ Class for performing the Mottschotcky procedure.
