@@ -2,6 +2,10 @@
 History
 =======
 
+1.1.0 (2023-08-07)
+-------------------
+* Fixes issue with mismatch array length when positive imaginary data is given
+
 0.11.0 (2022-10-16)
 -------------------
 
