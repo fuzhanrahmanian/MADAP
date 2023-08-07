@@ -115,4 +115,4 @@ test/testfile/procedure_test/
 test/testfile/other test
 
 # Exclude pyinstaller files
-pyinstaller.bat
+pyinstaller_file.bat
