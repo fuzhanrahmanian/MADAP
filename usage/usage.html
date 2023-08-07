@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; MADAP 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Arrhenius" href="../generated_arrhenius/modules.html" />
+    <link rel="prev" title="Welcome to MADAP’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MADAP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Usage:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#madap-as-a-python-package">MADAP as a python package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#madap-as-a-command-line-tool">MADAP as a command line tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#madap-as-a-gui">MADAP as a GUI</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated_arrhenius/modules.html">Arrhenius</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated_impedance/modules.html">Impedance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated_voltammetry/modules.html">Voltammetry</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MADAP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h1>
+<section id="madap-as-a-python-package">
+<h2>MADAP as a python package<a class="headerlink" href="#madap-as-a-python-package" title="Permalink to this headline"></a></h2>
+<p>The most simple usage of MADAP for Arrhenius and Impedance analysis is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">madap.echem.arrhenius</span> <span class="kn">import</span> <span class="n">arrhenius</span>
+<span class="kn">from</span> <span class="nn">madap.echem.e_impedance</span> <span class="kn">import</span> <span class="n">e_impedance</span>
+<span class="kn">from</span> <span class="nn">madap.data_acquisition</span> <span class="kn">import</span> <span class="n">data_acquisition</span> <span class="k">as</span> <span class="n">da</span>
+
+
+<span class="c1"># Load the data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">acquire_data</span><span class="p">(</span><span class="s1">&#39;data.csv&#39;</span><span class="p">)</span>
+<span class="c1"># Define the desired plots for Arrhenius analysis</span>
+<span class="n">plots_arr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;arrhenius&quot;</span><span class="p">,</span> <span class="s2">&quot;arrhenius_fit&quot;</span><span class="p">]</span>
+<span class="c1"># Define the desired plots for impedance analysis</span>
+<span class="n">plots_eis</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nyquist&quot;</span><span class="p">,</span> <span class="s2">&quot;nyquist_fit&quot;</span><span class="p">,</span> <span class="s2">&quot;bode&quot;</span><span class="p">,</span> <span class="s2">&quot;residual&quot;</span><span class="p">]</span>
+<span class="c1"># Define a save location#</span>
+<span class="n">save_dir</span> <span class="o">=</span> <span class="s2">&quot;/results&quot;</span>
+
+<span class="c1">### Arrhenius</span>
+<span class="c1"># Instantiate the Arrhenius class for analysis (column names do not have to match exactly, this is just an example)</span>
+<span class="n">Arr</span> <span class="o">=</span> <span class="n">arrhenius</span><span class="o">.</span><span class="n">Arrhenius</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">],</span> <span class="n">da</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductivity&quot;</span><span class="p">])))</span>
+<span class="c1"># Perform analysis and plotting</span>
+<span class="n">Arr</span><span class="o">.</span><span class="n">perform_all_actions</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">plots</span> <span class="o">=</span> <span class="n">plots_arr</span><span class="p">)</span>
+
+<span class="c1">### Impedance</span>
+<span class="c1"># Initialize the Impedance class for analysis (column names do not have to match exactly, this is just an example)</span>
+<span class="n">Im</span> <span class="o">=</span> <span class="n">e_impedance</span><span class="o">.</span><span class="n">EImpedance</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;freq&quot;</span><span class="p">]),</span> <span class="n">da</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;real&quot;</span><span class="p">]),</span> <span class="n">da</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]))</span>
+<span class="c1"># Initialis the EIS procedure. The initial value is the initial guess for the equivalent circuit (can also be left empty)</span>
+<span class="n">Eis</span>  <span class="o">=</span> <span class="n">e_impedance</span><span class="o">.</span><span class="n">EIS</span><span class="p">(</span><span class="n">Im</span><span class="p">,</span> <span class="n">suggested_circuit</span> <span class="o">=</span> <span class="s2">&quot;R0-p(R1,CPE1)&quot;</span><span class="p">,</span><span class="n">initial_value</span> <span class="o">=</span><span class="p">[</span><span class="mi">860</span><span class="p">,</span> <span class="mf">3e+5</span><span class="p">,</span> <span class="mf">1e-09</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">])</span>
+<span class="c1"># Analyze the data</span>
+<span class="n">Eis</span><span class="o">.</span><span class="n">perform_all_actions</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">plots</span> <span class="o">=</span> <span class="n">plots_eis</span><span class="p">)</span>
+
+<span class="c1"># More usages and options can be found in the documentation.</span>
+</pre></div>
+</div>
+<p>There are more options i.e. for impedance class, outlier detection can be used with respective quantile parameters.
+Furthermore, different plot settings
+and circuit options can be used as well. For more information, please refer to the documentation.
+It is possible to expand MADAP with custom analysis procedures. The implementation steps are as follows:</p>
+<ol class="arabic simple">
+<li><p>Create a new class in the respective folder (echem) and inherit from the base class (procedure.py).</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">madap.procedure</span> <span class="kn">import</span> <span class="n">EChemProcedure</span>
+<span class="kn">from</span> <span class="nn">madap.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+
+<span class="k">class</span> <span class="nc">MyProcedure</span><span class="p">(</span><span class="n">EChemProcedure</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Implement the abstract methods (see documentation for more information).</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Perform analysis</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Plot results</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">):</span>
+    <span class="c1"># Save results</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">perform_all_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Perform all actions</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Create a new class in the respective folder (echem) for the plotting and inherit from the base class (plotting.py).</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">madap.plotting.plotting</span> <span class="kn">import</span> <span class="n">Plots</span>
+<span class="kn">from</span> <span class="nn">madap.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+
+<span class="k">class</span> <span class="nc">MyPlotting</span><span class="p">(</span><span class="n">Plots</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="madap-as-a-command-line-tool">
+<h2>MADAP as a command line tool<a class="headerlink" href="#madap-as-a-command-line-tool" title="Permalink to this headline"></a></h2>
+<p>MADAP can also be used via command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>madap_cli --file &lt;path_to_file&gt; --procedure &lt;procedure&gt; --results &lt;path_to_results&gt; --header_list &lt;header_list&gt; --plot &lt;list_of_plots&gt;
+</pre></div>
+</div>
+<p>Note that when using the argument “impedance” for the option –procedure, another option –impedance_procedure is necessary to be specified.
+At the moment, the only possible impedance procedure is “EIS”. Mottschotcky and Lissajous are not yet implemented.</p>
+<p>The possible EIS arguments include:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--plots</span></code>  &lt;list_of_plots&gt; (e.g: [“nyquist”, “nyquist_fit”, “bode”, “residual”])</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--voltage</span></code> &lt;voltage&gt; (e.g: 0.1)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--cell_constant</span></code> &lt;cell_constant&gt; (e.g: 0.5)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--suggested_circuits</span></code> &lt;suggested_circuits&gt; (e.g: “R0-p(R1,CPE1)”). This can be left empty. Madap will attempt to find the best circuit accordingly.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--initial_values</span></code> &lt;initial_values&gt; (e.g: [860, 3e+5, 1e-09, 0.90]). This can be left empty. Madap will attempt to find the best initial value accordingly.</p></li>
+</ul>
+</section>
+<section id="madap-as-a-gui">
+<h2>MADAP as a GUI<a class="headerlink" href="#madap-as-a-gui" title="Permalink to this headline"></a></h2>
+<p>MADAP can also be used via a GUI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>madap_gui
+</pre></div>
+</div>
+<p>An example of the GUI for impedance is shown below:</p>
+<a class="reference internal image-reference" href="../_images/GUI_Impedance.png"><img alt="../_images/GUI_Impedance.png" class="align-center" src="../_images/GUI_Impedance.png" style="width: 600px;" /></a>
+<p>An example of the GUI for Arrhenius is shown below:</p>
+<a class="reference internal image-reference" href="../_images/GUI_Arrhenius.png"><img alt="../_images/GUI_Arrhenius.png" class="align-center" src="../_images/GUI_Arrhenius.png" style="width: 600px;" /></a>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to MADAP’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../generated_arrhenius/modules.html" class="btn btn-neutral float-right" title="Arrhenius" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Fuzhan Rahmanian.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
