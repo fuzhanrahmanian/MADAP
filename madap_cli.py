@@ -253,7 +253,7 @@ def call_arrhenius(data, result_dir, args):
 
     return arrhenius_cls
 
-def call_voltammetry(data, result_dir, plots):
+def call_voltammetry(data, result_dir, args):
     """ Calling the voltammetry procedure and parse the corresponding arguments
 
     Args:
@@ -299,9 +299,10 @@ def start_procedure(args):
     elif args.procedure in ["arrhenius", "Arrhenius"]:
         procedure = call_arrhenius(data, result_dir, args)
 
-    elif args.procedure == "voltammetry":
-        log.info("Voltammetrys is not supported at the moment. Exiting ...")
-        sys.exit()
+    elif args.procedure in ["voltammetry", "Voltammetry"]:
+        procedure = call_voltammetry(data, result_dir, args)
+        # log.info("Voltammetrys is not supported at the moment. Exiting ...")
+        # sys.exit()
 
     return procedure
 

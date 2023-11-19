@@ -28,6 +28,9 @@ class MadapGui:
         self.initial_values = None
         self.upper_limit_quantile = None
         self.lower_limit_quantile = None
+        self.voltammetry_procedure = None
+        self.current = None
+        self.scan_rate = None
 
     # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
@@ -153,6 +156,14 @@ def gui_layout(madap, colors):
 
     tab_layout_mott = [[sg.Text('This is inside Mottschosky')],
                     [sg.Input(key='-inMott-')]]
+    
+    # ----------- Create tabs for Voltammetry procedure ----------- #
+    tab_layout_ca = [[sg.Text('Voltage [V] (optional)',justification='left', font=("Arial", 13))],
+                [sg.InputText(key='-inCAVoltage-')]]
+    tab_layout_cp = [[sg.Text('Current [A]',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCPCurrent-')]]
+    tab_layout_cv = [[sg.Text('Scan Rate [V/s] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.Input(key='-inCVScanRate-')]]
 
     # ----------- Layout the Impedance Options (Three TABS) ----------- #
     layout_impedance = [[sg.TabGroup(
@@ -173,7 +184,11 @@ def gui_layout(madap, colors):
                                     expand_y=True)]]
 
     # ----------- TODO Layout the Voltammetry Options ----------- #
-    layout_voltammetry = [[sg.Text('This is Voltammetry')]]
+    layout_voltammetry = [[sg.TabGroup(
+        [[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
+          sg.Tab('Chrono-Amperomtery', tab_layout_ca,key='-TAB_CA-', expand_y=True),
+          sg.Tab('Cyclic Voltammetry', tab_layout_cv, key='-TAB_CV-', expand_y=True)]],
+        tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]]
 
 
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
@@ -231,6 +246,9 @@ def main():
         if event in (sg.WIN_CLOSED, 'EXIT'):
             break
         if event in ['-BUT_Impedance-', '-BUT_Arrhenius-', '-BUT_Voltammetry-']:
+            if event == '-BUT_Voltammetry-':
+                # empty HEADER_OR_SPECIFIC_VALUE
+                window['-HEADER_OR_SPECIFIC_VALUE-']('current, voltage, time')
             event = event.strip('-BUT_')
             window[f'-COL_{madap_gui.procedure}-'].update(visible=False)
             window[f'-BUT_{madap_gui.procedure}-'].update(button_color=colors)
@@ -239,6 +257,8 @@ def main():
             madap_gui.procedure = event
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
+        if values[1] in ['-TAB_CA-', '-TAB_CP-', '-TAB_CV-']:
+            madap_gui.voltammetry_procedure = values[1].strip('-TAB_')
 
         # Prevent the user from inoutting a value that is not a number in the voltage, cell constant and initial_value input field
         if event == '-voltage-' and len(values['-voltage-']) \
@@ -261,7 +281,9 @@ def main():
             window['-LOG-'].update('Starting procedure...')
             madap_gui.file = values['-DATA_PATH-']
             madap_gui.results = values['-RESULT_PATH-']
-            madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
+            # TODO: this needs to be expanded for Voltammetry
+            if madap_gui.procedure == 'Impedance' or madap_gui.procedure == 'Arrhenius':
+                madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
             madap_gui.voltage = values['-voltage-']
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] \
@@ -272,7 +294,10 @@ def main():
                                           if not values['-upper_limit_quantile-'] == '' else None
             madap_gui.lower_limit_quantile = values['-lower_limit_quantile-'] \
                                           if not values['-lower_limit_quantile-'] == '' else None
-
+            madap_gui.current = values['-inCPCurrent-'] \
+                                            if not values['-inCPCurrent-'] == '' else None
+            madap_gui.scan_rate = values['-inCVScanRate-'] \
+                                            if not values['-inCVScanRate-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
