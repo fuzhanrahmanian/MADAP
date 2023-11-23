@@ -278,7 +278,7 @@ def call_voltammetry(data, result_dir, args):
                                                         voltage=da.format_data(voltage_data),
                                                         time =da.format_data(time_data),
                                                         args=args)
-    
+
     # Format plots arguments
     plots = da.format_plots(args.plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
