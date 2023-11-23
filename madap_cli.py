@@ -261,23 +261,26 @@ def call_voltammetry(data, result_dir, args):
         result_dir (str): the directory for saving results
         plots (list): list of plots to be generated
     """
-    log.info("What is the name (or index) of the column of voltage (v [V]) ?")
-    # TODO
-    voltage_idx = "voltage" #input()
-    # TODO
-    log.info("What is the name (or index) of the column of current (I [A]) ?")
-    current_idx = "current" #input()
-    # TODO
-    log.info("What is the name (or index) of the column of time (t [s]) ?")
-    time_idx = "time" #input()
+    if args.header_list:
+        # Check if args header is a list
+        if isinstance(args.header_list, list):
+            header_names = args.header_list[0].split(", ") if len(args.header_list) == 1 else \
+            args.header_list
+        else:
+            header_names = args.header_list
 
-    voltammetry_cls = voltammetry_CA.Voltammetry_CA(da.format_data(data[voltage_idx]),
-                                  da.format_data(data[current_idx]),
-                                da.format_data(data[time_idx]))
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
+        # extracting the data
+        current_data, voltage_data, time_data = data[header_names[0]],\
+                                                data[header_names[1]],\
+                                                data[header_names[2]]
+    if args.voltammetry_procedure == "CA":
+        voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
+                                                        voltage=da.format_data(voltage_data),
+                                                        time =da.format_data(time_data),
+                                                        args=args)
+    
+    # Format plots arguments
+    plots = da.format_plots(args.plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
 
 def start_procedure(args):
