@@ -274,6 +274,7 @@ def call_voltammetry(data, result_dir, args):
                                                 data[header_names[1]],\
                                                 data[header_names[2]]
     if args.voltammetry_procedure == "CA":
+        # TODO Check if voltage is given
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
                                                         time =da.format_data(time_data),

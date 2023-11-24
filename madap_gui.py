@@ -181,7 +181,7 @@ def gui_layout(madap, colors):
                     [sg.Text('Area of active material [cm2] (optional)',justification='left', font=("Arial", 13))],
                     [sg.InputText(key='-inCAArea-', default_text="0.196")],
                     [sg.Text('Window size (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inCAWindowSize-', default_text="3")],
+                    [sg.InputText(key='-inCAWindowSize-', default_text="20000")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
                     [sg.Listbox([x for x in madap.ca_plots], key='-PLOTS_CA-',
                                 size=(50,len(madap.ca_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,

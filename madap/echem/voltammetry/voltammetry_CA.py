@@ -26,10 +26,12 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         self.mass_of_active_material = float(args.mass_of_active_material) if args.mass_of_active_material is not None else None # Unit: g
         self.area_of_active_material = float(args.area_of_active_material) if args.area_of_active_material is not None else 1 # Unit: cm^2
         self.concentration_of_active_material = float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
-        self.window_size = int(args.window_size) if args.window_size is not None else 10
+        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
         self.diffusion_coefficient = None # Unit: cm^2/s
         self.reaction_order = None # 1 or 2
         self.reaction_rate_constant = None # Unit: 1/s or cm^3/mol/s
+        self.best_fit_reaction_rate = None
+        self.best_fit_diffusion = None
 
     def analyze(self):
         # Calculate diffusion coefficient
@@ -65,6 +67,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         # Cortrell equation: I = (nFAD^1/2 * C)/ (pi^1/2 * t^1/2)
         self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * faraday_constant ** 2 * self.area_of_active_material ** 2 * self.concentration_of_active_material ** 2)
         log.info(f"Diffusion coefficient: {self.diffusion_coefficient} cm^2/s")
+        self.best_fit_diffusion = best_fit
 
 
     def _analyze_reaction_kinetics(self):
@@ -81,17 +84,20 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         log.info("Analyzing reaction kinetics for second kinetic order...")
         second_order_fit = self.analyze_best_linear_fit( x_data=self.np_time[1:], y_data=1/self.np_current[1:])
 
+
         # Determine which order fits best
         if first_order_fit['r_squared'] > second_order_fit['r_squared']:
             self.reaction_order = 1
             # Assigning the negative of the slope for first-order kinetics
             self.reaction_rate_constant = -first_order_fit['slope']
+            self.best_fit_reaction_rate = first_order_fit
             log.info(f"Reaction rate constant for first order: {self.reaction_rate_constant} 1/s")
             log.info("A positive rate constant indicates a decay process, while a negative one indicates an increasing process or growth.")
 
         else:
             self.reaction_order = 2
             self.reaction_rate_constant = second_order_fit['slope']
+            self.best_fit_reaction_rate = second_order_fit
             log.info(f"Reaction rate constant for second order: {self.reaction_rate_constant} cm^3/mol/s")
             log.info("A positive rate constant indicates a typical second-order increasing concentration process.")
 
@@ -103,24 +109,32 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
                         area_of_active_material=self.area_of_active_material,
                         mass_of_active_material=self.mass_of_active_material,
                         cumulative_charge=self.cumulative_charge)
-        fig, available_axes = plot.compose_ca_subplot(plots=plots)
+        if self.voltage is None and "Voltage" in plots:
+            log.warning("Measured voltage is not provided. Voltage plot is not available.")
+            # Drop the voltage plot from the plots list
+            plots = [plot for plot in plots if plot != "Voltage"]
 
+        fig, available_axes = plot.compose_ca_subplot(plots=plots)
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name == "CA":
                 plot.CA(subplot_ax=sub_ax)
             elif plot_name == "Log_CA":
-                plot.Log_CA(subplot_ax=sub_ax)
+                if self.reaction_order == 1:
+                    y_data = np.log(self.np_current[1:])
+                elif self.reaction_order == 2:
+                    y_data = 1/self.np_current[1:]
+                plot.Log_CA(subplot_ax=sub_ax, y_data = y_data,
+                            reaction_rate=self.reaction_rate_constant,
+                            reaction_order=self.reaction_order,
+                            best_fit_reaction_rate=self.best_fit_reaction_rate)
             elif plot_name == "CC":
                 plot.CC(subplot_ax=sub_ax)
             elif plot_name == "Cotrell":
-                plot.Cotrell(subplot_ax=sub_ax)
+                plot.Cotrell(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient, best_fit_diffusion=self.best_fit_diffusion)
             elif plot_name == "Anson":
-                plot.Anson(subplot_ax=sub_ax)
+                plot.Anson(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient)
             elif plot_name == "Voltage":
-                if self.applied_voltage is not None:
-                    plot.Voltage(subplot_ax=sub_ax)
-                else:
-                    log.warning("Measured voltage is not provided. Voltage plot is not available.")
+                plot.Voltage(subplot_ax=sub_ax)
             else:
                 log.error("Voltammetry CA class does not have the selected plot.")
                 continue

@@ -67,8 +67,29 @@ class VoltammetryCAPlotting(Plots):
         else:
             subplot_ax.legend(loc="upper right")
 
-    def Log_CA(self, subplot_ax):
-        pass
+    def Log_CA(self, subplot_ax, y_data, reaction_rate, reaction_order,best_fit_reaction_rate):
+        """Plot the Log CA plot.
+        
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+        log.info("Creating Log CA plot")
+        if reaction_order == 1:
+            y_label = "Log(Current) (A)"
+            label = r"$\kappa$"+f"={reaction_rate:.2e} 1/s"
+        elif reaction_order == 2:
+            y_label = "1/Current (1/A)"
+            label = r"$\kappa$"+f"{reaction_rate:.2e}"+r"$cm^3/mol/s$"
+        
+        x_vals = np.array([self.time[best_fit_reaction_rate['start']], self.time[best_fit_reaction_rate['end']]])
+        y_vals = best_fit_reaction_rate['slope']*x_vals + best_fit_reaction_rate['intercept']
+        subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Instantaneous rate")
+        # MArk the instantaneous rate on the plot
+        #subplot_ax.scatter(x_vals, y_vals, color="#660d33", s=5, marker='x', linewidth=2, label="Intercept")
+        subplot_ax.scatter(self.time[1:], y_data, s=3, label=label)
+        self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel=y_label, ax_sci_notation="x",
+                            x_lim=[0, max(self.time)], y_lim=[min(y_data)*0.6, max(y_data)*1.1])
+        subplot_ax.legend(loc="upper right")
 
     def CC(self, subplot_ax):
         """Plot the CC plot.
@@ -77,13 +98,12 @@ class VoltammetryCAPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
         log.info("Creating CC plot")
-        
-        
+
         if self.applied_voltage is None:
             measured_voltage = np.mean(self.voltage)
         else:
             measured_voltage = self.applied_voltage
-        
+
         subplot_ax.scatter(self.time, self.cumulative_charge, label=f"{measured_voltage:.2f} V", s=3)
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="Charge (C)",
                            ax_sci_notation="both", x_lim=[0, max(self.time)], y_lim=[0, max(self.cumulative_charge)])
@@ -93,17 +113,46 @@ class VoltammetryCAPlotting(Plots):
             subplot_ax.legend(loc="lower right")
         else:
             subplot_ax.legend(loc="upper right")
-    
-    def Cotrell(self, subplot_ax):
-        pass
 
-    def Anson(self, subplot_ax):
-        pass
-    
-    
+    def Cotrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion):
+        """Plot the Cotrell plot.
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+
+        log.info("Creating Cotrell plot")
+
+        x_data = (self.time)**(-0.5)
+        y_data = self.current
+
+        x_vals = np.array([x_data[best_fit_diffusion['start']], x_data[best_fit_diffusion['end']]])
+        y_vals = best_fit_diffusion['slope']*x_vals + best_fit_diffusion['intercept']
+
+
+        subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
+        subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Diffusion coefficient")
+        self.plot_identity(subplot_ax, xlabel=r"$t^{-1/2}  [s^{-1/2}]$", ylabel="Current (A)",
+                            ax_sci_notation="both", x_lim=[0, max(x_data[1:])], y_lim=[0, max(y_data[1:])])
+        subplot_ax.legend(loc="upper right")
+
+    def Anson(self, subplot_ax, diffusion_coefficient):
+        """Plot the Anson plot.
+
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+
+        log.info("Creating Anson plot")
+        x_data = (self.time)**(0.5)
+        y_data = self.cumulative_charge
+        subplot_ax.scatter(x_data, y_data, s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
+        self.plot_identity(subplot_ax, xlabel=r"$t^{1/2}  [s^{1/2}]$", ylabel="Charge (C)",
+                            ax_sci_notation="both", x_lim=[0, max(x_data)], y_lim=[0, max(y_data)])
+        subplot_ax.legend(loc="upper right")
+
     def Voltage(self, subplot_ax):
         """Plot the voltage plot.
-        
+
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
@@ -164,7 +213,7 @@ class VoltammetryCAPlotting(Plots):
             return fig, [ax1, ax2, ax3, ax4, ax5]
         
         if len(plots) == 6:
-            fig = plt.figure(figsize=(12, 5))
+            fig = plt.figure(figsize=(9, 5))
             spec = fig.add_gridspec(2, 3)
             ax1 = fig.add_subplot(spec[0, 0])
             ax2= fig.add_subplot(spec[0, 1])
