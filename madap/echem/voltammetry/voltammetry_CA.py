@@ -1,10 +1,15 @@
+import os
+
 import numpy as np
-from scipy.stats import linregress
+
 import scipy.constants as const
 
+from madap.utils import utils
 from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
+
+from madap.echem.voltammetry.voltammetry_CA_plotting import VoltammetryCAPlotting as caplt
 
 log = logger.get_logger("cyclic_amperometry")
 
@@ -13,7 +18,8 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
     """ This class defines the chrono amperometry method."""
     def __init__(self, current, voltage, time, args, charge:list[float]=None) -> None:
         super().__init__(voltage, current, time, args.measured_current_units, args.measured_time_units, args.number_of_electrons)
-        self.applied_voltage = float(args.applied_voltage) # Unit: V
+        self.voltage = voltage
+        self.applied_voltage = float(args.applied_voltage) if args.applied_voltage is not None else None # Unit: V
         self.np_time = np.array(self.time) # Unit: s
         self.np_current = np.array(self.current) # Unit: A
         self.cumulative_charge = self._calculate_charge() if charge is None else charge # Unit: C
@@ -30,10 +36,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         self._calculate_diffusion_coefficient()
 
         # Reaction kinetics analysis
-        self.reaction_kinetics = self._analyze_reaction_kinetics()
-
-        # Validate and preprocess data
-        self._preprocess_data()
+        self._analyze_reaction_kinetics()
 
 
     def _calculate_charge(self):
@@ -53,7 +56,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         log.info("Calculating diffusion coefficient using Cottrell analysis...")
         # Find the best linear region for Cottrell analysis
         t_inv_sqrt = np.sqrt(1 / self.np_time[1:])  # Avoid division by zero
-        best_fit = self._analyze_best_linear_fit(t_inv_sqrt, self.np_current[1:])
+        best_fit = self.analyze_best_linear_fit(t_inv_sqrt, self.np_current[1:])
         slope = best_fit['slope']
         # Constants for Cottrell equation
         faraday_constant = const.physical_constants["Faraday constant"][0]  # Faraday constant in C/mol
@@ -73,10 +76,10 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         """
         # Analyze for first-order kinetics
         log.info("Analyzing reaction kinetics for first kinetic order...")
-        first_order_fit = self._analyze_best_linear_fit(x_data=self.np_time[1:], y_data=np.log(self.np_current[1:]))
+        first_order_fit = self.analyze_best_linear_fit(x_data=self.np_time[1:], y_data=np.log(self.np_current[1:]))
         # Analyze for second-order kinetics
         log.info("Analyzing reaction kinetics for second kinetic order...")
-        second_order_fit = self._analyze_best_linear_fit( x_data=self.np_time[1:], y_data=1/self.np_current[1:])
+        second_order_fit = self.analyze_best_linear_fit( x_data=self.np_time[1:], y_data=1/self.np_current[1:])
 
         # Determine which order fits best
         if first_order_fit['r_squared'] > second_order_fit['r_squared']:
@@ -93,40 +96,36 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             log.info("A positive rate constant indicates a typical second-order increasing concentration process.")
 
 
-    def _analyze_best_linear_fit(self, x_data, y_data):
-        """
-        Find the best linear region for the provided data.
+    def plot(self, save_dir, plots, optional_name: str = None):
+        plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
+        plot = caplt()
+        fig, available_axes = plot.compose_ca_subplot(plots=plots)
 
-        Args:
-            x_data (np.array): Transformed time array (e.g., t^(-1/2) for diffusion or time for kinetics).
-            y_data (np.array): Current array or transformed current array (e.g., log(current)).
+        for i, (sub_ax, plot_name) in enumerate(zip(available_axes, plots)):
+            sub_plot_ax = sub_ax[i] if i != 0 else sub_ax
+            if plot_name == "CA":
+                plot.CA(subplot_ax=sub_plot_ax, current=self.np_current, time=self.np_time,
+                        voltage=self.voltage, applied_voltage=self.applied_voltage,
+                        area_of_active_material=self.area_of_active_material,
+                        mass_of_active_material=self.mass_of_active_material)
+            elif plot_name == "Log_CA":
+                plot.Log_CA(subplot_ax=sub_plot_ax)
+            elif plot_name == "CC":
+                plot.CC(subplot_ax=sub_plot_ax)
+            elif plot_name == "Cotrell":
+                plot.Cotrell(subplot_ax=sub_plot_ax)
+            elif plot_name == "Anson":
+                plot.Anson(subplot_ax=sub_plot_ax)
+            else:
+                log.error("Voltammetry CA class does not have the selected plot.")
+                continue
 
-        Returns:
-            best fit (dict): Dictionary containing the best linear fit parameters:
-                start_index (int): Start index of the best linear region.
-                end_index (int): End index of the best linear region.
-                slope (float): Slope of the best linear fit.
-                intercept (float): Intercept of the best linear fit.
-                r_squared (float): R-squared value of the best linear fit.
-        """
+        fig.tight_layout()
+        self.figure = fig
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__)
+        plot.save_plot(fig, plot_dir, name)
 
-        best_fit = {'start': 0, 'end': self.window_size, 'r_squared': 0, 'slope': 0, 'intercept': 0}
-        for start in range(len(x_data) - self.window_size + 1):
-            end = start + self.window_size
-            slope, intercept, r_value, _, _ = linregress(x_data[start:end], y_data[start:end])
-            r_squared = r_value**2
-            if r_squared > best_fit['r_squared']:
-                best_fit.update({'start': start, 'end': end, 'r_squared': r_squared, 'slope': slope, 'intercept': intercept})
-        log.info(f"Best linear fit found from {best_fit['start']} to {best_fit['end']} with R^2 = {best_fit['r_squared']}")
-        return best_fit
-
-
-    def _preprocess_data(self):
-        # Data validation and preprocessing
-        pass
-
-    def plot(self):
-        pass
 
     def save_data(self):
         pass
@@ -134,4 +133,23 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
-        self.save_data(save_dir=save_dir, optional_name=optional_name)
+        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+    @property
+    def figure(self):
+        """Get the figure of the plot.
+
+        Returns:
+            obj: Figure object for ca plot.
+        """
+        return self._figure
+
+
+    @figure.setter
+    def figure(self, figure):
+        """Set the figure of the plot.
+
+        Args:
+            figure (obj): Figure object for ca plot.
+        """
+        self._figure = figure
