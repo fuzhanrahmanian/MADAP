@@ -10,7 +10,7 @@ log = logger.get_logger("voltammetry_plotting")
 class VoltammetryCAPlotting(Plots):
 
     def __init__(self, current, time, voltage, applied_voltage,
-                 area_of_active_material, mass_of_active_material, cumulative_charge) -> None:
+                 electrode_mass, mass_of_active_material, cumulative_charge) -> None:
         """This class defines the plotting of the cyclic amperometry method.
         
         Args:
@@ -18,7 +18,7 @@ class VoltammetryCAPlotting(Plots):
             time (list): list of times
             voltage (list): list of voltages
             applied_voltage (float): applied voltage
-            area_of_active_material (float): area of active material
+            electrode_mass (float): area of active material
             mass_of_active_material (float): mass of active material
         """
         super().__init__()
@@ -27,7 +27,7 @@ class VoltammetryCAPlotting(Plots):
         self.time = time
         self.voltage = voltage
         self.applied_voltage = applied_voltage
-        self.area_of_active_material = area_of_active_material
+        self.electrode_mass = electrode_mass
         self.mass_of_active_material = mass_of_active_material
         self.cumulative_charge = cumulative_charge
     def CA(self, subplot_ax):
@@ -44,9 +44,9 @@ class VoltammetryCAPlotting(Plots):
             # Change the unit of current from mA to mA/g7
             current_mA = [i/self.mass_of_active_material for i in self.current]
             y_label = "Current (mA/g)"
-        elif self.area_of_active_material is not None:
+        elif self.electrode_mass is not None:
             # Change the unit of current from mA to mA/cm^2
-            current_mA = [i/self.area_of_active_material for i in self.current]
+            current_mA = [i/self.electrode_mass for i in self.current]
             y_label = "Current (mA/cm^2)"
         else:
             y_label = "Current (mA)"

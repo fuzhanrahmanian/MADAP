@@ -3,6 +3,9 @@ import io
 
 import PySimpleGUI as sg
 import matplotlib.pyplot as plt
+import queue
+from madap.logger.logger import log_queue
+import threading
 
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 
@@ -36,11 +39,11 @@ class MadapGui:
         self.measured_time_units = None
         self.applied_voltage = None
         self.mass_of_active_material = None
-        self.area_of_active_material = None
+        self.electrode_mass = None
         self.concentration_of_active_material = None
         self.number_of_electrons = None
         self.window_size = None
-
+    
     # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
         """ This function validates the fields in the GUI
@@ -178,7 +181,7 @@ def gui_layout(madap, colors):
                     [sg.InputText(key='-inCAVoltage-', default_text="0.43")],
                     [sg.Text('Mass of active material [g] (optional)',justification='left', font=("Arial", 13))],
                     [sg.InputText(key='-inCAMass-', default_text="0.0001")],
-                    [sg.Text('Area of active material [cm2] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.Text('Electrode area [cm2] (optional)',justification='left', font=("Arial", 13))],
                     [sg.InputText(key='-inCAArea-', default_text="0.196")],
                     [sg.Text('Window size (optional)',justification='left', font=("Arial", 13))],
                     [sg.InputText(key='-inCAWindowSize-', default_text="20000")],
@@ -211,18 +214,18 @@ def gui_layout(madap, colors):
 
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_voltammetry = [
-                        [sg.Text('Measured Current Units', justification='left', font=("Arial", 12)),
-                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True)],
+                        [sg.Text('Measured Current Units', justification='left', font=("Arial", 12), pad=(1,(15,0))),
+                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True, pad=(10,(15,0)))],
 
-                        [sg.Text('Measured Time Units', justification='left', font=("Arial", 12)),
-                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True)],
+                        [sg.Text('Measured Time Units', justification='left', font=("Arial", 12), pad=(1,(15,0))),
+                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True, pad=(25,(15,0)))],
 
-                        [sg.Text('Number of electrons n', justification='left', font=("Arial", 12)),
-                        sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1))],
+                        [sg.Text('Number of electrons n', justification='left', font=("Arial", 12), pad=(1,(15,0))),
+                        sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1), pad=(22,(15,0)))],
 
-                        [sg.Text('Concentration of active material (optional)', justification='left', font=("Arial", 12)),
-                        sg.InputText(key='-inVoltConcentration-', default_text="1", size=(10, 1)),
-                        sg.Text('[mol/cm3]', justification='left', font=("Arial", 12))],
+                        [sg.Text('Concentration of active material (optional)', justification='left', font=("Arial", 12),  pad=(1,(15,0))),
+                        sg.InputText(key='-inVoltConcentration-', default_text="1", size=(5, 1), pad=(5,(15,0))),
+                        sg.Text('[mol/cm3]', justification='left', font=("Arial", 12), pad=(1,(15,0)))],
 
                         [sg.TabGroup([[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
                                     sg.Tab('Chrono-Amperomtery', tab_layout_ca, key='-TAB_CA-', expand_y=True),
@@ -260,7 +263,8 @@ def gui_layout(madap, colors):
         [col1, col2],
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-',
                  enable_events=True)],
-        [sg.Button('RUN'), sg.Button('EXIT')]]
+        [sg.Button('RUN'), sg.Button('EXIT')],
+        [sg.Multiline(size=(100, 10), key='LogOutput', autoscroll=True, background_color='black', text_color='white')],]
 
     return layout
 
@@ -280,10 +284,21 @@ def main():
     layout = gui_layout(madap_gui, colors)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
     window = sg.Window(title, layout, resizable=True)
+    # Shared variable for the return value and a flag to indicate completion
+    procedure_result = [None]  # List to hold the return value
+    procedure_complete = [False]  # Flag to indicate completion
+    procedure_error = [None]
+
+    def procedure_wrapper():
+        try:
+            procedure_result[0] = start_procedure(madap_gui)
+        except Exception as e:
+            procedure_error[0] = e
+        finally:
+            procedure_complete[0] = True
     # Event loop
     while True:
-        event, values = window.read()
-        print(event, values)
+        event, values = window.read(timeout=100)
         if event in (sg.WIN_CLOSED, 'EXIT'):
             break
         if event in ['-BUT_Impedance-', '-BUT_Arrhenius-', '-BUT_Voltammetry-']:
@@ -318,6 +333,7 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) \
                                       and values['-initial_value-'][-1] not in '012345678890,.e-+[]':
             window['-initial_value-'].update(values['-initial_value-'][:-1])
+        
         if event == 'RUN':
             window['-LOG-'].update('Starting procedure...')
             madap_gui.file = values['-DATA_PATH-']
@@ -347,7 +363,7 @@ def main():
                                             if not values['-inCAVoltage-'] == '' else None
             madap_gui.mass_of_active_material = values['-inCAMass-'] \
                                             if not values['-inCAMass-'] == '' else None
-            madap_gui.area_of_active_material = values['-inCAArea-'] \
+            madap_gui.electrode_mass = values['-inCAArea-'] \
                                             if not values['-inCAArea-'] == '' else None
             madap_gui.concentration_of_active_material = values['-inVoltConcentration-'] \
                                             if not values['-inVoltConcentration-'] == '' else None
@@ -369,17 +385,42 @@ def main():
             if not validation:
                 window['-LOG-'].update('Inputs were not valid! Try again.')
                 continue
-            try:
-                procedure = start_procedure(madap_gui)
-            except Exception as e:
-                sg.popup(f'Error: Something went wrong. {e}')
-                continue
-            window['-LOG-'].update('Generating plot...')
-            window['-COL_PLOTS-'].update(visible=True)
-            window['-IMAGE-']('')
-            draw_figure(window['-IMAGE-'], procedure.figure)
-            window['-LOG-'].update('DONE! Results and plots were saved in the given path')
+            window['LogOutput'].update('')
+            window['RUN'].update(disabled=True)
+            procedure_thread = threading.Thread(target=procedure_wrapper)
+            procedure_thread.start()
+        # Update log output while the procedure is running or GUI is active
+        update_log_output(window)
 
+        # Check for completion or errors from the background process
+        if procedure_complete[0]:
+            # Reset the completion flag
+            procedure_complete[0] = False
+
+            if procedure_error[0]:
+                sg.popup(f'Error: Something went wrong. {procedure_error[0]}')
+                procedure_error[0] = None
+            else:
+                procedure_return_value = procedure_result[0]
+                window['-LOG-'].update('Generating plot...')
+                window['-COL_PLOTS-'].update(visible=True)
+                window['-IMAGE-']('')
+                draw_figure(window['-IMAGE-'], procedure_return_value.figure)
+                window['-LOG-'].update('DONE! Results and plots were saved in the given path')
+
+            # Reset the completion flag and re-enable the RUN button
+            #procedure_complete[0] = False
+            window['RUN'].update(disabled=False)
+
+def update_log_output(window):
+    """Reads log messages from the queue and updates the GUI."""
+    while not log_queue.empty():
+        try:
+            record = log_queue.get_nowait()
+            if record:
+                window['LogOutput'].update(record.msg + '\n', append=True)
+        except queue.Empty:
+            break
 
 if __name__ == '__main__':
     main()

@@ -24,7 +24,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         self.np_current = np.array(self.current) # Unit: A
         self.cumulative_charge = self._calculate_charge() if charge is None else charge # Unit: C
         self.mass_of_active_material = float(args.mass_of_active_material) if args.mass_of_active_material is not None else None # Unit: g
-        self.area_of_active_material = float(args.area_of_active_material) if args.area_of_active_material is not None else 1 # Unit: cm^2
+        self.electrode_mass = float(args.electrode_mass) if args.electrode_mass is not None else 1 # Unit: cm^2
         self.concentration_of_active_material = float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
         self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
         self.diffusion_coefficient = None # Unit: cm^2/s
@@ -65,7 +65,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         # Calculate D using the slope
         # Unit of D: cm^2/s
         # Cortrell equation: I = (nFAD^1/2 * C)/ (pi^1/2 * t^1/2)
-        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * faraday_constant ** 2 * self.area_of_active_material ** 2 * self.concentration_of_active_material ** 2)
+        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * faraday_constant ** 2 * self.electrode_mass ** 2 * self.concentration_of_active_material ** 2)
         log.info(f"Diffusion coefficient: {self.diffusion_coefficient} cm^2/s")
         self.best_fit_diffusion = best_fit
 
@@ -106,7 +106,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = caplt(current=self.np_current, time=self.np_time,
                         voltage=self.voltage, applied_voltage=self.applied_voltage,
-                        area_of_active_material=self.area_of_active_material,
+                        electrode_mass=self.electrode_mass,
                         mass_of_active_material=self.mass_of_active_material,
                         cumulative_charge=self.cumulative_charge)
         if self.voltage is None and "Voltage" in plots:

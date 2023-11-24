@@ -1,11 +1,17 @@
 """This module defines the logger for the MADAP application."""
 import logging
+from logging.handlers import QueueHandler
 import os
 import sys
+import queue
 APP_LOGGER_NAME = 'MADAP'
+log_queue = queue.Queue()  # Queue for log messages
 
+class QueueLoggerHandler(QueueHandler):
+    def __init__(self, log_queue):
+        super().__init__(log_queue)
 
-def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
+def setup_applevel_logger(logger_name=APP_LOGGER_NAME, file_name=None):
     """Sets up the app level logger
 
     Args:
@@ -17,18 +23,25 @@ def setup_applevel_logger(logger_name = APP_LOGGER_NAME, file_name=None):
     """
 
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    logger.setLevel(logging.DEBUG)  # Set the logging level
+
+    # Create handlers
     stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setFormatter(formatter)
-    logger.handlers.clear()
+    queue_handler = QueueLoggerHandler(log_queue)  # Custom handler for queue
+
+    # Create formatters and add it to handlers
+    stream_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    stream_handler.setFormatter(stream_format)
+
+    # Add handlers to the logger
     logger.addHandler(stream_handler)
+    logger.addHandler(queue_handler)
+
     if file_name:
-        if not os.path.exists("logs"):
-            os.makedirs("logs")
-        file_handler = logging.FileHandler(f"./logs/{file_name}", encoding="utf-8")
-        file_handler.setFormatter(formatter)
+        file_handler = logging.FileHandler(file_name)
+        file_handler.setFormatter(stream_format)
         logger.addHandler(file_handler)
+
     return logger
 
 def get_logger(module_name):
