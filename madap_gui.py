@@ -13,7 +13,7 @@ class MadapGui:
     """
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
     arrhenius_plots = ["arrhenius", "arrhenius_fit"]
-    ca_plots = ["CA", "Log_CA", "CC", "Cotrell", "Anson"]
+    ca_plots = ["CA", "Log_CA", "CC", "Cotrell", "Anson", "Voltage"]
 
     def __init__(self):
         self.procedure = "Impedance"

@@ -48,7 +48,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         interval_charges = delta_t * self.np_current[1:]
 
         # Compute the cumulative charge
-        self.cumulative_charge = np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
+        return np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
 
 
     def _calculate_diffusion_coefficient(self):
@@ -98,24 +98,29 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
     def plot(self, save_dir, plots, optional_name: str = None):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
-        plot = caplt()
-        fig, available_axes = plot.compose_ca_subplot(plots=plots)
-
-        for i, (sub_ax, plot_name) in enumerate(zip(available_axes, plots)):
-            sub_plot_ax = sub_ax[i] if i != 0 else sub_ax
-            if plot_name == "CA":
-                plot.CA(subplot_ax=sub_plot_ax, current=self.np_current, time=self.np_time,
+        plot = caplt(current=self.np_current, time=self.np_time,
                         voltage=self.voltage, applied_voltage=self.applied_voltage,
                         area_of_active_material=self.area_of_active_material,
-                        mass_of_active_material=self.mass_of_active_material)
+                        mass_of_active_material=self.mass_of_active_material,
+                        cumulative_charge=self.cumulative_charge)
+        fig, available_axes = plot.compose_ca_subplot(plots=plots)
+
+        for sub_ax, plot_name in zip(available_axes, plots):
+            if plot_name == "CA":
+                plot.CA(subplot_ax=sub_ax)
             elif plot_name == "Log_CA":
-                plot.Log_CA(subplot_ax=sub_plot_ax)
+                plot.Log_CA(subplot_ax=sub_ax)
             elif plot_name == "CC":
-                plot.CC(subplot_ax=sub_plot_ax)
+                plot.CC(subplot_ax=sub_ax)
             elif plot_name == "Cotrell":
-                plot.Cotrell(subplot_ax=sub_plot_ax)
+                plot.Cotrell(subplot_ax=sub_ax)
             elif plot_name == "Anson":
-                plot.Anson(subplot_ax=sub_plot_ax)
+                plot.Anson(subplot_ax=sub_ax)
+            elif plot_name == "Voltage":
+                if self.applied_voltage is not None:
+                    plot.Voltage(subplot_ax=sub_ax)
+                else:
+                    log.warning("Measured voltage is not provided. Voltage plot is not available.")
             else:
                 log.error("Voltammetry CA class does not have the selected plot.")
                 continue
