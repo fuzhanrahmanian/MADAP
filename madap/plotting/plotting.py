@@ -52,18 +52,38 @@ class Plots():
             step_size_x (str, optional): step size of the x axis. Defaults to "auto".
             step_size_y (str, optional): step size of the y axis. Defaults to "auto".
         """
+        def calculate_ticks(lim, step_size, num_steps=5):
+            if step_size == "auto":
+                raw_step = (max(lim) - min(lim)) / num_steps
+                step = round(raw_step, -int(np.floor(np.log10(raw_step))))  # Adjust rounding precision
+            else:
+                step = step_size
+
+            start = step * np.floor(min(lim) / step)
+            end = step * np.ceil(max(lim) / step)
+            return np.arange(start, end + step, step), [start, end]
+
+
         if xlabel:
             ax.set_xlabel(xlabel, fontsize=9)
         if ylabel:
             ax.set_ylabel(ylabel, fontsize=9)
         if x_lim:
-            step = (max(x_lim)-min(x_lim))/5 if step_size_x=="auto" else step_size_x
-            ax.set_xlim([min(x_lim), max(x_lim)])
-            ax.set_xticks(np.arange(min(x_lim), max(x_lim), step))
+            #step = (max(x_lim)-min(x_lim))/5 if step_size_x=="auto" else step_size_x
+            #ax.set_xlim([min(x_lim), max(x_lim)])
+            #ax.set_xticks(np.arange(min(x_lim), max(x_lim), step))
+            x_ticks, x_lim_adj = calculate_ticks(x_lim, step_size_x)
+            ax.set_xlim(x_lim_adj)
+            ax.set_xticks(x_ticks)
+
         if y_lim:
-            step = (max(y_lim)-min(y_lim))/5 if step_size_y=="auto" else step_size_y
-            ax.set_ylim([min(y_lim), max(y_lim)])
-            ax.set_yticks(np.arange(min(y_lim), max(y_lim), step))
+            # step = (max(y_lim)-min(y_lim))/5 if step_size_y=="auto" else step_size_y
+            # ax.set_ylim([min(y_lim), max(y_lim)])
+            # ax.set_yticks(np.arange(min(y_lim), max(y_lim), step))
+            y_ticks, y_lim_adj = calculate_ticks(y_lim, step_size_y)
+            ax.set_ylim(y_lim_adj)
+            ax.set_yticks(y_ticks)
+
         if rotation:
             ax.xaxis.set_tick_params(rotation=rotation)
         if ax_sci_notation:

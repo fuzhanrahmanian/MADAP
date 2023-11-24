@@ -13,6 +13,7 @@ class MadapGui:
     """
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
     arrhenius_plots = ["arrhenius", "arrhenius_fit"]
+    ca_plots = ["CA", "Log_CA", "CC", "Cotrell", "Anson", "Voltage"]
 
     def __init__(self):
         self.procedure = "Impedance"
@@ -28,6 +29,17 @@ class MadapGui:
         self.initial_values = None
         self.upper_limit_quantile = None
         self.lower_limit_quantile = None
+        self.voltammetry_procedure = None
+        self.current = None
+        self.scan_rate = None
+        self.measured_current_units = None
+        self.measured_time_units = None
+        self.applied_voltage = None
+        self.mass_of_active_material = None
+        self.area_of_active_material = None
+        self.concentration_of_active_material = None
+        self.number_of_electrons = None
+        self.window_size = None
 
     # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
@@ -59,6 +71,10 @@ class MadapGui:
             if self.specific and (len(self.specific) != 2):
                 sg.popup_error('Wrong number of specific inputs.', title='Input Error')
                 return False
+        # Check if the str of numbers of electrons is a number whole number
+        if self.number_of_electrons and not self.number_of_electrons.isdigit():
+            sg.popup_error('Number of electrons must be a number.', title='Input Error')
+            return False
         return True
 
 
@@ -101,10 +117,12 @@ def gui_layout(madap, colors):
 
     # ----------- Create a layout with a field for a data path and a result path ----------- #
     layout_data = [[sg.Text('Data Path', size=(10, 1)), sg.InputText(key='-DATA_PATH-',
-                                                                     size=(55,1)),
+                                                                     size=(55,1),
+                                                                     default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CA/example_ca.csv"),
                     sg.FileBrowse(key='-BROWSE_DATA_PATH-')],
                    [sg.Text('Result Path', size=(10, 1)), sg.InputText(key='-RESULT_PATH-',
-                                                                       size=(55,1)),
+                                                                       size=(55,1),
+                                                                       default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CA"),
                     sg.FolderBrowse(key='-BROWSE_RESULT_PATH-')],
                 ]
 
@@ -153,6 +171,25 @@ def gui_layout(madap, colors):
 
     tab_layout_mott = [[sg.Text('This is inside Mottschosky')],
                     [sg.Input(key='-inMott-')]]
+    
+    # ----------- Create tabs for Voltammetry procedure ----------- #
+    tab_layout_ca = [
+                    [sg.Text('Applied Voltage [V] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCAVoltage-', default_text="0.43")],
+                    [sg.Text('Mass of active material [g] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCAMass-', default_text="0.0001")],
+                    [sg.Text('Area of active material [cm2] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCAArea-', default_text="0.196")],
+                    [sg.Text('Window size (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCAWindowSize-', default_text="20000")],
+                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.Listbox([x for x in madap.ca_plots], key='-PLOTS_CA-',
+                                size=(50,len(madap.ca_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
+                                expand_x=True, expand_y=True)]]
+    tab_layout_cp = [[sg.Text('Current [A]',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inCPCurrent-')]]
+    tab_layout_cv = [[sg.Text('Scan Rate [V/s] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.Input(key='-inCVScanRate-')]]
 
     # ----------- Layout the Impedance Options (Three TABS) ----------- #
     layout_impedance = [[sg.TabGroup(
@@ -173,7 +210,26 @@ def gui_layout(madap, colors):
                                     expand_y=True)]]
 
     # ----------- TODO Layout the Voltammetry Options ----------- #
-    layout_voltammetry = [[sg.Text('This is Voltammetry')]]
+    layout_voltammetry = [
+                        [sg.Text('Measured Current Units', justification='left', font=("Arial", 12)),
+                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True)],
+
+                        [sg.Text('Measured Time Units', justification='left', font=("Arial", 12)),
+                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True)],
+
+                        [sg.Text('Number of electrons n', justification='left', font=("Arial", 12)),
+                        sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1))],
+
+                        [sg.Text('Concentration of active material (optional)', justification='left', font=("Arial", 12)),
+                        sg.InputText(key='-inVoltConcentration-', default_text="1", size=(10, 1)),
+                        sg.Text('[mol/cm3]', justification='left', font=("Arial", 12))],
+
+                        [sg.TabGroup([[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
+                                    sg.Tab('Chrono-Amperomtery', tab_layout_ca, key='-TAB_CA-', expand_y=True),
+                                    sg.Tab('Cyclic Voltammetry', tab_layout_cv, key='-TAB_CV-', expand_y=True)]],
+                                    tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]
+]
+
 
 
     # ----------- Assemble the Procedure Column Element with the three layouts ----------- #
@@ -231,6 +287,9 @@ def main():
         if event in (sg.WIN_CLOSED, 'EXIT'):
             break
         if event in ['-BUT_Impedance-', '-BUT_Arrhenius-', '-BUT_Voltammetry-']:
+            if event == '-BUT_Voltammetry-':
+                # empty HEADER_OR_SPECIFIC_VALUE
+                window['-HEADER_OR_SPECIFIC_VALUE-']('current, voltage, time')
             event = event.strip('-BUT_')
             window[f'-COL_{madap_gui.procedure}-'].update(visible=False)
             window[f'-BUT_{madap_gui.procedure}-'].update(button_color=colors)
@@ -239,6 +298,8 @@ def main():
             madap_gui.procedure = event
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
+        if values[1] in ['-TAB_CA-', '-TAB_CP-', '-TAB_CV-']:
+            madap_gui.voltammetry_procedure = values[1].split('_')[1].strip("-")
 
         # Prevent the user from inoutting a value that is not a number in the voltage, cell constant and initial_value input field
         if event == '-voltage-' and len(values['-voltage-']) \
@@ -261,7 +322,11 @@ def main():
             window['-LOG-'].update('Starting procedure...')
             madap_gui.file = values['-DATA_PATH-']
             madap_gui.results = values['-RESULT_PATH-']
-            madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
+            # TODO: this needs to be expanded for Voltammetry
+            if madap_gui.procedure == 'Impedance' or madap_gui.procedure == 'Arrhenius':
+                madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
+            if madap_gui.procedure == 'Voltammetry':
+                madap_gui.plots = values[f'-PLOTS_{madap_gui.voltammetry_procedure}-']
             madap_gui.voltage = values['-voltage-']
             madap_gui.cell_constant = values['-cell_constant-']
             madap_gui.suggested_circuit = values['-suggested_circuit-'] \
@@ -272,7 +337,24 @@ def main():
                                           if not values['-upper_limit_quantile-'] == '' else None
             madap_gui.lower_limit_quantile = values['-lower_limit_quantile-'] \
                                           if not values['-lower_limit_quantile-'] == '' else None
-
+            madap_gui.current = values['-inCPCurrent-'] \
+                                            if not values['-inCPCurrent-'] == '' else None
+            madap_gui.scan_rate = values['-inCVScanRate-'] \
+                                            if not values['-inCVScanRate-'] == '' else None
+            madap_gui.measured_current_units = values['-inVoltUnits-']
+            madap_gui.measured_time_units = values['-inVoltTimeUnits-']
+            madap_gui.applied_voltage = values['-inCAVoltage-'] \
+                                            if not values['-inCAVoltage-'] == '' else None
+            madap_gui.mass_of_active_material = values['-inCAMass-'] \
+                                            if not values['-inCAMass-'] == '' else None
+            madap_gui.area_of_active_material = values['-inCAArea-'] \
+                                            if not values['-inCAArea-'] == '' else None
+            madap_gui.concentration_of_active_material = values['-inVoltConcentration-'] \
+                                            if not values['-inVoltConcentration-'] == '' else None
+            madap_gui.number_of_electrons = values['-inVoltNumberElectrons-'] \
+                                            if not values['-inVoltNumberElectrons-'] == '' else None
+            madap_gui.window_size = values['-inCAWindowSize-'] \
+                                            if not values['-inCAWindowSize-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
