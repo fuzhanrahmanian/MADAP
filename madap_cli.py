@@ -283,6 +283,9 @@ def call_voltammetry(data, result_dir, args):
     plots = da.format_plots(args.plots)
     voltammetry_cls.perform_all_actions(result_dir, plots=plots)
 
+    return voltammetry_cls
+
+
 def start_procedure(args):
     """Function to prepare the data for analysis.
     It also prepares folder for results and plots.
