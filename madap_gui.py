@@ -16,7 +16,7 @@ class MadapGui:
     """
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
     arrhenius_plots = ["arrhenius", "arrhenius_fit"]
-    ca_plots = ["CA", "Log_CA", "CC", "Cotrell", "Anson", "Voltage"]
+    ca_plots = ["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"]
 
     def __init__(self):
         self.procedure = "Impedance"
@@ -39,7 +39,7 @@ class MadapGui:
         self.measured_time_units = None
         self.applied_voltage = None
         self.mass_of_active_material = None
-        self.electrode_mass = None
+        self.electrode_area = None
         self.concentration_of_active_material = None
         self.number_of_electrons = None
         self.window_size = None
@@ -363,7 +363,7 @@ def main():
                                             if not values['-inCAVoltage-'] == '' else None
             madap_gui.mass_of_active_material = values['-inCAMass-'] \
                                             if not values['-inCAMass-'] == '' else None
-            madap_gui.electrode_mass = values['-inCAArea-'] \
+            madap_gui.electrode_area = values['-inCAArea-'] \
                                             if not values['-inCAArea-'] == '' else None
             madap_gui.concentration_of_active_material = values['-inVoltConcentration-'] \
                                             if not values['-inVoltConcentration-'] == '' else None

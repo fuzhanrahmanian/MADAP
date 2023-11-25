@@ -10,7 +10,7 @@ log = logger.get_logger("voltammetry_plotting")
 class VoltammetryCAPlotting(Plots):
 
     def __init__(self, current, time, voltage, applied_voltage,
-                 electrode_mass, mass_of_active_material, cumulative_charge) -> None:
+                 electrode_area, mass_of_active_material, cumulative_charge) -> None:
         """This class defines the plotting of the cyclic amperometry method.
         
         Args:
@@ -18,7 +18,7 @@ class VoltammetryCAPlotting(Plots):
             time (list): list of times
             voltage (list): list of voltages
             applied_voltage (float): applied voltage
-            electrode_mass (float): area of active material
+            electrode_area (float): area of active material
             mass_of_active_material (float): mass of active material
         """
         super().__init__()
@@ -27,7 +27,7 @@ class VoltammetryCAPlotting(Plots):
         self.time = time
         self.voltage = voltage
         self.applied_voltage = applied_voltage
-        self.electrode_mass = electrode_mass
+        self.electrode_area = electrode_area
         self.mass_of_active_material = mass_of_active_material
         self.cumulative_charge = cumulative_charge
     def CA(self, subplot_ax):
@@ -44,9 +44,9 @@ class VoltammetryCAPlotting(Plots):
             # Change the unit of current from mA to mA/g7
             current_mA = [i/self.mass_of_active_material for i in self.current]
             y_label = "Current (mA/g)"
-        elif self.electrode_mass is not None:
+        elif self.electrode_area is not None:
             # Change the unit of current from mA to mA/cm^2
-            current_mA = [i/self.electrode_mass for i in self.current]
+            current_mA = [i/self.electrode_area for i in self.current]
             y_label = "Current (mA/cm^2)"
         else:
             y_label = "Current (mA)"
@@ -114,13 +114,13 @@ class VoltammetryCAPlotting(Plots):
         else:
             subplot_ax.legend(loc="upper right")
 
-    def Cotrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion):
-        """Plot the Cotrell plot.
+    def Cottrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion):
+        """Plot the Cottrell plot.
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
 
-        log.info("Creating Cotrell plot")
+        log.info("Creating Cottrell plot")
 
         x_data = (self.time)**(-0.5)
         y_data = self.current

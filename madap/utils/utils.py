@@ -57,7 +57,7 @@ def save_data_as_csv(directory, data, name):
         data (Pandas DataFrame): The data that should be saved
         name (str): The name of the file
     """
-    log.info(f"Saving data in {directory} as csv")
+    log.info(f"Saving data in {directory}.csv")
     data.to_csv(os.path.join(directory, name))
 
 
@@ -69,12 +69,9 @@ def save_data_as_json(directory, data, name):
         data (dict): The data that should be saved
         name (str): The name of the file
     """
-    log.info(f"Saving data in {directory} as json")
+    log.info(f"Saving data in {directory}.json")
     with open(os.path.join(directory, name), 'w', encoding="utf-8") as file:
         json.dump(data, file)
-    log.info(f"Saving data in {directory} as json")
-    with open(os.path.join(directory, name), 'w', encoding="utf8") as f:
-        json.dump(data, f, ensure_ascii=False)
 
 def load_data_as_json(directory, name):
     """ Load the given data as json
