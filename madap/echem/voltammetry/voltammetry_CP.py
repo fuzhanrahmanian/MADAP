@@ -76,7 +76,8 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                 plot.Potential_Rate(subplot_ax=sub_ax, dVdt=self.dVdt, transition_values=self.transition_values,
                                     tao_initial=self.tao_initial)
             elif plot_name == "Differential_Capacity":
-                plot.Differential_Capacity(subplot_ax=sub_ax)
+                plot.Differential_Capacity(subplot_ax=sub_ax, dQdV_no_nan=self.dQdV,positive_peaks=self.positive_peaks,
+                                            negative_peaks=self.negative_peaks)
             else:
                 log.error("Voltammetry CP class does not have the selected plot.")
                 continue
@@ -136,32 +137,35 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         # If mass is available, convert it to mAh/gV
         if self.mass_of_active_material is not None:
             dQdV_no_nan /= self.mass_of_active_material  # mAh/gV
+        elif self.mass_of_active_material is None and self.electrode_area is not None:
+            dQdV_no_nan /= self.electrode_area
 
-        # Find all peaks (positive and negative) and prepare for clustering
         all_peaks, _ = find_peaks(dQdV_no_nan)
-        peak_data = np.column_stack((self.np_voltage[all_peaks], dQdV_no_nan[all_peaks]))
+
         # Find all negative peaks if dQdV has negative values
         if np.any(dQdV_no_nan < 0):
             negative_peaks, _ = find_peaks(-dQdV_no_nan)
-            negative_peak_data = np.column_stack((self.np_voltage[negative_peaks], dQdV_no_nan[negative_peaks]))
+
         # Apply k-means clustering to categorize into two clusters
-        n_possible_reactions = self._determine_cluster_number(peak_data)
-        kmeans = KMeans(n_clusters=n_possible_reactions, random_state=0).fit(peak_data)
+        n_possible_reactions = self._determine_cluster_number(all_peaks)
+        kmeans = KMeans(n_clusters=n_possible_reactions, random_state=42).fit(self.np_voltage[all_peaks].reshape(-1, 1))
         labels = kmeans.labels_
         if np.any(dQdV_no_nan < 0):
-            negative_labels = kmeans.predict(negative_peak_data)
+            negative_labels = kmeans.predict(self.np_voltage[negative_peaks].reshape(-1, 1))
         # Find the most significant peak in each cluster
         for i in range(n_possible_reactions):
             # Positive Peaks
-            cluster_peaks = peak_data[labels == i]
-            max_peak = cluster_peaks[np.argmax(cluster_peaks[:, 1])]
-            self.positive_peaks[max_peak[0]] = max_peak[1]
+            cluster_peaks_of_dqdv = dQdV_no_nan[all_peaks][labels == i]
+            index_of_max_peak = np.argmax(cluster_peaks_of_dqdv)
+            self.positive_peaks[self.np_voltage[all_peaks][labels == i][index_of_max_peak]] =\
+                                                dQdV_no_nan[all_peaks][labels == i][index_of_max_peak]
 
             if np.any(dQdV_no_nan < 0):
                 # Negative Peaks
-                cluster_neg_peaks = negative_peak_data[negative_labels == i]
-                min_peak = cluster_neg_peaks[np.argmin(cluster_neg_peaks[:, 1])]
-                self.negative_peaks[min_peak[0]] = min_peak[1]
+                cluster_neg_peaks = dQdV_no_nan[negative_peaks][negative_labels == i]
+                min_peak = np.argmin(cluster_neg_peaks)
+                self.negative_peaks[self.np_voltage[negative_peaks][negative_labels == i][min_peak]] =\
+                                                dQdV_no_nan[negative_peaks][negative_labels == i][min_peak]
 
         self.dQdV = dQdV_no_nan
 
