@@ -273,11 +273,18 @@ def call_voltammetry(data, result_dir, args):
         current_data, voltage_data, time_data = data[header_names[0]],\
                                                 data[header_names[1]],\
                                                 data[header_names[2]]
+
+    if len(header_names) == 4:
+        charge_data = da.format_data(data[header_names[3]])
+    else:
+        charge_data = None
+
     if args.voltammetry_procedure == "CA":
         # TODO Check if voltage is given
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
                                                         time =da.format_data(time_data),
+                                                        charge=charge_data,
                                                         args=args)
     if args.voltammetry_procedure == "CV":
         pass
@@ -285,6 +292,7 @@ def call_voltammetry(data, result_dir, args):
         voltammetry_cls = voltammetry_CP.Voltammetry_CP(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
                                                         time =da.format_data(time_data),
+                                                        charge=charge_data,
                                                         args=args)
 
     # Format plots arguments
