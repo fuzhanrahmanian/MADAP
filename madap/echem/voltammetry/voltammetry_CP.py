@@ -3,6 +3,8 @@ import numpy as np
 
 import scipy.constants as const
 from scipy.signal import savgol_filter, find_peaks
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
 import ruptures as rpt
 
@@ -13,6 +15,7 @@ from madap.logger import logger
 
 from madap.echem.voltammetry.voltammetry_CP_plotting import VoltammetryCPPlotting as cpplt
 
+
 log = logger.get_logger("cyclic_potentiometry")
 
 
@@ -21,15 +24,14 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         super().__init__(voltage, current, time, charge, args)
         self.applied_current = float(args.applied_current) if args.applied_current is not None else None # Unit: A
         self.dQdV = None # Unit: C/V
-        self.dQdV_smoothed = None # Unit: C/V
         self.dVdt = None # Unit: V/h
         self.dVdt_smoothed = None # Unit: V/h
         self.tao_initial = None # Unit: s
         self.stabilization_transitions = {} # transition time (s): transition voltage (V)
-        self.transition_times = {}
+        self.transition_values = {}
         self.d_coefficient = None # Unit: cm^2/s
-        self.window_length = int(args.window_length) if args.window_length is not None else 51
-        self.polyorder = int(args.polyorder) if args.polyorder is not None else 3
+        self.n_possible_reactions = int(args.n_possible_reactions) if args.n_possible_reactions is not None else 2
+        self.penalty_value = float(args.penalty_value) if args.penalty_value is not None else 0.25
 
         self.positive_peaks = {}
         self.negative_peaks = {}
@@ -109,38 +111,76 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
         # Calculate the differential of charge with respect to voltage
         dQdV = np.gradient(cumulative_charge_mAh, self.np_voltage)  # mAh/V
-        # Impute NaN values in dQdV and smooth the data using Savitzky-Golay filter
+        # Impute NaN values in dQdV using the mean of nearest neighbors
         dQdV_no_nan = self._impute_mean_nearest_neighbors(dQdV)
-        self.dQdV_smoothed = savgol_filter(dQdV_no_nan, self.window_length, self.polyorder)
         # If mass is available, convert it to mAh/gV
         if self.mass_of_active_material is not None:
             dQdV_no_nan /= self.mass_of_active_material  # mAh/gV
 
-        # Peak detection for smoothed dQ/dV data
-        positive_peaks_indices, _ = find_peaks(self.dQdV_smoothed)
-        negative_peaks_indices, _ = find_peaks(-self.dQdV_smoothed)  # Invert the curve to find negative peaks
+        # Find all peaks (positive and negative) and prepare for clustering
+        all_peaks, _ = find_peaks(dQdV_no_nan)
+        peak_data = np.column_stack((self.np_voltage[all_peaks], dQdV_no_nan[all_peaks]))
+        # Find all negative peaks if dQdV has negative values
+        if np.any(dQdV_no_nan < 0):
+            negative_peaks, _ = find_peaks(-dQdV_no_nan)
+            negative_peak_data = np.column_stack((self.np_voltage[negative_peaks], dQdV_no_nan[negative_peaks]))
+        # Apply k-means clustering to categorize into two clusters
+        n_possible_reactions = self._determine_cluster_number(peak_data)
+        kmeans = KMeans(n_clusters=n_possible_reactions, random_state=0).fit(peak_data)
+        labels = kmeans.labels_
+        if np.any(dQdV_no_nan < 0):
+            negative_labels = kmeans.predict(negative_peak_data)
+        # Find the most significant peak in each cluster
+        for i in range(n_possible_reactions):
+            # Positive Peaks
+            cluster_peaks = peak_data[labels == i]
+            max_peak = cluster_peaks[np.argmax(cluster_peaks[:, 1])]
+            self.positive_peaks[max_peak[0]] = max_peak[1]
 
-        # Store the indices and values of the peaks
-        self.positive_peaks = {self.np_voltage[i]: self.dQdV_smoothed[i] for i in positive_peaks_indices}
-        self.negative_peaks = {self.np_voltage[i]: self.dQdV_smoothed[i] for i in negative_peaks_indices}
+            if np.any(dQdV_no_nan < 0):
+                # Negative Peaks
+                cluster_neg_peaks = negative_peak_data[negative_labels == i]
+                min_peak = cluster_neg_peaks[np.argmin(cluster_neg_peaks[:, 1])]
+                self.negative_peaks[min_peak[0]] = min_peak[1]
 
         self.dQdV = dQdV_no_nan
 
     def _calculate_dVdt(self):
         self.dVdt = np.gradient(self.np_voltage, self.np_time) * 3600  # V/h
 
+    def _determine_cluster_number(self, data):
+        """Determine the optimal number of clusters using the silhouette score.
+
+        Args:
+            data (np.array): data where the cluster number should be determined
+        """
+        max_silhouette_score = -1
+        optimal_n_clusters = 1
+        # check if data is 1D
+        if len(data.shape) == 1:
+            data = data.reshape(-1, 1)
+        for n_clusters in range(2, min(len(data), 10)):
+            kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(data)
+            silhouette_avg = silhouette_score(data, kmeans.labels_)
+            if silhouette_avg > max_silhouette_score:
+                max_silhouette_score = silhouette_avg
+                optimal_n_clusters = n_clusters
+
+        return optimal_n_clusters
+
+    
     def _calculate_initial_stabilization_time(self):
 
         model = "l1"  # L1 norm minimization
         algo = rpt.Pelt(model=model).fit(self.np_voltage)
-        result = algo.predict(pen=10)  # Adjust pen value as needed
+        result = algo.predict(pen=self.penalty_value)
 
         # The first change point is the end of the initial stabilization phase
         self.tao_initial = self.np_time[result[0]] if result else None
         self.stabilization_transitions[self.tao_initial] = self.np_voltage[result[0]] if result else None
 
 
-    def _find_potential_transition_times(self, window_length=51, polyorder=3):
+    def _find_potential_transition_times(self, window_length=73, polyorder=3):
         """Find potential transition times and their corresponding transition voltages.
         This functions excludes the initial stabilization time.
         """
@@ -157,9 +197,34 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         transition_indices = np.where(np.abs(d2Vdt2) > threshold)[0]
 
         # Filter out times within the initial stabilization phase
-        transition_indices = transition_indices[self.np_time[transition_indices] > self.tao_initial]
-        self.transition_times = {self.np_time[i]: self.np_voltage[i] for i in transition_indices}
+        #transition_indices = transition_indices[self.np_time[transition_indices] > self.tao_initial]
+        if transition_indices.size > 0:
+            if len(self.np_time[transition_indices].shape) == 1:
+                data = self.np_time[transition_indices].reshape(-1, 1)
+            else:
+                data = self.np_time[transition_indices]
+            n_possible_reactions = self._determine_cluster_number(data)
+            if n_possible_reactions != 1:
+                kmeans = KMeans(n_clusters=n_possible_reactions, random_state=0).fit(data)
+                labels = kmeans.labels_
 
+                for i in range(n_possible_reactions):
+                    # check if the self.tao_initial is in the transition_indices then remove the cluster that contains the self.tao_initial
+                    if self.tao_initial is not None and self.tao_initial in self.np_time[transition_indices][labels == i]:
+                        continue
+                    else:
+                        # cluster the peaks
+                        cluster_peaks = self.dVdt_smoothed[transition_indices][labels == i]
+                        # find the max peak in the cluster
+                        max_peak = cluster_peaks[np.argmax(cluster_peaks)]
+                        # get the index of the max peak
+                        max_peak_index = np.where(self.dVdt_smoothed == max_peak)[0][0]
+                        self.transition_values = {self.np_time[max_peak_index]: self.np_voltage[max_peak_index]}
+                        #self.positive_peaks[max_peak[0]] = max_peak[1]
+            else:
+                max_peak_index = np.argmax(self.dVdt_smoothed[transition_indices])
+                self.transition_values = {self.np_time[transition_indices][max_peak_index]: self.np_voltage[transition_indices][max_peak_index]}
+                #self.transition_value = {self.np_time[i]: self.np_voltage[i] for i in transition_indices}
     def _calculate_diffusion_coefficient(self):
         """Calculate the diffusion coefficient value using Sand's formula without tau.
         """
@@ -169,9 +234,9 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         # Calculate the coefficient part of the diffusion coefficient using Sand's formula without tau
         # Coefficient = (4 * I^2) / ((n * F * A * c)^2 * pi)
         if self.applied_current is not None:
-            current = self.applied_current
+            current = np.abs(self.applied_current)
         else:
-            current = np.mean(self.np_current)
+            current = np.abs(np.mean(self.np_current))
         self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * faraday_constant * self.electrode_area * self.concentration_of_active_material)**2 * np.pi)
 
     @property
