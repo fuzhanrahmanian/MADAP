@@ -9,7 +9,7 @@ from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
 
-from madap.echem.voltammetry.voltammetry_CA_plotting import VoltammetryCAPlotting as caplt
+from madap.echem.voltammetry.voltammetry_plotting import VoltammetryPlotting as voltPlot
 
 log = logger.get_logger("cyclic_amperometry")
 
@@ -17,16 +17,8 @@ log = logger.get_logger("cyclic_amperometry")
 class Voltammetry_CA(Voltammetry, EChemProcedure):
     """ This class defines the chrono amperometry method."""
     def __init__(self, current, voltage, time, args, charge:list[float]=None) -> None:
-        super().__init__(voltage, current, time, args.measured_current_units, args.measured_time_units, args.number_of_electrons)
-        self.voltage = voltage
+        super().__init__(voltage, current, time, charge, args)
         self.applied_voltage = float(args.applied_voltage) if args.applied_voltage is not None else None # Unit: V
-        self.np_time = np.array(self.time) # Unit: s
-        self.np_current = np.array(self.current) # Unit: A
-        self.cumulative_charge = self._calculate_charge() if charge is None else charge # Unit: C
-        self.mass_of_active_material = float(args.mass_of_active_material) if args.mass_of_active_material is not None else None # Unit: g
-        self.area_of_active_material = float(args.area_of_active_material) if args.area_of_active_material is not None else 1 # Unit: cm^2
-        self.concentration_of_active_material = float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
-        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
         self.diffusion_coefficient = None # Unit: cm^2/s
         self.reaction_order = None # 1 or 2
         self.reaction_rate_constant = None # Unit: 1/s or cm^3/mol/s
@@ -40,19 +32,6 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         # Reaction kinetics analysis
         self._analyze_reaction_kinetics()
 
-
-    def _calculate_charge(self):
-        """ Calculate the cumulative charge passed in a chronoamperometry experiment."""
-        # Calculate the time intervals (delta t)
-        delta_t = np.diff(self.np_time)
-
-        # Calculate the charge for each interval as the product of the interval duration and the current at the end of the interval
-        interval_charges = delta_t * self.np_current[1:]
-
-        # Compute the cumulative charge
-        return np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
-
-
     def _calculate_diffusion_coefficient(self):
         """ Calculate the diffusion coefficient using Cottrell analysis."""
         log.info("Calculating diffusion coefficient using Cottrell analysis...")
@@ -65,7 +44,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         # Calculate D using the slope
         # Unit of D: cm^2/s
         # Cortrell equation: I = (nFAD^1/2 * C)/ (pi^1/2 * t^1/2)
-        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * faraday_constant ** 2 * self.area_of_active_material ** 2 * self.concentration_of_active_material ** 2)
+        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * faraday_constant ** 2 * self.electrode_area ** 2 * self.concentration_of_active_material ** 2)
         log.info(f"Diffusion coefficient: {self.diffusion_coefficient} cm^2/s")
         self.best_fit_diffusion = best_fit
 
@@ -104,17 +83,19 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
     def plot(self, save_dir, plots, optional_name: str = None):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
-        plot = caplt(current=self.np_current, time=self.np_time,
-                        voltage=self.voltage, applied_voltage=self.applied_voltage,
-                        area_of_active_material=self.area_of_active_material,
+        plot = voltPlot(current=self.np_current, time=self.np_time,
+                        voltage=self.voltage,
+                        electrode_area=self.electrode_area,
                         mass_of_active_material=self.mass_of_active_material,
-                        cumulative_charge=self.cumulative_charge)
+                        cumulative_charge=self.cumulative_charge,
+                        procedure_type=self.__class__.__name__,
+                        applied_voltage=self.applied_voltage)
         if self.voltage is None and "Voltage" in plots:
             log.warning("Measured voltage is not provided. Voltage plot is not available.")
             # Drop the voltage plot from the plots list
             plots = [plot for plot in plots if plot != "Voltage"]
 
-        fig, available_axes = plot.compose_ca_subplot(plots=plots)
+        fig, available_axes = plot.compose_volt_subplot(plots=plots)
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name == "CA":
                 plot.CA(subplot_ax=sub_ax)
@@ -129,12 +110,12 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
                             best_fit_reaction_rate=self.best_fit_reaction_rate)
             elif plot_name == "CC":
                 plot.CC(subplot_ax=sub_ax)
-            elif plot_name == "Cotrell":
-                plot.Cotrell(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient, best_fit_diffusion=self.best_fit_diffusion)
+            elif plot_name == "Cottrell":
+                plot.Cottrell(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient, best_fit_diffusion=self.best_fit_diffusion)
             elif plot_name == "Anson":
                 plot.Anson(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient)
             elif plot_name == "Voltage":
-                plot.Voltage(subplot_ax=sub_ax)
+                plot.CP(subplot_ax=sub_ax)
             else:
                 log.error("Voltammetry CA class does not have the selected plot.")
                 continue
@@ -146,13 +127,54 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         plot.save_plot(fig, plot_dir, name)
 
 
-    def save_data(self):
-        pass
+    def save_data(self, save_dir:str, optional_name:str = None):
+        """Save the data
+
+        Args:
+            save_dir (str): The directory where the data should be saved
+            optional_name (str): The optional name of the data.
+        """
+        log.info("Saving data...")
+        # Create a directory for the data
+        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
+
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__, "params.json") if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__, "params.json")
+
+        if self.reaction_order == 1:
+            reaction_rate_constant_unit = "1/s"
+        elif self.reaction_order == 2:
+            reaction_rate_constant_unit = "cm^3/mol/s"
+        # Add the settings and processed data to the dictionary
+        added_data = {
+            "Applied voltage [V]": self.applied_voltage,
+            "Diffusion coefficient [cm^2/s]": self.diffusion_coefficient,
+            "Reaction order": self.reaction_order,
+            f"Reaction rate constant ({reaction_rate_constant_unit})": self.reaction_rate_constant,
+            "Best fit reaction rate": self.best_fit_reaction_rate,
+            "Best fit diffusion": self.best_fit_diffusion,
+            "Electrode area [cm^2]": self.electrode_area,
+            "Mass of active material [g]": self.mass_of_active_material,
+            "Concentration of active material [mol/cm^3]": self.concentration_of_active_material,
+            "Window size of fit": self.window_size
+        }
+        utils.save_data_as_json(save_dir, added_data, name)
+
+        # Save the raw data
+        data = utils.assemble_data_frame(**{
+            "voltage [V]": self.voltage,
+            "current [A]": self.current,
+            "time [s]": self.time,
+            "cumulative_charge [C]": self.cumulative_charge
+        })
+        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__, "data.csv")
+        utils.save_data_as_csv(save_dir, data, data_name)
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
-        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+        self.save_data(save_dir=save_dir, optional_name=optional_name)
 
     @property
     def figure(self):

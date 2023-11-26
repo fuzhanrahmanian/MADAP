@@ -1,3 +1,5 @@
+""" This module contains the Voltammetry class, which is used to analyze voltammetry data."""
+import numpy as np
 from scipy.stats import linregress
 from madap.logger import logger
 from madap.echem.procedure import EChemProcedure
@@ -6,16 +8,39 @@ from madap.echem.procedure import EChemProcedure
 log = logger.get_logger("voltammetry")
 
 class Voltammetry(EChemProcedure):
-    def __init__(self, voltage, current, time,
-                 measured_current_units:str,
-                 measured_time_units:str,
-                 number_of_electrons:str) -> None:
+    """ This class defines the voltammetry method."""
+    def __init__(self, voltage, current, time, charge, args) -> None:
+        """Initialize the voltammetry method.
+        Args:
+            voltage (list): list of voltages
+            current (list): list of currents
+            time (list): list of times
+            charge (list): list of charges
+            args (argparse.Namespace): arguments
+        """
         self.voltage = voltage
+        self.np_voltage = np.array(voltage) # Unit: V
+
         self.current = current
+        self.np_current = np.array(self.current) # Unit: A
+
         self.time = time
-        self.measured_current_unit = measured_current_units
-        self.measured_time_unitis = measured_time_units
-        self.number_of_electrons = int(number_of_electrons)
+        self.np_time = np.array(self.time) # Unit: s
+
+        self.cumulative_charge = self._calculate_charge() if charge is None else charge # Unit: C
+        self.np_cumulative_charge = np.array(self.cumulative_charge) # Unit: C
+
+        self.mass_of_active_material = float(args.mass_of_active_material) if args.mass_of_active_material is not None else None # Unit: g
+        self.electrode_area = float(args.electrode_area) if args.electrode_area is not None else 1 # Unit: cm^2
+        self.concentration_of_active_material = \
+        float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
+
+        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
+
+        self.measured_current_unit = args.measured_current_units
+        self.measured_time_unitis = args.measured_time_units
+        self.number_of_electrons = int(args.number_of_electrons)
+
         self.convert_current()
         self.convert_time()
 
@@ -47,7 +72,7 @@ class Voltammetry(EChemProcedure):
             log.error(f"Time unit not supported. Supported units are: s, min, h")
             raise ValueError("Time unit not supported")
 
-    
+
     def analyze_best_linear_fit(self, x_data, y_data):
         """
         Find the best linear region for the provided data.
@@ -74,3 +99,15 @@ class Voltammetry(EChemProcedure):
                 best_fit.update({'start': start, 'end': end, 'r_squared': r_squared, 'slope': slope, 'intercept': intercept})
         log.info(f"Best linear fit found from {best_fit['start']} to {best_fit['end']} with R^2 = {best_fit['r_squared']}")
         return best_fit
+
+
+    def _calculate_charge(self):
+        """ Calculate the cumulative charge passed in a voltammetry experiment."""
+        # Calculate the time intervals (delta t)
+        delta_t = np.diff(self.np_time)
+
+        # Calculate the charge for each interval as the product of the interval duration and the current at the end of the interval
+        interval_charges = delta_t * self.np_current[1:]
+
+        # Compute the cumulative charge
+        return np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
