@@ -117,16 +117,13 @@ class VoltammetryPlotting(Plots):
         time_h = [i/3600 for i in self.time]
         # Change the unit of charge from As to mAh
         charge, y_label = self._charge_conversion()
-
+        charge = np.abs(charge)
         subplot_ax.scatter(time_h, charge, label=label, s=3)
         self.plot_identity(subplot_ax, xlabel="Time (h)", ylabel=y_label,
                            ax_sci_notation="both", x_lim=[0, max(time_h)], y_lim=[0, max(charge)])
         # If the charge increases the legend is placed in the lower right corner
         # If the charge decreases the legend is placed in the upper right corner
-        if self.cumulative_charge[-1] > self.cumulative_charge[0]:
-            subplot_ax.legend(loc="lower right")
-        else:
-            subplot_ax.legend(loc="upper right")
+        subplot_ax.legend(loc="lower right")
 
     def Cottrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion = None):
         """Plot the Cottrell plot.
@@ -180,6 +177,7 @@ class VoltammetryPlotting(Plots):
         log.info("Creating voltage profile plot")
 
         charge, x_label = self._charge_conversion()
+        charge = np.abs(charge)
         subplot_ax.scatter(charge, self.voltage, s=3)
         self.plot_identity(subplot_ax, xlabel=x_label, ylabel="Voltage (V)",
                            ax_sci_notation="both", x_lim=[min(charge), max(charge)], y_lim=[min(self.voltage), max(self.voltage)])
@@ -190,6 +188,9 @@ class VoltammetryPlotting(Plots):
         
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
+            dVdt (list): list of potential rates
+            transition_values (dict): dictionary of transition values
+            tao_initial (float): initial stabilization time
         """
         log.info("Creating potential rate, dVdt plot")
         
@@ -207,14 +208,40 @@ class VoltammetryPlotting(Plots):
 
         if np.mean(self.current) < 0:
             subplot_ax.text(0.95, 0.05, textbox_text, transform=subplot_ax.transAxes,
-                            fontsize=7, verticalalignment='bottom', horizontalalignment='right')
+                            fontsize=8, verticalalignment='bottom', horizontalalignment='right')
         else:
-            subplot_ax.text(0.5, 0.8, textbox_text, transform=subplot_ax.transAxes,
-                        fontsize=7, verticalalignment='bottom', horizontalalignment='left')
+            subplot_ax.text(0.05, 0.8, textbox_text, transform=subplot_ax.transAxes,
+                        fontsize=8, verticalalignment='bottom', horizontalalignment='left')
 
-    def Differential_Capacity(self, subplot_ax):
-        pass 
-    
+    def Differential_Capacity(self, subplot_ax, dQdV_no_nan, positive_peaks, negative_peaks=None):
+        """Plot the differential capacity plot.
+        
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+            dQdV_no_nan (list): list of differential capacity
+            positive_peaks (list): list of positive peaks
+            negative_peaks (list): list of negative peaks
+        """
+        log.info("Creating differential capacity plot")
+        subplot_ax.plot(self.voltage, dQdV_no_nan, linewidth=1)
+        # PLot the positive peaks as upper triangles
+        for i in positive_peaks:
+            subplot_ax.scatter(i, positive_peaks[i], marker='^', color='green', s=15)
+        if negative_peaks:
+            # PLot the negative peaks as lower triangles
+            for i in negative_peaks:
+                subplot_ax.scatter(i, negative_peaks[i], marker='v', color='red', s=15)
+
+        if self.mass_of_active_material is not None:
+            y_label = "Differential Capacity (mAh/g/V)"
+        elif self.electrode_area is not None:
+            y_label = "Differential Capacity (mAh/cm^2/V)"
+        else:
+            y_label = "Differential Capacity (mAh/V)"
+
+        self.plot_identity(subplot_ax, xlabel="Voltage (V)", ylabel=y_label,
+                            ax_sci_notation="y", x_lim=[min(self.voltage), max(self.voltage)], y_lim=[min(dQdV_no_nan), max(dQdV_no_nan)*1.1])
+
     def CP(self, subplot_ax):
         """Plot the voltage plot.
 
@@ -222,13 +249,15 @@ class VoltammetryPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
         log.info("Creating voltage plot")
-        if self.applied_current:
+        if self.procedure_type == "Voltammetry_CP":
             subplot_ax.scatter(self.time, self.voltage, s=3, label=f"{np.abs(np.mean(self.current)):.2e} A")
-        else:
+        elif self.procedure_type == "Voltammetry_CA":
             subplot_ax.scatter(self.time, self.voltage, s=3)
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="Voltage (V)",
                             ax_sci_notation="x", x_lim=[0, max(self.time)], y_lim=[min(self.voltage)*0.6, max(self.voltage)*1.1])
         subplot_ax.legend(loc="upper right")
+
+
     def compose_volt_subplot(self, plots:list):
         """ Compose the subplot for the CA plot.
         Args:
