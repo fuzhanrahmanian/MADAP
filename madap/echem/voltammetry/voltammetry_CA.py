@@ -147,7 +147,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             reaction_rate_constant_unit = "cm^3/mol/s"
         # Add the settings and processed data to the dictionary
         added_data = {
-            "Applied voltage [[V]": self.applied_voltage,
+            "Applied voltage [V]": self.applied_voltage,
             "Diffusion coefficient [cm^2/s]": self.diffusion_coefficient,
             "Reaction order": self.reaction_order,
             f"Reaction rate constant ({reaction_rate_constant_unit})": self.reaction_rate_constant,

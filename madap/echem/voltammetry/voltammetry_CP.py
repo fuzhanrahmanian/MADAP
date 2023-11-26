@@ -26,6 +26,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         super().__init__(voltage, current, time, charge, args)
         self.applied_current = float(args.applied_current) if args.applied_current is not None else None # Unit: A
         self.dQdV = None # Unit: C/V
+        self.dQdV_unit = None
         self.dVdt = None # Unit: V/h
         self.dVdt_smoothed = None # Unit: V/h
         self.tao_initial = None # Unit: s
@@ -88,13 +89,51 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                     optional_name else utils.assemble_file_name(self.__class__.__name__)
         plot.save_plot(fig, plot_dir, name)
 
-    def save_data(self):
-        pass
+    def save_data(self, save_dir:str, optional_name:str = None):
+        """Save the data
+
+        Args:
+            save_dir (str): The directory where the data should be saved
+            optional_name (str): The optional name of the data.
+        """
+        log.info("Saving data...")
+        # Create a directory for the data
+        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
+
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__, "params.json") if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__, "params.json")
+        # add the settings and processed data to the dictionary
+        added_data = {
+            "Applied Current [A]": self.applied_current,
+            "Penalty Value": self.penalty_value,
+            "Initial Stabilization Time [s]": self.tao_initial,
+            "Stabilization Values {time [s]: potential [V]}": self.stabilization_values,
+            "Transition Values {time [s]: potential [V]}": self.transition_values,
+            "Diffusion Coefficient [cm^2/s]": f"{self.d_coefficient} * Tau",
+            "Positive_peaks {potential [V]: dQdV" + f"{self.dQdV_unit}" + "}": self.positive_peaks,
+            "Negative_peaks {potential [V]: dQdV" + f"{self.dQdV_unit}" + "}": self.negative_peaks,
+        }
+
+        utils.save_data_as_json(save_dir, added_data, name)
+
+        # save the raw data
+        data = utils.assemble_data_frame(**{
+            "Time [s]": self.np_time,
+            "Voltage [V]": self.np_voltage,
+            "Current [A]": self.np_current,
+            "Cumulative Charge [C]": self.np_cumulative_charge,
+            "dQdV" + f"{self.dQdV_unit}": self.dQdV,
+            "dVdt [V/h]": self.dVdt
+        })
+        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__, "data.csv")
+        utils.save_data_as_csv(save_dir, data, data_name)
+
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
-        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+        self.save_data(save_dir=save_dir, optional_name=optional_name)
 
 
     def _impute_mean_nearest_neighbors(self, data):
@@ -137,8 +176,12 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         # If mass is available, convert it to mAh/gV
         if self.mass_of_active_material is not None:
             dQdV_no_nan /= self.mass_of_active_material  # mAh/gV
+            self.dQdV_unit = "mAh/gV"
         elif self.mass_of_active_material is None and self.electrode_area is not None:
             dQdV_no_nan /= self.electrode_area
+            self.dQdV_unit = "mAh/cm^2V"
+        else:
+            self.dQdV_unit = "mAh/V"
 
         all_peaks, _ = find_peaks(dQdV_no_nan)
 
