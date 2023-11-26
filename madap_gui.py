@@ -44,8 +44,7 @@ class MadapGui:
         self.concentration_of_active_material = None
         self.number_of_electrons = None
         self.window_size = None
-        self.window_length = None
-        self.polyorder = None
+        self.penalty_value = None
 
     # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
@@ -80,10 +79,6 @@ class MadapGui:
         # Check if the str of numbers of electrons is a number whole number
         if self.number_of_electrons and not self.number_of_electrons.isdigit():
             sg.popup_error('Number of electrons must be a number.', title='Input Error')
-            return False
-        # Check if window length is an uneven number
-        if self.window_length and (int(self.window_length) % 2) == 0:
-            sg.popup_error('Window length must be an uneven number.', title='Input Error')
             return False
         return True
 
@@ -194,12 +189,8 @@ def gui_layout(madap, colors):
                                 expand_x=True, expand_y=True)]]
     tab_layout_cp = [[sg.Text('Applied Current (optional)',justification='left', font=("Arial", 13))],
                     [sg.InputText(key='-inCPCurrent-',  default_text="0.000005"), sg.Text('[A]')],
-                    [sg.Text('Window size (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inVoltWindowSize-', default_text="20000")],
-                    [sg.Text('Window length for smoothing (uneven)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inVoltWindowLength-', default_text="15")],
-                    [sg.Text('Polyorder for smoothing',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inVoltPoly-', default_text="3")],
+                    [sg.Text('Penalty value (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inPenaltyValue-', default_text="0.25")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cp_plots], key='-PLOTS_CP-',
                                 size=(50,len(madap.cp_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
@@ -392,10 +383,8 @@ def main():
                                             if not values['-inVoltNumberElectrons-'] == '' else None
             madap_gui.window_size = values['-inVoltWindowSize-'] \
                                             if not values['-inVoltWindowSize-'] == '' else None
-            madap_gui.window_length = values['-inVoltWindowLength-'] \
-                                            if not values['-inVoltWindowLength-'] == '' else None
-            madap_gui.polyorder = values['-inVoltPoly-'] \
-                                            if not values['-inVoltPoly-'] == '' else None
+            madap_gui.penalty_value = values['-inPenaltyValue-'] \
+                                            if not values['-inPenaltyValue-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")

@@ -7,10 +7,13 @@ from madap.plotting.plotting import Plots
 
 log = logger.get_logger("voltammetry_plotting")
 
-class VoltammetryCAPlotting(Plots):
+class VoltammetryPlotting(Plots):
 
-    def __init__(self, current, time, voltage, applied_voltage,
-                 electrode_area, mass_of_active_material, cumulative_charge) -> None:
+    def __init__(self, current, time, voltage,
+                 electrode_area, mass_of_active_material,
+                 cumulative_charge, procedure_type,
+                 applied_voltage = None,
+                 applied_current = None) -> None:
         """This class defines the plotting of the cyclic amperometry method.
         
         Args:
@@ -22,7 +25,7 @@ class VoltammetryCAPlotting(Plots):
             mass_of_active_material (float): mass of active material
         """
         super().__init__()
-        self.plot_type = "voltammetry_CA"
+        self.procedure_type = procedure_type
         self.current = current
         self.time = time
         self.voltage = voltage
@@ -30,6 +33,9 @@ class VoltammetryCAPlotting(Plots):
         self.electrode_area = electrode_area
         self.mass_of_active_material = mass_of_active_material
         self.cumulative_charge = cumulative_charge
+        self.applied_current = applied_current
+
+
     def CA(self, subplot_ax):
         """Plot the CA plot.
         
@@ -98,15 +104,35 @@ class VoltammetryCAPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
         log.info("Creating CC plot")
+        if self.procedure_type == "Voltammetry_CA":
+            if self.applied_voltage is None:
+                measured_voltage = np.mean(self.voltage)
+            else:
+                measured_voltage = self.applied_voltage
+            label = f"{measured_voltage:.2f} V"
+        elif self.procedure_type == "Voltammetry_CP":
+            measured_current = np.abs(np.mean(self.current))
+            label = f"{measured_current:.2e} A"
 
-        if self.applied_voltage is None:
-            measured_voltage = np.mean(self.voltage)
+        # Change the unit of charge from As to mAh
+        cumulative_charge_mAh = [i*1e3/3600 for i in self.cumulative_charge]
+        # Convert self.time from s to h
+        time_h = [i/3600 for i in self.time]
+        if self.mass_of_active_material is not None:
+            # Change the unit of current from A to mA/g
+            charge = [i/self.mass_of_active_material for i in cumulative_charge_mAh]
+            y_label = "Capacity (mAh/g)"
+        elif self.electrode_area is not None:
+            # Change the unit of current from A to mA/cm^2
+            charge = [i/self.electrode_area for i in cumulative_charge_mAh]
+            y_label = "Capacity (mAh/cm^2)"
         else:
-            measured_voltage = self.applied_voltage
+            charge = cumulative_charge_mAh
+            y_label = "Charge (mAh)"
 
-        subplot_ax.scatter(self.time, self.cumulative_charge, label=f"{measured_voltage:.2f} V", s=3)
-        self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="Charge (C)",
-                           ax_sci_notation="both", x_lim=[0, max(self.time)], y_lim=[0, max(self.cumulative_charge)])
+        subplot_ax.scatter(time_h, charge, label=label, s=3)
+        self.plot_identity(subplot_ax, xlabel="Time (h)", ylabel=y_label,
+                           ax_sci_notation="both", x_lim=[0, max(time_h)], y_lim=[0, max(charge)])
         # If the charge increases the legend is placed in the lower right corner
         # If the charge decreases the legend is placed in the upper right corner
         if self.cumulative_charge[-1] > self.cumulative_charge[0]:
@@ -150,18 +176,28 @@ class VoltammetryCAPlotting(Plots):
                             ax_sci_notation="both", x_lim=[0, max(x_data)], y_lim=[0, max(y_data)])
         subplot_ax.legend(loc="upper right")
 
-    def Voltage(self, subplot_ax):
+    def Voltage_Profile(self, subplot_ax):
+        pass
+    def Potential_Rate(self, subplot_ax):
+        pass
+    def Differential_Capacity(self, subplot_ax):
+        pass 
+    
+    def CP(self, subplot_ax):
         """Plot the voltage plot.
 
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
         log.info("Creating voltage plot")
-        subplot_ax.scatter(self.time, self.voltage, s=3)
+        if self.applied_current:
+            subplot_ax.scatter(self.time, self.voltage, s=3, label=f"{np.abs(np.mean(self.current)):.2e} A")
+        else:
+            subplot_ax.scatter(self.time, self.voltage, s=3)
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="Voltage (V)",
                             ax_sci_notation="x", x_lim=[0, max(self.time)], y_lim=[min(self.voltage)*0.6, max(self.voltage)*1.1])
-
-    def compose_ca_subplot(self, plots:list):
+        subplot_ax.legend(loc="upper right")
+    def compose_volt_subplot(self, plots:list):
         """ Compose the subplot for the CA plot.
         Args:
             plots (list): List of plots to be composed.
@@ -225,7 +261,7 @@ class VoltammetryCAPlotting(Plots):
 
         if len(plots) == 0:
             log.error("No plots for EIS were selected.")
-            return Exception(f"No plots for EIS were selected for plot {self.plot_type}.")
+            return Exception(f"No plots for EIS were selected for plot {self.procedure_type}.")
 
         log.error("Maximum plots for EIS is exceeded.")
-        return Exception(f"Maximum plots for EIS is exceeded for plot {self.plot_type}.")
+        return Exception(f"Maximum plots for EIS is exceeded for plot {self.procedure_type}.")

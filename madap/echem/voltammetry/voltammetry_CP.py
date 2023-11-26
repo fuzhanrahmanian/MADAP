@@ -1,3 +1,4 @@
+"""This module contains the cyclic potentiometry class."""
 import os
 import numpy as np
 
@@ -13,13 +14,14 @@ from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
 
-from madap.echem.voltammetry.voltammetry_CP_plotting import VoltammetryCPPlotting as cpplt
+from madap.echem.voltammetry.voltammetry_plotting import VoltammetryPlotting as voltPlot
 
 
 log = logger.get_logger("cyclic_potentiometry")
 
 
 class Voltammetry_CP(Voltammetry, EChemProcedure):
+    """This class defines the cyclic potentiometry method."""
     def __init__(self, voltage, current, time,  args, charge:list[float]=None) -> None:
         super().__init__(voltage, current, time, charge, args)
         self.applied_current = float(args.applied_current) if args.applied_current is not None else None # Unit: A
@@ -30,13 +32,19 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         self.stabilization_transitions = {} # transition time (s): transition voltage (V)
         self.transition_values = {}
         self.d_coefficient = None # Unit: cm^2/s
-        self.n_possible_reactions = int(args.n_possible_reactions) if args.n_possible_reactions is not None else 2
         self.penalty_value = float(args.penalty_value) if args.penalty_value is not None else 0.25
 
         self.positive_peaks = {}
         self.negative_peaks = {}
 
     def analyze(self):
+        """Analyze the cyclic potentiometry data. These analysis include:
+        1. Calculate dQ/dV
+        2. Calculate dV/dt
+        3. Calculate initial stabilization time
+        4. Find potential transition times
+        5. Calculate diffusion coefficient
+        """
         # Calculate: dQ/dV, dV/dt, initial stabilization time, potential transition time(s), diffusion coefficient,
         self._calculate_dQdV()
         self._calculate_dVdt()
@@ -44,12 +52,17 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         self._find_potential_transition_times()
         self._calculate_diffusion_coefficient()
 
+
     def plot(self, save_dir, plots, optional_name: str = None):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
-        plot = cpplt(self.current, self.time, self.voltage, self.applied_current,
-                     self.electrode_area, self.mass_of_active_material, self.cumulative_charge)
-        # "CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"
-        fig, available_axes = plot.compose_ca_subplot(plots=plots)
+        plot = voltPlot(current=self.np_current, time=self.np_time,
+                        voltage=self.np_voltage,
+                        electrode_area=self.electrode_area,
+                        mass_of_active_material=self.mass_of_active_material,
+                        cumulative_charge=self.cumulative_charge,
+                        procedure_type=self.__class__.__name__,
+                        applied_current=self.applied_current)
+        fig, available_axes = plot.compose_volt_subplot(plots=plots)
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name == "CP":
                 plot.CP(subplot_ax=sub_ax)
@@ -79,11 +92,14 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
-        self.save_data(save_dir=save_dir, optional_name=optional_name)
+        #self.save_data(save_dir=save_dir, optional_name=optional_name)
 
 
     def _impute_mean_nearest_neighbors(self, data):
-        """Impute NaN values using the mean of nearest neighbors."""
+        """Impute NaN values using the mean of nearest neighbors.
+        Args:
+            data (np.array): data where the NaN values should be imputed
+        """
         n = len(data)
         for i in range(n):
             if np.isnan(data[i]):
@@ -105,7 +121,10 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                 data[i] = np.mean(neighbors) if neighbors else 0
         return data
 
+
     def _calculate_dQdV(self):
+        """Calculate the differential of charge with respect to voltage.
+        """
         # Convert the cumulative charge from As to mAh
         cumulative_charge_mAh = self.np_cumulative_charge * (1000/3600)
 
@@ -145,14 +164,21 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
         self.dQdV = dQdV_no_nan
 
+
     def _calculate_dVdt(self):
+        """Calculate the differential of voltage with respect to time.
+        """
         self.dVdt = np.gradient(self.np_voltage, self.np_time) * 3600  # V/h
+
 
     def _determine_cluster_number(self, data):
         """Determine the optimal number of clusters using the silhouette score.
 
         Args:
             data (np.array): data where the cluster number should be determined
+
+        Returns:
+            int: optimal number of clusters
         """
         max_silhouette_score = -1
         optimal_n_clusters = 1
@@ -168,9 +194,10 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
         return optimal_n_clusters
 
-    
-    def _calculate_initial_stabilization_time(self):
 
+    def _calculate_initial_stabilization_time(self):
+        """Calculate the initial stabilization time using the Pelt algorithm.
+        """
         model = "l1"  # L1 norm minimization
         algo = rpt.Pelt(model=model).fit(self.np_voltage)
         result = algo.predict(pen=self.penalty_value)
@@ -183,6 +210,10 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
     def _find_potential_transition_times(self, window_length=73, polyorder=3):
         """Find potential transition times and their corresponding transition voltages.
         This functions excludes the initial stabilization time.
+
+        Args:
+            window_length (int): length of the filter window
+            polyorder (int): order of the polynomial to fit
         """
         # Apply Savitzky-Golay filter to smooth dV/dt data
         self.dVdt_smoothed = savgol_filter(self.dVdt, window_length, polyorder)
@@ -220,11 +251,12 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                         # get the index of the max peak
                         max_peak_index = np.where(self.dVdt_smoothed == max_peak)[0][0]
                         self.transition_values = {self.np_time[max_peak_index]: self.np_voltage[max_peak_index]}
-                        #self.positive_peaks[max_peak[0]] = max_peak[1]
             else:
                 max_peak_index = np.argmax(self.dVdt_smoothed[transition_indices])
                 self.transition_values = {self.np_time[transition_indices][max_peak_index]: self.np_voltage[transition_indices][max_peak_index]}
                 #self.transition_value = {self.np_time[i]: self.np_voltage[i] for i in transition_indices}
+
+
     def _calculate_diffusion_coefficient(self):
         """Calculate the diffusion coefficient value using Sand's formula without tau.
         """
@@ -238,6 +270,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         else:
             current = np.abs(np.mean(self.np_current))
         self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * faraday_constant * self.electrode_area * self.concentration_of_active_material)**2 * np.pi)
+
 
     @property
     def figure(self):

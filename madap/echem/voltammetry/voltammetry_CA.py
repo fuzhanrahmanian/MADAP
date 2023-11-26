@@ -9,7 +9,7 @@ from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
 
-from madap.echem.voltammetry.voltammetry_CA_plotting import VoltammetryCAPlotting as caplt
+from madap.echem.voltammetry.voltammetry_plotting import VoltammetryPlotting as voltPlot
 
 log = logger.get_logger("cyclic_amperometry")
 
@@ -83,17 +83,19 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
     def plot(self, save_dir, plots, optional_name: str = None):
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
-        plot = caplt(current=self.np_current, time=self.np_time,
-                        voltage=self.voltage, applied_voltage=self.applied_voltage,
+        plot = voltPlot(current=self.np_current, time=self.np_time,
+                        voltage=self.voltage,
                         electrode_area=self.electrode_area,
                         mass_of_active_material=self.mass_of_active_material,
-                        cumulative_charge=self.cumulative_charge)
+                        cumulative_charge=self.cumulative_charge,
+                        procedure_type=self.__class__.__name__,
+                        applied_voltage=self.applied_voltage)
         if self.voltage is None and "Voltage" in plots:
             log.warning("Measured voltage is not provided. Voltage plot is not available.")
             # Drop the voltage plot from the plots list
             plots = [plot for plot in plots if plot != "Voltage"]
 
-        fig, available_axes = plot.compose_ca_subplot(plots=plots)
+        fig, available_axes = plot.compose_volt_subplot(plots=plots)
         for sub_ax, plot_name in zip(available_axes, plots):
             if plot_name == "CA":
                 plot.CA(subplot_ax=sub_ax)
@@ -113,7 +115,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             elif plot_name == "Anson":
                 plot.Anson(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient)
             elif plot_name == "Voltage":
-                plot.Voltage(subplot_ax=sub_ax)
+                plot.CP(subplot_ax=sub_ax)
             else:
                 log.error("Voltammetry CA class does not have the selected plot.")
                 continue
