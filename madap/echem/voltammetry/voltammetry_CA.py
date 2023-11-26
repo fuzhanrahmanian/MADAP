@@ -17,16 +17,8 @@ log = logger.get_logger("cyclic_amperometry")
 class Voltammetry_CA(Voltammetry, EChemProcedure):
     """ This class defines the chrono amperometry method."""
     def __init__(self, current, voltage, time, args, charge:list[float]=None) -> None:
-        super().__init__(voltage, current, time, args.measured_current_units, args.measured_time_units, args.number_of_electrons)
-        self.voltage = voltage
+        super().__init__(voltage, current, time, charge, args)
         self.applied_voltage = float(args.applied_voltage) if args.applied_voltage is not None else None # Unit: V
-        self.np_time = np.array(self.time) # Unit: s
-        self.np_current = np.array(self.current) # Unit: A
-        self.cumulative_charge = self._calculate_charge() if charge is None else charge # Unit: C
-        self.mass_of_active_material = float(args.mass_of_active_material) if args.mass_of_active_material is not None else None # Unit: g
-        self.electrode_area = float(args.electrode_area) if args.electrode_area is not None else 1 # Unit: cm^2
-        self.concentration_of_active_material = float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
-        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
         self.diffusion_coefficient = None # Unit: cm^2/s
         self.reaction_order = None # 1 or 2
         self.reaction_rate_constant = None # Unit: 1/s or cm^3/mol/s
@@ -39,19 +31,6 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
         # Reaction kinetics analysis
         self._analyze_reaction_kinetics()
-
-
-    def _calculate_charge(self):
-        """ Calculate the cumulative charge passed in a chronoamperometry experiment."""
-        # Calculate the time intervals (delta t)
-        delta_t = np.diff(self.np_time)
-
-        # Calculate the charge for each interval as the product of the interval duration and the current at the end of the interval
-        interval_charges = delta_t * self.np_current[1:]
-
-        # Compute the cumulative charge
-        return np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
-
 
     def _calculate_diffusion_coefficient(self):
         """ Calculate the diffusion coefficient using Cottrell analysis."""
@@ -148,7 +127,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the data
-        
+
         Args:
             save_dir (str): The directory where the data should be saved
             optional_name (str): The optional name of the data.
@@ -156,10 +135,10 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         log.info("Saving data...")
         # Create a directory for the data
         save_dir = utils.create_dir(os.path.join(save_dir, "data"))
-        
+
         name = utils.assemble_file_name(optional_name, self.__class__.__name__, "params.json") if \
                     optional_name else utils.assemble_file_name(self.__class__.__name__, "params.json")
-        
+
         if self.reaction_order == 1:
             reaction_rate_constant_unit = "1/s"
         elif self.reaction_order == 2:
