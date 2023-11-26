@@ -107,7 +107,7 @@ class Voltammetry(EChemProcedure):
         delta_t = np.diff(self.np_time)
 
         # Calculate the charge for each interval as the product of the interval duration and the current at the end of the interval
-        interval_charges = delta_t * self.np_current[1:]
+        interval_charges = delta_t * np.abs(self.np_current[1:])
 
         # Compute the cumulative charge
         return np.cumsum(np.insert(interval_charges, 0, 0)).tolist()
