@@ -75,7 +75,7 @@ class VoltammetryPlotting(Plots):
 
     def Log_CA(self, subplot_ax, y_data, reaction_rate, reaction_order,best_fit_reaction_rate):
         """Plot the Log CA plot.
-        
+
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
@@ -86,7 +86,7 @@ class VoltammetryPlotting(Plots):
         elif reaction_order == 2:
             y_label = "1/Current (1/A)"
             label = r"$\kappa$"+f"{reaction_rate:.2e}"+r"$cm^3/mol/s$"
-        
+
         x_vals = np.array([self.time[best_fit_reaction_rate['start']], self.time[best_fit_reaction_rate['end']]])
         y_vals = best_fit_reaction_rate['slope']*x_vals + best_fit_reaction_rate['intercept']
         subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Instantaneous rate")
@@ -99,7 +99,7 @@ class VoltammetryPlotting(Plots):
 
     def CC(self, subplot_ax):
         """Plot the CC plot.
-        
+
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
@@ -114,21 +114,9 @@ class VoltammetryPlotting(Plots):
             measured_current = np.abs(np.mean(self.current))
             label = f"{measured_current:.2e} A"
 
-        # Change the unit of charge from As to mAh
-        cumulative_charge_mAh = [i*1e3/3600 for i in self.cumulative_charge]
-        # Convert self.time from s to h
         time_h = [i/3600 for i in self.time]
-        if self.mass_of_active_material is not None:
-            # Change the unit of current from A to mA/g
-            charge = [i/self.mass_of_active_material for i in cumulative_charge_mAh]
-            y_label = "Capacity (mAh/g)"
-        elif self.electrode_area is not None:
-            # Change the unit of current from A to mA/cm^2
-            charge = [i/self.electrode_area for i in cumulative_charge_mAh]
-            y_label = "Capacity (mAh/cm^2)"
-        else:
-            charge = cumulative_charge_mAh
-            y_label = "Charge (mAh)"
+        # Change the unit of charge from As to mAh
+        charge, y_label = self._charge_conversion()
 
         subplot_ax.scatter(time_h, charge, label=label, s=3)
         self.plot_identity(subplot_ax, xlabel="Time (h)", ylabel=y_label,
@@ -140,7 +128,7 @@ class VoltammetryPlotting(Plots):
         else:
             subplot_ax.legend(loc="upper right")
 
-    def Cottrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion):
+    def Cottrell(self, subplot_ax, diffusion_coefficient, best_fit_diffusion = None):
         """Plot the Cottrell plot.
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
@@ -149,17 +137,24 @@ class VoltammetryPlotting(Plots):
         log.info("Creating Cottrell plot")
 
         x_data = (self.time)**(-0.5)
-        y_data = self.current
+        if self.procedure_type == "Voltammetry_CA":
+            x_vals = np.array([x_data[best_fit_diffusion['start']], x_data[best_fit_diffusion['end']]])
+            y_data = self.current
+            y_vals = best_fit_diffusion['slope']*x_vals + best_fit_diffusion['intercept']
+            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
+            subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Diffusion coefficient")
+            y_label = "Current (A)"
+        elif self.procedure_type == "Voltammetry_CP":
+            y_data = self.voltage
+            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e}"+r"$\cdot \tau$"+" cm^2/s")
+            y_label = "Voltage (V)"
 
-        x_vals = np.array([x_data[best_fit_diffusion['start']], x_data[best_fit_diffusion['end']]])
-        y_vals = best_fit_diffusion['slope']*x_vals + best_fit_diffusion['intercept']
-
-
-        subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
-        subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Diffusion coefficient")
-        self.plot_identity(subplot_ax, xlabel=r"$t^{-1/2}  [s^{-1/2}]$", ylabel="Current (A)",
-                            ax_sci_notation="both", x_lim=[0, max(x_data[1:])], y_lim=[0, max(y_data[1:])])
-        subplot_ax.legend(loc="upper right")
+        self.plot_identity(subplot_ax, xlabel=r"$t^{-1/2}  [s^{-1/2}]$", ylabel=y_label,
+                            ax_sci_notation="both", x_lim=[0, max(x_data[1:])], y_lim=[min(y_data), max(y_data[1:])])
+        if np.mean(self.current) > 0:
+            subplot_ax.legend(loc="upper right")
+        else:
+            subplot_ax.legend(loc="lower right")
 
     def Anson(self, subplot_ax, diffusion_coefficient):
         """Plot the Anson plot.
@@ -177,9 +172,46 @@ class VoltammetryPlotting(Plots):
         subplot_ax.legend(loc="upper right")
 
     def Voltage_Profile(self, subplot_ax):
-        pass
-    def Potential_Rate(self, subplot_ax):
-        pass
+        """Plot the voltage profile plot.
+
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+        log.info("Creating voltage profile plot")
+
+        charge, x_label = self._charge_conversion()
+        subplot_ax.scatter(charge, self.voltage, s=3)
+        self.plot_identity(subplot_ax, xlabel=x_label, ylabel="Voltage (V)",
+                           ax_sci_notation="both", x_lim=[min(charge), max(charge)], y_lim=[min(self.voltage), max(self.voltage)])
+
+
+    def Potential_Rate(self, subplot_ax, dVdt, transition_values, tao_initial):
+        """Plot the potential rate plot.
+        
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+        log.info("Creating potential rate, dVdt plot")
+        
+        subplot_ax.plot(self.time, dVdt, linewidth=1)
+        #subplot_ax.plot(self.time, dVdt_smoothed, color="#f48024", linewidth=2, label="Smoothed")
+        self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="dV/dt (V/s)",
+                           ax_sci_notation="y", x_lim=[0, max(self.time)], y_lim=[min(dVdt), max(dVdt)*1.1])
+        #subplot_ax.legend(loc="upper right")
+        # Define a textbox under the legend with the transition and stabilization values
+        if transition_values:
+            transition_times = [round(i,2) for i in transition_values.keys()]
+            textbox_text = r"$\tau_{stabilization}$"+f"={round(tao_initial,2)} [s]\n"+r"$\tau_{transition} \in $"+"{"+f"{str(transition_times)[1:-1]}"+"} [s]"
+        else:
+            textbox_text = r"$\tau_{stabilization}$"+f"={round(tao_initial,2)} [s]"
+
+        if np.mean(self.current) < 0:
+            subplot_ax.text(0.95, 0.05, textbox_text, transform=subplot_ax.transAxes,
+                            fontsize=7, verticalalignment='bottom', horizontalalignment='right')
+        else:
+            subplot_ax.text(0.5, 0.8, textbox_text, transform=subplot_ax.transAxes,
+                        fontsize=7, verticalalignment='bottom', horizontalalignment='left')
+
     def Differential_Capacity(self, subplot_ax):
         pass 
     
@@ -265,3 +297,21 @@ class VoltammetryPlotting(Plots):
 
         log.error("Maximum plots for EIS is exceeded.")
         return Exception(f"Maximum plots for EIS is exceeded for plot {self.procedure_type}.")
+
+
+    def _charge_conversion(self):
+        # Change the unit of charge from As to mAh
+        cumulative_charge_mAh = [i*1e3/3600 for i in self.cumulative_charge]
+        # Convert self.time from s to h
+        if self.mass_of_active_material is not None:
+            # Change the unit of current from A to mA/g
+            charge = [i/self.mass_of_active_material for i in cumulative_charge_mAh]
+            y_label = "Capacity (mAh/g)"
+        elif self.electrode_area is not None:
+            # Change the unit of current from A to mA/cm^2
+            charge = [i/self.electrode_area for i in cumulative_charge_mAh]
+            y_label = "Capacity (mAh/cm^2)"
+        else:
+            charge = cumulative_charge_mAh
+            y_label = "Charge (mAh)"
+        return charge, y_label

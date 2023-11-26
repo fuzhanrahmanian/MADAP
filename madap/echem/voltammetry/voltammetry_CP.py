@@ -29,7 +29,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         self.dVdt = None # Unit: V/h
         self.dVdt_smoothed = None # Unit: V/h
         self.tao_initial = None # Unit: s
-        self.stabilization_transitions = {} # transition time (s): transition voltage (V)
+        self.stabilization_values = {} # transition time (s): transition voltage (V)
         self.transition_values = {}
         self.d_coefficient = None # Unit: cm^2/s
         self.penalty_value = float(args.penalty_value) if args.penalty_value is not None else 0.25
@@ -73,7 +73,8 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             elif plot_name == "Voltage_Profile":
                 plot.Voltage_Profile(subplot_ax=sub_ax)
             elif plot_name == "Potential_Rate":
-                plot.Potential_Rate(subplot_ax=sub_ax)
+                plot.Potential_Rate(subplot_ax=sub_ax, dVdt=self.dVdt, transition_values=self.transition_values,
+                                    tao_initial=self.tao_initial)
             elif plot_name == "Differential_Capacity":
                 plot.Differential_Capacity(subplot_ax=sub_ax)
             else:
@@ -204,7 +205,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
         # The first change point is the end of the initial stabilization phase
         self.tao_initial = self.np_time[result[0]] if result else None
-        self.stabilization_transitions[self.tao_initial] = self.np_voltage[result[0]] if result else None
+        self.stabilization_values[self.tao_initial] = self.np_voltage[result[0]] if result else None
 
 
     def _find_potential_transition_times(self, window_length=73, polyorder=3):
@@ -252,8 +253,15 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                         max_peak_index = np.where(self.dVdt_smoothed == max_peak)[0][0]
                         self.transition_values = {self.np_time[max_peak_index]: self.np_voltage[max_peak_index]}
             else:
-                max_peak_index = np.argmax(self.dVdt_smoothed[transition_indices])
-                self.transition_values = {self.np_time[transition_indices][max_peak_index]: self.np_voltage[transition_indices][max_peak_index]}
+                # if all the times at the transition_indices are smaller than the self.tao_initial then we do not have a transition
+                if np.all(self.np_time[transition_indices] < self.tao_initial):
+                    self.transition_values = {}
+                else:
+                    if self.tao_initial is not None:
+                        transition_indices = transition_indices[self.np_time[transition_indices] > self.tao_initial]
+                    # max_peak_index = np.argmax(self.dVdt_smoothed[transition_indices])
+                    if transition_indices.size > 0:
+                        self.transition_values = {self.np_time[i]: self.np_voltage[i] for i in transition_indices}
                 #self.transition_value = {self.np_time[i]: self.np_voltage[i] for i in transition_indices}
 
 
