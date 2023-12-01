@@ -12,7 +12,7 @@ from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
 from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
-from madap.echem.voltammetry import voltammetry_CA, voltammetry_CP
+from madap.echem.voltammetry import voltammetry_CA, voltammetry_CP, voltammetry_CV
 
 
 
@@ -67,17 +67,41 @@ def _analyze_parser_args():
     elif proc.procedure == "voltammetry":
         voltammetry_pars = first_parser.add_argument_group("Options for the Arrhenius procedure")
         voltammetry_pars.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
-                            choices=['cyclic_voltammetric', 'cyclic_amperometric', "cyclic_potentiometric"],)
+                            choices=['cv', 'ca', "cp"],)
+        voltammetry_pars.add_argument("-mc", "--measured_current_units", type=str, required=True,
+                            default="uA", choices=["uA", "mA", "A"], help="Measured current units")
+        voltammetry_pars.add_argument("-mt", "--measured_time_units", type=str, required=True,
+                            default="s", choices=["ms", "s", "min", "h"], help="Measured time units")
+        voltammetry_pars.add_argument("-ne", "--number_of_electrons", type=int, required=True,
+                            default=1, help="Number of electrons involved in the reaction")
+        voltammetry_pars.add_argument("-cam", "--concentration_of_active_material", type=float, required=False,
+                            default=None, help="Concentration of the active material [mol/cm^3]")
+        voltammetry_pars.add_argument("mam", "--mass_of_active_material", type=float, required=False,
+                            default=None, help="Mass of the active material [g]")
+        voltammetry_pars.add_argument("-ea", "--electrode_area", type=float, required=False,
+                            default=None, help="Electrode area [cm^2]")
         proc = first_parser.parse_known_args()[0]
-        if proc.voltammetry_procedure == "cyclic_voltammetric":
-            # TODO
-            pass
-        elif proc.voltammetry_procedure == "cyclic_amperometric":
-            # TODO
-            pass
-        elif proc.voltammetry_procedure == "cyclic_potentiometric":
-            # TODO
-            pass
+        if proc.voltammetry_procedure == "cv":
+            cv = first_parser.add_argument_group("Options for the CV procedure")
+            cv.add_argument("-pl", "--plots", required=True, choices=["cv"],
+                            nargs="+", help="plots to be generated")
+            cv.add_argument("-s", "--scan_rate", type=float, required=False, default=None,
+                            help="scan rate [V/s] if applicable")
+        elif proc.voltammetry_procedure == "ca":
+            ca = first_parser.add_argument_group("Options for the CA procedure")
+            ca.add_argument("-pl", "--plots", required=True, choices=["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"],
+                            nargs="+", help="plots to be generated")
+            ca.add_argument("-a", "--applied_voltage", type=float, required=False, default=None,
+                            help="applied voltage [V] if applicable")
+            ca.add_argument("-w", "--window_size", type=int, required=False, default=None, help="window size for the moving average")
+        elif proc.voltammetry_procedure == "cp":
+            cp = first_parser.add_argument_group("Options for the CP procedure")
+            cp.add_argument("-pl", "--plots", required=True, choices=["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"],
+                            nargs="+", help="plots to be generated")
+            cp.add_argument("-ap", "--applied_potential", type=float, required=False, default=None,
+                            help="applied potential [V] if applicable")
+            cp.add_argument("-pv", "--penalty_value", type=float, required=False, default=None,
+                            help="penalty value for the regularization")
 
     # Options for data import
     data = first_parser.add_argument_group("Options for data import")
@@ -280,14 +304,17 @@ def call_voltammetry(data, result_dir, args):
         charge_data = None
 
     if args.voltammetry_procedure == "CA":
-        # TODO Check if voltage is given
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
                                                         time =da.format_data(time_data),
                                                         charge=charge_data,
                                                         args=args)
     if args.voltammetry_procedure == "CV":
-        pass
+        voltammetry_cls = voltammetry_CV.Voltammetry_CV(current=da.format_data(current_data),
+                                                        voltage=da.format_data(voltage_data),
+                                                        time =da.format_data(time_data),
+                                                        scan_rate=charge_data,
+                                                        args=args)
     if args.voltammetry_procedure == "CP":
         voltammetry_cls = voltammetry_CP.Voltammetry_CP(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
