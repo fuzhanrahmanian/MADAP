@@ -23,7 +23,7 @@ log = logger.get_logger("cyclic_potentiometry")
 class Voltammetry_CP(Voltammetry, EChemProcedure):
     """This class defines the cyclic potentiometry method."""
     def __init__(self, voltage, current, time,  args, charge:list[float]=None) -> None:
-        super().__init__(voltage, current, time, charge, args)
+        super().__init__(voltage, current, time, args, charge=charge)
         self.applied_current = float(args.applied_current) if args.applied_current is not None else None # Unit: A
         self.dQdV = None # Unit: C/V
         self.dQdV_unit = None
