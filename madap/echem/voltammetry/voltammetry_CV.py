@@ -31,19 +31,14 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self._find_fwd_bwd_scans()
         # Identify cycles
         self._identify_cycles()
-        # todo: find the cycle number
-        # todo: find the peak current for both anodic and cathodic peak
+        # todo: find the peak current for both anodic and cathodic peak and their corresponding voltage
+        self._find_peak_currents()
         # todo: find the potential at the peak current and calculate the E_half
         # todo: find the height of the peak current to the linearly fitted baseline
         # todo: find the capacitative and faradaic current
         # todo: calculate the diffucsion coefficient from Randles Scelvik equation
         # todo: get the two linear lines from Tafel plot and calculate the E_corr and I_corr
         # todo: calculate the capactiy of the electrode
-        # call a function that
-        # separate all the cycles
-        # self._find_fwd_and_bkw_scans()
-        self._find_peak_currents()
-
 
 
     def _find_fwd_bwd_scans(self):
@@ -67,3 +62,44 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
 
         # Add the scan direction data to the dataframe
         self.data['scan_direction'] = scan_directions
+
+
+    def _identify_cycles(self):
+        """ Identify the cycles in the data.
+        """
+        # Initialize the cycle number and previous direction
+        cycle_number = 1
+        previous_direction = None
+        cycle_numbers = []
+
+        for direction in self.data['scan_direction']:
+            if previous_direction and direction != previous_direction:
+                # Increment the cycle number if the direction changes
+                cycle_number += 1
+
+            cycle_numbers.append((cycle_number + 1) // 2)  # Integer division to pair F and B in the same cycle
+
+            previous_direction = direction
+
+        # add the cycle number to the dataframe
+        self.data['cycle_number'] = cycle_numbers
+
+
+
+    def plot(self, save_dir, plots, optional_name: str = None):
+        pass
+
+    def save_data(self, save_dir:str, optional_name:str = None):
+        pass
+
+    def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
+        self.analyze()
+        self.plot(save_dir, plots, optional_name=optional_name)
+        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+    def _peek_to_peek_seperation(self):
+        pass
+    def _calcualte_diffusion_coefficient(self):
+        pass
+    def _randles_sevcik_equation(self):
+        pass
