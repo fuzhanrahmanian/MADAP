@@ -21,6 +21,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.anodic_peak_current = {}
         self.cathodic_peak_current = {}
         self.data = None
+        self.width = 15 if args.peak_width is None else int(args.peak_width)
 
     def analyze(self):
 
@@ -31,9 +32,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self._find_fwd_bwd_scans()
         # Identify cycles
         self._identify_cycles()
-        # todo: find the peak current for both anodic and cathodic peak and their corresponding voltage
+        # Find peak cathodic and anodic currents and their corresponding values
         self._find_peak_currents()
-        # todo: find the potential at the peak current and calculate the E_half
+        # calculate the E half
+        self._calculate_E_half()
         # todo: find the height of the peak current to the linearly fitted baseline
         # todo: find the capacitative and faradaic current
         # todo: calculate the diffucsion coefficient from Randles Scelvik equation
@@ -84,6 +86,49 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # add the cycle number to the dataframe
         self.data['cycle_number'] = cycle_numbers
 
+
+
+    def _find_peak_currents(self):
+        """ Find the peak currents in the data.
+        """
+        # Iterate through each cycle and direction
+        for cycle in self.data['cycle_number'].unique():
+            for direction in ['F', 'B']:
+                # Filter the data for the current cycle and direction
+                cycle_data = self.data[(self.data['cycle_number'] == cycle) & (self.data['scan_direction'] == direction)]
+
+                # Identify peaks
+                if direction == 'F':  # Forward scan - looking for cathodic peaks
+                    peaks, _ = find_peaks(cycle_data['current'], width=self.width)
+                    self._store_peak_data(peaks=peaks, data=cycle_data, cycle_num=cycle, peak_type='cathodic', scan_direction=direction)
+                else:  # Backward scan - looking for anodic peaks
+                    peaks, _ = find_peaks(-cycle_data['current'], width=self.width)
+                    self._store_peak_data(peaks=peaks, data=cycle_data, cycle_num=cycle, peak_type='anodic', scan_direction=direction)
+
+
+    def _store_peak_data(self, peaks, data, cycle_num, peak_type, scan_direction):
+        """ Store the peak data in the appropriate dictionary.
+
+        Args:
+            peaks (list): List of peak indexes
+            data (pd.DataFrame): Dataframe containing the data
+            cycle_num (int): Cycle number
+            peak_type (str): Type of peak (anodic or cathodic)
+            scan_direction (str): Scan direction (forward or backward)
+        """
+        # Store peak data in the appropriate dictionary
+        peak_dict = self.cathodic_peak_current if peak_type == 'cathodic' else self.anodic_peak_current
+
+        for i, peak in enumerate(peaks):
+            peak_data = {
+                'current': data.iloc[peak]['current'],
+                'voltage': data.iloc[peak]['voltage'],
+                'index': data.index[peak],
+                'cycle_num': cycle_num,
+                'direction': scan_direction,
+                'peak_type': 'cathodic' if peak_type == 'cathodic' else 'anodic'
+            }
+            peak_dict[f'peak_{len(peak_dict) + 1}'] = peak_data
 
 
     def plot(self, save_dir, plots, optional_name: str = None):
