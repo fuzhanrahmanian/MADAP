@@ -23,6 +23,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.E_half = {}
         self.data = None
         self.width = 15 if args.peak_width is None else int(args.peak_width)
+        self.temperature = float(args.temperature) if args.temperature is not None else 298.15 # Unit: K
 
     def analyze(self):
 
@@ -37,9 +38,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self._find_peak_currents()
         # calculate the E half
         self._calculate_E_half()
+        # calculate the diffusion coefficient from Randles-Sevcik equation
+        self._calculate_diffusion_coefficient()
         # todo: find the height of the peak current to the linearly fitted baseline
         # todo: find the capacitative and faradaic current
-        # todo: calculate the diffucsion coefficient from Randles Scelvik equation
         # todo: get the two linear lines from Tafel plot and calculate the E_corr and I_corr
 
 
@@ -120,15 +122,15 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # Store peak data in the appropriate dictionary
         peak_dict = self.cathodic_peak_current if peak_type == 'cathodic' else self.anodic_peak_current
 
-        for i, peak in enumerate(peaks):
+        for peak in peaks:
             peak_data = {
                 'current': data.iloc[peak]['current'],
                 'voltage': data.iloc[peak]['voltage'],
                 'index': data.index[peak],
                 'cycle_num': cycle_num,
                 'direction': scan_direction,
-                'peak_type': 'cathodic' if peak_type == 'cathodic' else 'anodic'
-            }
+                'peak_type': 'cathodic' if peak_type == 'cathodic' else 'anodic',
+                'scan_rate': data.iloc[peak]['scan_rate']}
             peak_dict[f'peak_{len(peak_dict) + 1}'] = peak_data
 
 
@@ -156,6 +158,39 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # Check if there are any unmatched peaks
         if not self.E_half:
             log.info("No matching current pairs found for E_half calculation.")
+
+
+    def _calculate_diffusion_coefficient(self):
+        # Constants
+        const_298K = 2.69 * 10**5
+        const_other_temp = 0.4463
+
+        # Function to calculate D
+        def calculate_D(i_peak, scan_rate):
+            if int(self.temperature) == 298:
+                # Randles-Sevcik equation
+                #i_peak [A] = 2.69 * 10**5 * n**(3/2) * A * C * v**(1/2) * D**(1/2) with A [cm^2], C [mol/cm^3], v [V/s], D [cm^2/s]
+                denominator = (const_298K * self.number_of_electrons**(3/2) * self.electrode_area * self.concentration_of_active_material * (scan_rate**0.5))
+                return (i_peak / denominator)**2
+            else:
+                # Randles-Sevcik equation
+                #i_peak [A] = 0.4463 * n * F * A * C * (n**(1/2) * v**(1/2) * D**(1/2)/R*T)**(1/2) with A [cm^2], C [mol/cm^3], v [V/s], D [cm^2/s]
+                coefficient = ((self.number_of_electrons * self.faraday_constant * scan_rate)/(self.gas_constant * self.temperature))**0.5
+                denominator =  (const_other_temp * self.number_of_electrons * self.faraday_constant * self.electrode_area * self.concentration_of_active_material * coefficient)
+                return (i_peak / denominator)**2
+
+        # Find the highest peak in anodic and cathodic direction
+        highest_anodic_peak_key = max(self.anodic_peak_current, key=lambda k: self.anodic_peak_current[k]['current'])
+        highest_cathodic_peak_key = max(self.cathodic_peak_current, key=lambda k: self.cathodic_peak_current[k]['current'])
+
+
+        # Calculate D for anodic and cathodic peaks
+        D_anodic = calculate_D(self.anodic_peak_current[highest_anodic_peak_key]['current'], self.anodic_peak_current[highest_anodic_peak_key]['scan_rate'])
+        D_cathodic = calculate_D(self.cathodic_peak_current[highest_cathodic_peak_key]['current'], self.cathodic_peak_current[highest_cathodic_peak_key]['scan_rate'])
+
+        # Add D to the peak dictionaries
+        self.anodic_peak_current[highest_anodic_peak_key]['D'] = D_anodic
+        self.cathodic_peak_current[highest_cathodic_peak_key]['D'] = D_cathodic
 
 
     def plot(self, save_dir, plots, optional_name: str = None):
