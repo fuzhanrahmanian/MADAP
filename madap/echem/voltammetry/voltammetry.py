@@ -1,5 +1,6 @@
 """ This module contains the Voltammetry class, which is used to analyze voltammetry data."""
 import numpy as np
+import scipy.constants as const
 from scipy.stats import linregress
 from madap.logger import logger
 from madap.echem.procedure import EChemProcedure
@@ -9,7 +10,7 @@ log = logger.get_logger("voltammetry")
 
 class Voltammetry(EChemProcedure):
     """ This class defines the voltammetry method."""
-    def __init__(self, voltage, current, time, charge, args) -> None:
+    def __init__(self, voltage, current, time, args, charge=None) -> None:
         """Initialize the voltammetry method.
         Args:
             voltage (list): list of voltages
@@ -18,6 +19,9 @@ class Voltammetry(EChemProcedure):
             charge (list): list of charges
             args (argparse.Namespace): arguments
         """
+        self.faraday_constant = const.physical_constants["Faraday constant"][0] # Unit: C/mol
+        # gas constant
+        self.gas_constant = const.physical_constants["molar gas constant"][0] # Unit: J/mol/K
         self.voltage = voltage
         self.np_voltage = np.array(voltage) # Unit: V
 
