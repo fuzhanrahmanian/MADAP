@@ -28,39 +28,12 @@ UPPER_LIMIT_QUANTILE_HELP="Upper limit quantile (optional)."
 
 LOWER_LIMIT_QUANTILE_HELP="Lower limit quantile (optional)."
 
-def plotting_element(subparser, plots):
-    """ Adds an element to the GUI for plotting the data.
+WINDOW_SIZE_HELP="Window size for the best linear fit for getting diffusion coefficient and reaction rate constant (optional)."
 
-    Args:
-        subparser (GooeyParser): Subparser to add the element to.
-        plots (list): List of plot types.
-    """
-    subparser.add_argument("-pl", "--plots", metavar="Plots", required=True, choices=plots,
-                             nargs="+", help="Plots to be generated", widget="Listbox")
+APPLIED_CURRENT_HELP = "Applied current (optional)."
 
-def data_import_element(subparser):
-    """ Adds an element to the GUI for importing the data.
+PENALTY_VALUE_HELP = "Penalty value for finding the inflection point or peak points (optional)."
 
-    Args:
-        subparser (GooeyParser): Subparser to add the element to.
-    """
-    # Procedure subgroup
-    data = subparser.add_argument_group("Data import",
-                                        gooey_options={'show_border': True, 'columns': 1})
+MEASURED_CURRENT_UNITS_HELP = "The unit in which the current is measured."
 
-    # Procedure - File
-    file = data.add_argument_group("File selection", gooey_options={'show_border': True})
-    file.add_argument("-f", "--file", type=str, required=True,
-                      metavar="File containing the dataset", help="Path to the data file",
-                      widget="FileChooser")
-
-    # Procedure - File - Data Selection
-    file_data = data.add_argument_group("Data Selection (select one)", gooey_options={
-         'show_border': True,
-         'columns': 1
-     })
-    file_data.add_argument("-ds", "--data-selection", choices=["Headers", "Specific"],
-                           required=True, metavar="Data Selection",
-                           help="Select all data (by header) or specific data", widget="Dropdown")
-    file_data.add_argument("-dl", "--data-list", type=str, required=False,
-                           metavar="Headers or Specific", help=HEADER_OR_SPECIFIC_HELP)
+MEASURED_TIME_UNITS_HELP = "The unit in which the time is measured."
