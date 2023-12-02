@@ -2,7 +2,7 @@
 import os
 import numpy as np
 
-import scipy.constants as const
+
 from scipy.signal import savgol_filter, find_peaks
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -315,16 +315,13 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
     def _calculate_diffusion_coefficient(self):
         """Calculate the diffusion coefficient value using Sand's formula without tau.
         """
-        # Assume that I (current) is known
-        # Note: Ensure that the values of n, F, A, and c are provided correctly
-        faraday_constant = const.physical_constants["Faraday constant"][0]
         # Calculate the coefficient part of the diffusion coefficient using Sand's formula without tau
         # Coefficient = (4 * I^2) / ((n * F * A * c)^2 * pi)
         if self.applied_current is not None:
             current = np.abs(self.applied_current)
         else:
             current = np.abs(np.mean(self.np_current))
-        self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * faraday_constant * self.electrode_area * self.concentration_of_active_material)**2 * np.pi)
+        self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * self.faraday_constant * self.electrode_area * self.concentration_of_active_material)**2 * np.pi)
 
 
     @property
