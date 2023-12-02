@@ -20,6 +20,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.direction_index = {}
         self.anodic_peak_current = {}
         self.cathodic_peak_current = {}
+        self.E_half = {}
         self.data = None
         self.width = 15 if args.peak_width is None else int(args.peak_width)
 
@@ -40,7 +41,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # todo: find the capacitative and faradaic current
         # todo: calculate the diffucsion coefficient from Randles Scelvik equation
         # todo: get the two linear lines from Tafel plot and calculate the E_corr and I_corr
-        # todo: calculate the capactiy of the electrode
+
 
 
     def _find_fwd_bwd_scans(self):
@@ -129,6 +130,32 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                 'peak_type': 'cathodic' if peak_type == 'cathodic' else 'anodic'
             }
             peak_dict[f'peak_{len(peak_dict) + 1}'] = peak_data
+
+
+    def _calculate_E_half(self):
+        """ Calculate the half-wave potential for each anodic peak."""
+        for anodic_key, anodic_peak in self.anodic_peak_current.items():
+            closest_cathodic_peak = None
+            min_current_difference = float('inf')
+
+            for _ , cathodic_peak in self.cathodic_peak_current.items():
+                current_difference = abs(anodic_peak['current'] - cathodic_peak['current'])
+
+                if current_difference < min_current_difference:
+                    min_current_difference = current_difference
+                    closest_cathodic_peak = cathodic_peak
+
+            if closest_cathodic_peak:
+                average_voltage = (anodic_peak['voltage'] + closest_cathodic_peak['voltage']) / 2
+                self.E_half[anodic_key] = {
+                    'anodic_peak': anodic_key,
+                    'cathodic_peak': closest_cathodic_peak['index'],
+                    'E_half': average_voltage
+                }
+
+        # Check if there are any unmatched peaks
+        if not self.E_half:
+            log.info("No matching current pairs found for E_half calculation.")
 
 
     def plot(self, save_dir, plots, optional_name: str = None):
