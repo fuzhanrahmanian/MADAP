@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
+from scipy.stats import linregress
 from sklearn.metrics import silhouette_score
 from scipy.signal import find_peaks
 from madap.echem.voltammetry.voltammetry import Voltammetry
@@ -24,7 +24,9 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.anodic_peak_current = {}
         self.cathodic_peak_current = {}
         self.E_half = {}
-        self.window_size = 10 #int(args.window_size) if args.window_size is not None else 10
+        self.window_size = 2 #int(args.window_size) if args.window_size is not None else 10
+        self.smoothing_window_size = 5
+        self.fitting_window_size = int(args.fitting_window_size) if args.fitting_window_size is not None else 30
         self.data = None
         self.temperature = float(args.temperature) if args.temperature is not None else 298.15 # Unit: K
 
@@ -103,15 +105,15 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         for cycle in self.data['cycle_number'].unique():
             for direction in ['F', 'B']:
                 # Filter the data for the current cycle and direction
-                cycle_data = self.data[(self.data['cycle_number'] == cycle) & (self.data['scan_direction'] == direction)]
+                cycle_data = self.data[(self.data['cycle_number'] == cycle) & (self.data['scan_direction'] == direction)].copy()
                 # smoothen current
-                smoothen_current = cycle_data['current'].rolling(window=self.window_size).mean()
+                smoothen_current = cycle_data['current'].rolling(window=1).mean()
                 # Identify peaks
                 if direction == 'F':  # Forward scan - looking for anodic peaks
-                    peaks, _ = find_peaks(smoothen_current, width=2, prominence=smoothen_current.mean()/25)
+                    peaks, _ = find_peaks(smoothen_current, width=5, prominence=smoothen_current.mean()/25)
                     self._store_peak_data(peaks=peaks, data=cycle_data, cycle_num=cycle, peak_type='anodic', scan_direction=direction)
                 else:  # Backward scan - looking for cathodic peaks
-                    peaks, _ = find_peaks(-smoothen_current, width=2, prominence=smoothen_current.mean()/25)
+                    peaks, _ = find_peaks(-smoothen_current, width=5, prominence=smoothen_current.mean()/25)
                     self._store_peak_data(peaks=peaks, data=cycle_data, cycle_num=cycle, peak_type='cathodic', scan_direction=direction)
 
 
@@ -228,8 +230,28 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                 peak_anodic_number = self.E_half[cycle][pair]['anodic_peak']
                 peak_cathodic_number = self.E_half[cycle][pair]['cathodic_peak']
                 self._find_overpotential(cycle, pair, peak_anodic_number, peak_cathodic_number)
-                filter_anodic_data, filter_cathodic_data = self._filter_anodic_cathodic_data(cycle, peak_anodic_number, peak_cathodic_number)
-                self._find_height_of_peak_current(cycle, pair, peak_anodic_number, peak_cathodic_number, filter_anodic_data, filter_cathodic_data)
+                cycle_number = int(cycle.split("_")[1])
+                # check if the cathodic peak  can be calculated
+                if self.data.loc[(self.data['voltage'] > self.anodic_peak_current[cycle][peak_anodic_number]['voltage']) & \
+                                 (self.data['cycle_number'] == cycle_number) & \
+                                 (self.data['scan_direction'] == "B")].empty:
+                    log.warning("No voltage values higher than the half voltage and in the same cycle and backward scan and the height of the cathodic peak current cannot be calculated")
+                else:
+                    # filtered cathodic data
+                    filter_cathodic_data = self.data[(self.data['cycle_number'] == cycle_number) & (self.data['scan_direction'] == "B")].copy()
+                    self._find_height_of_cathodic_peak_current(cycle, pair, peak_cathodic_number, filter_cathodic_data )
+
+                # check if the anodic peak  can be calculated
+                if self.data.loc[(self.data['voltage'] < self.cathodic_peak_current[cycle][peak_cathodic_number]['voltage']) & \
+                                 (self.data['cycle_number'] == cycle_number) & \
+                                 (self.data['scan_direction'] == "F")].empty:
+                    log.warning("No voltage values lower than the half voltage and in the same cycle and forward scan and the height of the anodic peak current cannot be calculated")
+                else:
+                    # filtered anodic data
+                    filter_anodic_data = self.data[(self.data['cycle_number'] == cycle_number) & (self.data['scan_direction'] == "F")].copy()
+                    self._find_height_of_anodic_peak_current(cycle, pair, peak_anodic_number, filter_anodic_data )
+
+
 
 
     def _find_overpotential(self, cycle, pair, peak_anodic_number, peak_cathodic_number):
@@ -238,28 +260,79 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # Calculate the overpotential for the cathodic peak
         self.E_half[cycle][pair]['cathodic_overpotential'] = self.cathodic_peak_current[cycle][peak_cathodic_number]['voltage']  - self.E_half[cycle][pair]['E_half']
 
+    def _find_height_of_cathodic_peak_current(self, cycle, pair, peak_cathodic_number, filter_cathodic_data):
+        max_distance = 0
+        best_line = None
+        # find the cathodic peak current
+        cathodic_peak_current = self.cathodic_peak_current[cycle][peak_cathodic_number]["current"]
+        cathodic_peak_voltage = self.cathodic_peak_current[cycle][peak_cathodic_number]["voltage"]
+        # Smoothen the filtered data
+        smoothened_data = filter_cathodic_data.copy()
+        smoothened_data["current"] = smoothened_data['current'].rolling(window=self.smoothing_window_size).mean()
+        index_of_I_half_voltage = max(filter_cathodic_data.index[filter_cathodic_data['voltage'] >= self.E_half[cycle][pair]['E_half']])
+        fitting_window = int(len(filter_cathodic_data[:index_of_I_half_voltage]) / self.fitting_window_size)
 
-    def _filter_anodic_cathodic_data(self, cycle, peak_anodic_number, peak_cathodic_number):
-        anodic_voltage = self.anodic_peak_current[cycle][peak_anodic_number]['voltage']
-        cycle_num = int(cycle.split("_")[1])
-        # check if in self.data there are voltage values higher than the anodic voltage and in the same cycle and backward scan
-        if self.data.loc[(self.data['voltage'] > anodic_voltage) & (self.data['cycle_number'] == cycle_num) & (self.data['scan_direction'] == "B")].empty:
-            log.info("No voltage values higher than the anodic voltage and in the same cycle and backward scan")
-            # get the data from the backward scan of the next cycle and filter the data for this and the next cycle
-            filter_cathodic_data = self.data[((self.data['cycle_number'] == cycle_num) | (self.data['cycle_number'] == cycle_num +1)) & (self.data['scan_direction'] == "B")]
+        for i in range(len(smoothened_data.loc[:index_of_I_half_voltage-fitting_window])):
+            # select two points and fit a line
+            point1, point2 = smoothened_data.iloc[i], smoothened_data.iloc[i+fitting_window]
+            # check if the points are not nan
+            if (abs(point1["current"]) < abs(point2["current"])) and (point1["voltage"] != point2["voltage"]):
+                slope, intercept, _, _, _ = linregress([point1['voltage'], point2['voltage']],
+                                                [point1['current'], point2['current']])
+
+                intersect_y = self._calculate_intersection_updated(slope, intercept, cathodic_peak_voltage)
+                if intersect_y > cathodic_peak_current:
+                    distance_to_peak = abs(cathodic_peak_current) - abs(intersect_y)
+                    if distance_to_peak > max_distance:
+                        best_point1, best_point2 = point1, point2
+                        max_distance = distance_to_peak
+                        best_line = (slope, intercept)
+        if max_distance == 0:
+            log.warning(f"No line found for cycle {cycle} and pair {pair} and cathodic peak {peak_cathodic_number}. Increase the smoothing window size or the fitting window size.")
         else:
-            filter_cathodic_data = self.data[(self.data['cycle_number'] == cycle_num) & (self.data['scan_direction'] == "B")]
+            self.cathodic_peak_current[cycle][peak_cathodic_number]["height"] = max_distance
+            self.cathodic_peak_current[cycle][peak_cathodic_number]["capacitative_line"] = best_line
 
-        cathodic_voltage = self.cathodic_peak_current[cycle][peak_cathodic_number]['voltage']
-        # check if in self.data there are voltage values lower than the cathodic voltage and in the same cycle and forward scan
-        if self.data[(self.data['voltage'] < cathodic_voltage) & (self.data['cycle_number'] == cycle_num) & (self.data['scan_direction'] == "F")].empty:
-            log.info("No voltage values lower than the cathodic voltage and in the same cycle and forward scan")
-            # get the data from the backward scan of the next cycle and filter the data for this and the next cycle
-            filter_anodic_data = self.data[((self.data['cycle_number'] == cycle_num) | (self.data['cycle_number'] == cycle_num+1)) & (self.data['scan_direction'] == "F")]
+    def _find_height_of_anodic_peak_current(self, cycle, pair, peak_anodic_number, filter_anodic_data):
+        max_distance = 0
+        best_line = None
+        # find the anodic peak current
+        anodic_peak_current = self.anodic_peak_current[cycle][peak_anodic_number]["current"]
+        anodic_peak_voltage = self.anodic_peak_current[cycle][peak_anodic_number]["voltage"]
+        # Smoothen the filtered data
+        filter_anodic_data['current'] = filter_anodic_data['current'].rolling(window=self.smoothing_window_size).mean()
+        index_of_I_half_voltage = max(filter_anodic_data.index[filter_anodic_data['voltage'] <= self.E_half[cycle][pair]['E_half']])
+        fitting_window = int(len(filter_anodic_data[:index_of_I_half_voltage]) / self.fitting_window_size)
+
+        for i in range(len(filter_anodic_data.loc[:index_of_I_half_voltage-fitting_window])):
+            # select two points and fit a line
+            point1, point2 = filter_anodic_data.iloc[i], filter_anodic_data.iloc[i+fitting_window]
+            if (abs(point1["current"]) > abs(point2["current"])) and (point1["voltage"] != point2["voltage"]):
+                slope, intercept, _, _, _ = linregress([point1['voltage'], point2['voltage']],
+                                                [point1['current'], point2['current']])
+
+                intersect_y = self._calculate_intersection_updated(slope, intercept, anodic_peak_voltage)
+                if intersect_y < anodic_peak_current:
+                    distance_to_peak = anodic_peak_current - intersect_y
+                    if distance_to_peak > max_distance:
+                        best_point1, best_point2 = point1, point2
+                        max_distance = distance_to_peak
+                        best_line = (slope, intercept)
+        if max_distance == 0:
+            log.warning(f"No line found for cycle {cycle} and pair {pair} and anodic peak {peak_anodic_number}. Increase the smoothing window size or the fitting window size.")
         else:
-            filter_anodic_data = self.data[(self.data['cycle_number'] == cycle_num) & (self.data['scan_direction'] == "F")]
-        return filter_anodic_data, filter_cathodic_data
+            self.anodic_peak_current[cycle][peak_anodic_number]["height"] = max_distance
+            self.anodic_peak_current[cycle][peak_anodic_number]["capacitative_line"] = best_line
 
+
+    def _calculate_intersection_updated(self, line_slope, line_intercept, peak_v):
+            """
+            Calculate the intersection of the fitted line with the vertical line through the peak.
+            The equation of the vertical line is x = peak_i (voltage).
+            The equation of the fitted line is y = line_slope * x + line_intercept.
+            """
+            intersect_i = line_slope * peak_v + line_intercept
+            return intersect_i
 
     def plot(self, save_dir, plots, optional_name: str = None):
         pass
@@ -269,7 +342,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
-        self.plot(save_dir, plots, optional_name=optional_name)
+        # self.plot(save_dir, plots, optional_name=optional_name)
         #self.save_data(save_dir=save_dir, optional_name=optional_name)
 
     def _peek_to_peek_seperation(self):
