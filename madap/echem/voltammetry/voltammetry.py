@@ -58,7 +58,7 @@ class Voltammetry(EChemProcedure):
         elif self.measured_current_unit == "A":
             self.current = self.current * 1e0
         else:
-            log.error(f"Current unit not supported. Supported units are: uA, mA, A")
+            log.error("Current unit not supported. Supported units are: uA, mA, A")
             raise ValueError("Current unit not supported")
 
     def convert_time(self):
@@ -73,7 +73,7 @@ class Voltammetry(EChemProcedure):
         elif self.measured_time_unitis == "ms":
             self.time = self.time * 1e-3
         else:
-            log.error(f"Time unit not supported. Supported units are: s, min, h")
+            log.error("Time unit not supported. Supported units are: s, min, h")
             raise ValueError("Time unit not supported")
 
 

@@ -1,3 +1,4 @@
+""" This module defines the cyclic amperometry methods. It is a subclass of the Voltammetry class  and the EChemProcedure class. It contains the cyclic amperometry methods for analyzing the data and plotting the results."""
 import os
 
 import numpy as np
@@ -41,7 +42,10 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         # Calculate D using the slope
         # Unit of D: cm^2/s
         # Cortrell equation: I = (nFAD^1/2 * C)/ (pi^1/2 * t^1/2)
-        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * self.faraday_constant ** 2 * self.electrode_area ** 2 * self.concentration_of_active_material ** 2)
+        self.diffusion_coefficient = (slope ** 2 * np.pi) / (self.number_of_electrons ** 2 * \
+                                                            self.faraday_constant ** 2 * \
+                                                            self.electrode_area ** 2 * \
+                                                            self.concentration_of_active_material ** 2)
         log.info(f"Diffusion coefficient: {self.diffusion_coefficient} cm^2/s")
         self.best_fit_diffusion = best_fit
 
