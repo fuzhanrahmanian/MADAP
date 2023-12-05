@@ -184,6 +184,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             self.dQdV_unit = "mAh/V"
 
         all_peaks, _ = find_peaks(dQdV_no_nan)
+        dQdV_no_nan = np.array(dQdV_no_nan)
 
         # Find all negative peaks if dQdV has negative values
         if np.any(dQdV_no_nan < 0):
@@ -291,14 +292,13 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
                     # check if the self.tao_initial is in the transition_indices then remove the cluster that contains the self.tao_initial
                     if self.tao_initial is not None and self.tao_initial in self.np_time[transition_indices][labels == i]:
                         continue
-                    else:
-                        # cluster the peaks
-                        cluster_peaks = self.dVdt_smoothed[transition_indices][labels == i]
-                        # find the max peak in the cluster
-                        max_peak = cluster_peaks[np.argmax(cluster_peaks)]
-                        # get the index of the max peak
-                        max_peak_index = np.where(self.dVdt_smoothed == max_peak)[0][0]
-                        self.transition_values = {self.np_time[max_peak_index]: self.np_voltage[max_peak_index]}
+                    # cluster the peaks
+                    cluster_peaks = self.dVdt_smoothed[transition_indices][labels == i]
+                    # find the max peak in the cluster
+                    max_peak = cluster_peaks[np.argmax(cluster_peaks)]
+                    # get the index of the max peak
+                    max_peak_index = np.where(self.dVdt_smoothed == max_peak)[0][0]
+                    self.transition_values = {self.np_time[max_peak_index]: self.np_voltage[max_peak_index]}
             else:
                 # if all the times at the transition_indices are smaller than the self.tao_initial then we do not have a transition
                 if np.all(self.np_time[transition_indices] < self.tao_initial):
@@ -321,7 +321,10 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             current = np.abs(self.applied_current)
         else:
             current = np.abs(np.mean(self.np_current))
-        self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * self.faraday_constant * self.electrode_area * self.concentration_of_active_material)**2 * np.pi)
+        self.d_coefficient = (4 * current**2) / ((self.number_of_electrons * \
+                                                self.faraday_constant * \
+                                                self.electrode_area * \
+                                                self.concentration_of_active_material)**2 * np.pi)
 
 
     @property
