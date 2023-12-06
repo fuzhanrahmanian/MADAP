@@ -1,19 +1,22 @@
 """ Voltammetry class for cyclic voltammetry data."""
+import os
+import time
+
 import numpy as np
 import pandas as pd
-import time
 
 from scipy.stats import linregress
 from scipy.signal import find_peaks
 
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import silhouette_score
 from sklearn.metrics import r2_score
+from sklearn.linear_model import LinearRegression
 
 from madap.utils import utils
 from madap.echem.voltammetry.voltammetry import Voltammetry
 from madap.echem.procedure import EChemProcedure
 from madap.logger import logger
+
+from madap.echem.voltammetry.voltammetry_plotting import VoltammetryPlotting as voltPlot
 
 log = logger.get_logger("cyclic_voltammetry")
 
@@ -266,9 +269,12 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     # filtered anodic data
                     filter_anodic_data = self.data[(self.data['cycle_number'] == cycle_number) & (self.data['scan_direction'] == "F")].copy()
                     self._find_height_of_anodic_peak_current(cycle, pair, peak_anodic_number, filter_anodic_data )
-
-                self._find_the_best_linear(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
-                self._find_the_best_linear(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
+                log.info(f"Finished calculating the height of the peaks for cycle {cycle} and pair {pair}")
+                self._find_tafel_region(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
+                self._find_tafel_region(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
+                #log.info(f"Finished calculating the peak parameters for cycle {cycle} and pair {pair}")
+                self._calculate_corrosion_point(cycle, peak_anodic_number, peak_cathodic_number)
+                log.info(f"Finished calculating the corrosion point for cycle {cycle} and pair {pair}")
 
 
     def _find_overpotential(self, cycle, pair, peak_anodic_number, peak_cathodic_number):
@@ -389,23 +395,28 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             return intersect_i
 
 
-    def _find_the_best_linear(self, cycle, peak_number, reaction_type, max_points=None):
+    def _find_tafel_region(self, cycle, peak_number, reaction_type, max_points=None):
         # fit the best line on the log-transformed current (y) and voltage (x)
         scan_direction = "B" if reaction_type == "cathodic" else "F"
         cycle_number = int(cycle.split("_")[1])
-
+        e_half = self.E_half[cycle][f"pair_{peak_number}"]["E_half"]
         # filter the data
         data = self.data[(self.data['cycle_number'] == cycle_number) & (self.data['scan_direction'] == scan_direction)].copy()
-        data = self._check_multiple_peaks(data, cycle, peak_number, reaction_type)
+        # filter the data between the peak voltage and the half voltage or between the peak voltage and the next peak voltage
+        data_for_fitting = self._check_multiple_peaks(data=data, cycle=cycle, peak_number=peak_number,
+                                                      reaction_type=reaction_type, e_half=e_half)
+
+        # remove the data points where the current is zero because it will cause an error in the log transformation
+        data_for_fitting = data_for_fitting[data_for_fitting["current"] != 0]
+
         if reaction_type == "anodic":
-            data_for_fitting = data[data["current"] > 0]
             sorted_data = data_for_fitting.sort_values(by="voltage", ascending=False)
-            sorted_data["log_current"] = np.log(sorted_data["current"])
+            # sorted_data["log_current"] = np.log(abs(sorted_data["current"]))
 
         elif reaction_type == "cathodic":
-            data_for_fitting = data[data["current"] < 0]
             sorted_data = data_for_fitting.sort_values(by="voltage", ascending=True)
-            sorted_data["log_current"] = np.log(-sorted_data["current"])
+
+        sorted_data["log_current"] = np.log10(abs(sorted_data["current"]))
 
         # initialize the best fit parameters
         best_fit_slope = 0
@@ -417,44 +428,63 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             max_points = len(sorted_data)
 
         # specify the minimum number of points to consider
-        min_points = int(len(sorted_data)/5)
+        min_points = int(len(sorted_data)/4) if int(len(sorted_data)/4) > 6 else 6
 
         # iterate through the data
         log.info(f"Start fitting the linear regression model for cycle {cycle} and {reaction_type} peak {peak_number}")
         # Take the starting point in time before the loop
         start_time = time.time()
-        for size in range(min_points, max_points + 1, 2):
-            subset = sorted_data.head(size)
-            X_data = subset[['voltage']]
-            y_data = subset['log_current']
+    # start the sorted data from the first point and iterate through the data
+        for start_ind in range(0, len(sorted_data), 1):
+            subset_of_sorted_data = sorted_data.iloc[start_ind:]
+            if best_fit_r2 > 0.98:
+                break
+            for size in range(min_points, max_points + 1, 2):
+                subset = subset_of_sorted_data.head(size)
+                X_data = subset[['voltage']]
+                y_data = subset['log_current']
 
-            # Fit the linear regression model
-            model = LinearRegression().fit(X_data, y_data)
-            y_pred = model.predict(X_data)
+                # Fit the linear regression model
+                model = LinearRegression(n_jobs=4).fit(X_data, y_data)
+                y_pred = model.predict(X_data)
 
-            # Calculate R^2 value
-            r2 = r2_score(y_data, y_pred)
-            # Update the best fit parameters if the R^2 value is higher
-            if r2 > best_fit_r2:
-                # Write the start and end points of the best fit line
-                start_point = {"voltage": X_data['voltage'].iloc[0], "current": subset['current'].iloc[0]}
-                end_point = {"voltage": X_data['voltage'].iloc[-1], "current": subset['current'].iloc[-1]}
-                best_fit_slope = model.coef_[0]
-                best_fit_r2 = r2
-                best_fit_size = size
-                # Slope = (alpha*F*n)/(2.3*R*T). Find alpha
-                alpha = (best_fit_slope * 2.3 * self.gas_constant * self.temperature) /(self.faraday_constant * self.number_of_electrons)
+                # Calculate R^2 value
+                r2 = r2_score(y_data, y_pred)
+                # Update the best fit parameters if the R^2 value is higher
+                if r2 > best_fit_r2:
+                    # Write the start and end points of the best fit line
+                    # TODO make it fix the start and end points and put it back to the original voltage scale
+                    start_point = {"voltage": X_data['voltage'].iloc[0],
+                                "current": subset['current'].iloc[0],
+                                "log_current": subset['log_current'].iloc[0]}
+                    end_point = {"voltage": X_data['voltage'].iloc[-1],
+                                "current": subset['current'].iloc[-1],
+                                "log_current": subset['log_current'].iloc[-1]}
+                    best_fit_slope = model.coef_[0]
+                    best_fit_intercept = model.intercept_
+                    best_fit_r2 = r2
+                    best_fit_size = size
+
+        if best_fit_r2 < 0.98:
+            log.warning(f"R^2 value is {best_fit_r2:.2f}. The slope and intercept of the Tafel region might not be accurate.")
+        # Slope = (alpha*F*n)/(2.3*R*T). Find alpha
+        alpha = (best_fit_slope * 2.3 * self.gas_constant * self.temperature) /(self.faraday_constant * self.number_of_electrons)
         end_time = time.time()
         log.info(f"Finished fitting the linear regression model for cycle {cycle} and {reaction_type} peak {peak_number} in {(end_time - start_time):.2f} seconds.")
+        log.info(f"Best R^2 value is {best_fit_r2:.2f}.")
+
         if reaction_type == "anodic":
             self.anodic_peak_current[cycle][peak_number]["faradaic_slope"] = best_fit_slope
+            self.anodic_peak_current[cycle][peak_number]["faradaic_intercept"] = best_fit_intercept
             self.anodic_peak_current[cycle][peak_number]["faradaic_r2"] = best_fit_r2
             self.anodic_peak_current[cycle][peak_number]["faradaic_size"] = best_fit_size
             self.anodic_peak_current[cycle][peak_number]["faradaic_start_point"] = start_point
             self.anodic_peak_current[cycle][peak_number]["faradaic_end_point"] = end_point
             self.anodic_peak_current[cycle][peak_number]["alpha"] = alpha
+
         elif reaction_type == "cathodic":
             self.cathodic_peak_current[cycle][peak_number]["faradaic_slope"] = best_fit_slope
+            self.cathodic_peak_current[cycle][peak_number]["faradaic_intercept"] = best_fit_intercept
             self.cathodic_peak_current[cycle][peak_number]["faradaic_r2"] = best_fit_r2
             self.cathodic_peak_current[cycle][peak_number]["faradaic_size"] = best_fit_size
             self.cathodic_peak_current[cycle][peak_number]["faradaic_start_point"] = start_point
@@ -462,37 +492,110 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             self.cathodic_peak_current[cycle][peak_number]["alpha"] = alpha
 
 
-    def _check_multiple_peaks(self, data, cycle, peak_number, reaction_type):
+
+    def _check_multiple_peaks(self, data, cycle, peak_number, reaction_type, e_half):
         peaks = self.anodic_peak_current if reaction_type == "anodic" else self.cathodic_peak_current
         cycle_peaks = peaks[cycle]
+        # total number of peaks
         number_of_peaks = len(cycle_peaks)
         current_peak_index = int(peak_number.split('_')[1])
 
         def get_filtered_voltage(index):
-            return (cycle_peaks[f"peak_{index}"]["voltage"] + cycle_peaks[f"peak_{index + 1}"]["voltage"]) / 2
+            return (cycle_peaks[f"peak_{index}"]["voltage"]) + (cycle_peaks[f"peak_{index + 1}"]["voltage"]) / 2
 
-        if number_of_peaks <= 1:
-            return data
 
-        if current_peak_index == 1:
-            filtered_voltage = get_filtered_voltage(current_peak_index)
-            condition = data["voltage"] < filtered_voltage if reaction_type == "anodic" else data["voltage"] > filtered_voltage
-        elif current_peak_index == number_of_peaks:
-            filtered_voltage = get_filtered_voltage(current_peak_index - 1)
-            condition = data["voltage"] > filtered_voltage if reaction_type == "anodic" else data["voltage"] < filtered_voltage
-        else:
+        if number_of_peaks == 1 or current_peak_index == 1:
+            offset = 1.05 if cycle_peaks[peak_number]["voltage"] > e_half else 0.95
+            # define the condition to filter the data between the peak voltage and the half voltage
+            if reaction_type == "anodic": # get the voltage above the E_half and below the anodic peak voltage
+                condition = (data["voltage"] > e_half) & (data["voltage"] < (cycle_peaks[peak_number]["voltage"]))
+            else: # get the voltage below the E_half and above the cathodic peak voltage
+                condition = (data["voltage"] < e_half) & (data["voltage"] > (cycle_peaks[peak_number]["voltage"]))
+
+
+        elif current_peak_index > 1 and current_peak_index < number_of_peaks:
             lower_voltage = get_filtered_voltage(current_peak_index - 1)
-            upper_voltage = get_filtered_voltage(current_peak_index)
+            upper_voltage = cycle_peaks[f"peak_{current_peak_index}"]["voltage"]
             if reaction_type == "anodic":
                 condition = (data["voltage"] > lower_voltage) & (data["voltage"] < upper_voltage)
             else:
                 condition = (data["voltage"] < lower_voltage) & (data["voltage"] > upper_voltage)
 
-        return data[condition]
+        elif current_peak_index == number_of_peaks:
+            filtered_voltage = get_filtered_voltage(current_peak_index - 1)
+            condition = data["voltage"] > filtered_voltage if reaction_type == "anodic" else data["voltage"] < filtered_voltage
+
+        else:
+            log.error(f"Peak number {current_peak_index} is not valid.")
+
+        return data[condition].copy()
 
 
+    def _calculate_corrosion_point(self, cycle, peak_anodic_number, peak_cathodic_number):
+                                   #slope1, intercept1, slope2, intercept2):
+        """ Calculate the intersection of two lines.
+
+        Args:
+            slope1 (float): Slope of the first line
+            intercept1 (float): Intercept of the first line
+            slope2 (float): Slope of the second line
+            intercept2 (float): Intercept of the second line
+
+        Returns:
+            float: Intersection of the two lines
+        """
+        # check if the lines are parallel
+        slope2 = self.anodic_peak_current[cycle][peak_anodic_number]["faradaic_slope"]
+        slope1 = self.cathodic_peak_current[cycle][peak_cathodic_number]["faradaic_slope"]
+        intercept2 = self.anodic_peak_current[cycle][peak_anodic_number]["faradaic_intercept"]
+        intercept1 = self.cathodic_peak_current[cycle][peak_cathodic_number]["faradaic_intercept"]
+
+        if slope1 == slope2:
+            log.error("The two lines are parallel and do not intersect.")
+            return None
+        # find the x coordinate of the intersection
+        x_point = (intercept2 - intercept1) / (slope1 - slope2)
+        # find the y coordinate of the intersection
+        y_point = slope1 * x_point + intercept1 # current is in log scale
+        y_point_linear = np.exp(y_point) # convert the current back to linear scale
+        self.E_half[cycle][f"pair_{peak_anodic_number}"]["corrosion_point"] = {}
+        self.E_half[cycle][f"pair_{peak_anodic_number}"]["corrosion_point"]["voltage"] = x_point
+        self.E_half[cycle][f"pair_{peak_anodic_number}"]["corrosion_point"]["log_current"] = y_point
+        self.E_half[cycle][f"pair_{peak_anodic_number}"]["corrosion_point"]["current"] = y_point_linear
+
+
+
+
+    #"CV", "Tafel", "I-E_half", "E-t", "I-t", "Peak Scan"
     def plot(self, save_dir, plots, optional_name: str = None):
-        pass
+        plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
+        plot = voltPlot(current=self.np_current, voltage=self.np_voltage, time=self.np_time,
+                        electrode_area=self.electrode_area,
+                        mass_of_active_material=self.mass_of_active_material,
+                        cumulative_charge = self.cumulative_charge,
+                        procedure_type=self.__class__.__name__)
+
+        fig, available_axes = plot.compose_volt_subplot(plots=plots)
+        for sub_ax, plot_name in zip(available_axes, plots):
+            if plot_name == "CV":
+                plot.CV(subplot_ax=sub_ax)
+            elif plot_name == "Tafel":
+                plot.Tafel(subplot_ax=sub_ax)
+            elif plot_name == "E-t":
+                plot.CP(subplot_ax=sub_ax, y_lim_min="auto")
+            elif plot_name == "I-t":
+                plot.CA(subplot_ax=sub_ax, y_lim_min="auto", legend=False)
+            elif plot_name == "Peak Scan":
+                plot.PeakScan(subplot_ax=sub_ax)
+            else:
+                log.error("Voltammetry CP class does not have the selected plot.")
+                continue
+
+        fig.tight_layout()
+        self.figure = fig
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__)
+        plot.save_plot(fig, plot_dir, name)
 
 
     def save_data(self, save_dir:str, optional_name:str = None):
@@ -519,7 +622,29 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     optional_name else utils.assemble_file_name(self.__class__.__name__, "data.csv")
         utils.save_data_as_csv(save_dir, self.data, data_name)
 
+
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
         self.analyze()
-        # self.plot(save_dir, plots, optional_name=optional_name)
-        self.save_data(save_dir=save_dir, optional_name=optional_name)
+        self.plot(save_dir, plots, optional_name=optional_name)
+        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+
+
+
+    @property
+    def figure(self):
+        """Get the figure of the plot.
+
+        Returns:
+            obj: Figure object for ca plot.
+        """
+        return self._figure
+
+
+    @figure.setter
+    def figure(self, figure):
+        """Set the figure of the plot.
+
+        Args:
+            figure (obj): Figure object for ca plot.
+        """
+        self._figure = figure
