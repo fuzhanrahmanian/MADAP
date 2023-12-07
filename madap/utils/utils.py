@@ -3,6 +3,7 @@ import time
 import json
 import os
 
+import numpy as np
 import pandas as pd
 
 from madap.logger import logger
@@ -49,6 +50,7 @@ def assemble_data_frame(**kwargs):
         df = pd.DataFrame(data=kwargs)
     return df
 
+
 def save_data_as_csv(directory, data, name):
     """Save the given data as csv
 
@@ -73,6 +75,7 @@ def save_data_as_json(directory, data, name):
     with open(os.path.join(directory, name), 'w', encoding="utf-8") as file:
         json.dump(data, file)
 
+
 def load_data_as_json(directory, name):
     """ Load the given data as json
 
@@ -85,6 +88,7 @@ def load_data_as_json(directory, name):
         data = json.load(file)
     return data
 
+
 def append_to_save_data(directory, added_data, name):
     """Append the given data to the existing data
 
@@ -96,3 +100,28 @@ def append_to_save_data(directory, added_data, name):
     data = load_data_as_json(directory, name)
     data.update(added_data)
     save_data_as_json(directory, data, name)
+
+
+def convert_numpy_to_python(data):
+    """Convert numpy data to python data
+
+    Args:
+        data (pandas.DataFrame): The data that should be converted
+
+    Returns:
+        pd.DataFrame: The converted data
+    """
+    # serializing numpy data to python data
+    if isinstance(data, dict):
+        return {k: convert_numpy_to_python(v) for k, v in data.items()}
+    # serializing numpy int to python int
+    elif isinstance(data, (np.int64, np.int32, np.int16, np.int8)):
+        return int(data)
+    # serializing numpy float to python float
+    elif isinstance(data, (np.float64, np.float32, np.float16)):
+        return float(data)
+    # serializing numpy array to python list
+    elif isinstance(data, (np.ndarray,)):
+        return data.tolist()
+
+    return data
