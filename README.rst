@@ -107,8 +107,7 @@ If you use MADAP in your research, please cite this GitHub repository https://gi
    :target: https://zenodo.org/badge/latestdoi/494354435
 
 Please also cite the following work:
-[Rahmanian2023] Rahmanian, F., Vogler, M., Wölke, C. et al. "Conductivity experiments for electrolyte formulations and their automated analysis." Sci Data 10, 43 (2023). https://doi.org/10.1038/s41597-023-01936-3
-
+`[Rahmanian2023] <https://doi.org/10.1038/s41597-023-01936-3>`_ Rahmanian, F., Vogler, M., Wölke, C. et al. "Conductivity experiments for electrolyte formulations and their automated analysis." Sci Data 10, 43 (2023).
 
 References
 ~~~~~~~~~~
