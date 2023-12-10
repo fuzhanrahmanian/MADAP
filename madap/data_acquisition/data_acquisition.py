@@ -89,7 +89,7 @@ def select_data(data, selected_data:str):
     return data
 
 
-def format_plots(plots):
+def format_list(list_data):
     """ Format the selection plots into a list
 
     Args:
@@ -97,12 +97,13 @@ def format_plots(plots):
 
     Returns:
         list: The list of plots selected by the user
-    """
-    if isinstance(plots, str):
-        plots = [plots]
-    if isinstance(plots, tuple):
-        plots = list(plots)
-    return plots
+    # """
+    if isinstance(list_data, str) or isinstance(list_data, int):
+        list_data = [list_data]
+    if isinstance(list_data, tuple):
+        list_data = list(list_data)
+    return list_data
+
 
 def remove_outlier_specifying_quantile(df, columns, low_quantile = 0.05, high_quantile = 0.95):
     """removing the outliers from the data by specifying the quantile
@@ -135,6 +136,7 @@ def remove_outlier_specifying_quantile(df, columns, low_quantile = 0.05, high_qu
                \n and the indeces are {nan_indices}.")
 
     return detect_search, nan_indices
+
 
 def remove_nan_rows(df, nan_indices):
     """ Remove the rows with nan values
