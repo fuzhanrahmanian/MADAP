@@ -127,7 +127,7 @@ def gui_layout(madap, colors):
     # ----------- Create a layout with a field for a data path and a result path ----------- #
     layout_data = [[sg.Text('Data Path', size=(10, 1)), sg.InputText(key='-DATA_PATH-',
                                                                      size=(55,1),
-                                                                     default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CV/example_cv.csv"),
+                                                                     default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CV/CV_Ru0001.xlsx"),
                     sg.FileBrowse(key='-BROWSE_DATA_PATH-')],
                    [sg.Text('Result Path', size=(10, 1)), sg.InputText(key='-RESULT_PATH-',
                                                                        size=(55,1),
@@ -215,7 +215,7 @@ def gui_layout(madap, colors):
                                key='-TAB_Lissajous-', expand_y=True),
                         sg.Tab('Mottschosky', tab_layout_mott, background_color='darkgreen',
                                key='-TAB_Mottschosky-', expand_y=True)]],
-                        tab_location='topleft', selected_title_color='black', enable_events=True,
+                        tab_location='topleft', selected_title_color='#0CF2F2', enable_events=True,
                         expand_y=True)]]
 
     # ----------- Layout the Arrhenius Options ----------- #
@@ -252,7 +252,7 @@ def gui_layout(madap, colors):
                         [sg.TabGroup([[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
                                     sg.Tab('Chrono-Amperomtery', tab_layout_ca, key='-TAB_CA-', expand_y=True),
                                     sg.Tab('Cyclic Voltammetry', tab_layout_cv, key='-TAB_CV-', expand_y=True)]],
-                                    tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True, pad=(1,(15,0)))]
+                                    tab_location='topleft', selected_title_color='#0CF2F2', enable_events=True, expand_y=True, pad=(1,(15,0)))]
 ]
 
 
@@ -295,8 +295,20 @@ def main():
     """Main function of the GUI
     """
 
+    # Defining the custom theme 'MADAP' using the provided hex values
+    sg.LOOK_AND_FEEL_TABLE['MADAP'] = {
+        'BACKGROUND': '#0D0D0D',        # A dark shade for the background for contrast
+        'TEXT': '#0CF2F2',              # Light grey for text, providing readability against the dark background
+        'INPUT': '#D6BBAF',            # A deep color for input fields, distinguishing them from the background
+        'TEXT_INPUT': '#2B2840',        # Light grey for input text to contrast with the dark input field
+        'SCROLL': '#2B2840',            # A bright, noticeable color for the scrollbar
+        'BUTTON': ('white', '#2B2840'), # A combination of white text on a vibrant button background
+        'PROGRESS': ('#F27166', '#0D0D0D'), # A contrasting progress bar with a dark background
+        'BORDER': 1, 'SLIDER_DEPTH': 0, 'PROGRESS_DEPTH': 0,
+    }
+
     # Select a theme
-    sg.theme("DarkGray3")
+    sg.theme("MADAP")
 
     # Create class with initial values
     madap_gui = MadapGui()
