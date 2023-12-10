@@ -7,7 +7,7 @@ import matplotlib.gridspec as gridspec
 from madap.logger import logger
 from madap.utils import utils
 from madap.plotting.plotting import Plots
-
+from matplotlib.legend_handler import HandlerTuple
 
 log = logger.get_logger("voltammetry_plotting")
 
@@ -392,10 +392,98 @@ class VoltammetryPlotting(Plots):
 
         self._cv_legend(subplot_ax)
 
-    def Tafel(self, subplot_ax):
-        # TODO: add D
-        pass
+    def Tafel(self, subplot_ax, data, anodic_peak_params, cathodic_peak_params, E_half_params, cycle_list):
+        """Plot the Tafel plot.
 
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+            data (pandas.DataFrame): dataframe of the data
+            anodic_peak_params (dict): dictionary of anodic peak parameters
+            cathodic_peak_params (dict): dictionary of cathodic peak parameters
+        """
+        log.info("Creating Tafel plot")
+
+        # Set a bigger size for the subplot due to the legend#
+        current_width, current_height = subplot_ax.get_figure().get_size_inches()
+        new_width = current_width * 1.2
+        subplot_ax.get_figure().set_size_inches(new_width, current_height)
+
+        if cycle_list is None:
+            cycle_list = [i+1 for i in range(len(data))]
+
+        # Array of colors from viridis with length of the number of cycles
+        if len(cycle_list) < 10:
+            # Take the first 10 colors from tab10 colormap
+            colors = plt.get_cmap("tab10").colors
+            tab10_colors = [colors[i] for i in range(10)]
+            complementary_colors = [utils.get_complementary_color(color) for color in tab10_colors]
+        else:
+            colors = plt.cm.winter(np.linspace(0, 1, len(cycle_list)))
+
+        # Loop through cycle with the plotted_cycle_frequency
+        for cycle_number in cycle_list:
+            for peak in E_half_params[f"cycle_{cycle_number}"].keys():
+                peak_num = peak.split("pair_")[-1]
+                # anodic tafel plot
+                subplot_ax.plot(data[f"cycle_{cycle_number}"][peak]["anodic"]["voltage"],
+                                np.log10(abs(data[f"cycle_{cycle_number}"][peak]["anodic"]["current"])),
+                                linewidth=0.9, color=colors[cycle_number-1], label=f"Cyc. {cycle_number}")
+                # anodic_tafel_line
+                subplot_ax.plot([anodic_peak_params[f"cycle_{cycle_number}"][peak_num]["faradaic_start_point"]["voltage"],
+                                E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["voltage"]],
+                                [anodic_peak_params[f"cycle_{cycle_number}"][peak_num]["faradaic_start_point"]["log_current"],
+                                E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["log_current"]],
+                                linestyle=':', linewidth=0.5, color=colors[cycle_number-1], alpha=0.7, zorder=5)
+
+                # cathodic tafel plot
+                subplot_ax.plot(data[f"cycle_{cycle_number}"][peak]["cathodic"]["voltage"],
+                                np.log10(abs(data[f"cycle_{cycle_number}"][peak]["cathodic"]["current"])),
+                                linewidth=0.9, color=complementary_colors[cycle_number-1], label=f"Cyc. {cycle_number}")
+                # cathodic_tafel_line
+                subplot_ax.plot([cathodic_peak_params[f"cycle_{cycle_number}"][peak_num]["faradaic_start_point"]["voltage"],
+                                E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["voltage"]],
+                                [cathodic_peak_params[f"cycle_{cycle_number}"][peak_num]["faradaic_start_point"]["log_current"],
+                                E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["log_current"]],
+                                linestyle=':', linewidth=0.5, color=complementary_colors[cycle_number-1], alpha=0.7, zorder=5)
+                # the corrosion  vertical line
+                subplot_ax.axvline(x=E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["voltage"],
+                                   color="blue", linestyle='--', linewidth=0.5, alpha=0.7)
+
+                subplot_ax.plot(E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["voltage"],
+                                E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["log_current"],
+                                "ro", label=f"Corrosion", markersize=1)
+
+        self.plot_identity(subplot_ax, xlabel="Voltage (V)", ylabel="Log(Current) (Log(A))")
+        # Add the legend outside the plot
+        # Check if the legend has mulitple entries of "Corrosion point" and delete all except the last one
+        # Retrieve current legend handles and labels
+        handles, labels = subplot_ax.get_legend_handles_labels()
+
+        # Process handles and labels
+        new_labels = []
+        new_handles = []
+        cycle_handles = {}
+
+        for handle, label in zip(handles, labels):
+            if "Cyc." in label:
+                if label not in cycle_handles:
+                    cycle_handles[label] = [handle]
+                else:
+                    cycle_handles[label].append(handle)
+            elif "Corrosion" == label:
+                corrosion_point_handle = handle  # Keep the last handle
+
+        # Grouping cycle handles
+        for label, handle_group in cycle_handles.items():
+            new_labels.append(label)
+            new_handles.append(tuple(handle_group))
+
+        # Adding corrosion point
+        new_labels.append("Corrosion")
+        new_handles.append(corrosion_point_handle)  # Add as a tuple if you want it to be treated the same as cycles
+
+        # Creating custom legend
+        subplot_ax.legend(new_handles, new_labels, handler_map={tuple: HandlerTuple(ndivide=None)}, loc='upper left', bbox_to_anchor=(1.05, 1))
 
     def peak_scan(self, subplot_ax, anodic_peak_params, cathodic_peak_params, E_half_params):
         """Plot the peak scan plot.
