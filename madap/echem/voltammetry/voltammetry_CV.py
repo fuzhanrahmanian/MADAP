@@ -39,6 +39,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.data = None
         self.temperature = float(args.temperature) if args.temperature is not None else 298.15 # Unit: K
         self.cycle_list = cycle_list
+        self.tafel_data = {}
 
 
     def analyze(self):
@@ -241,7 +242,9 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         """ Find the peak parameters for each anodic and cathodic peak.
         """
         for cycle in self.E_half_params:
+            self.tafel_data[cycle] = {}
             for pair in self.E_half_params[cycle].keys():
+                self.tafel_data[cycle][pair] = {}
                 peak_anodic_number = self.E_half_params[cycle][pair]['anodic_peak']
                 peak_cathodic_number = self.E_half_params[cycle][pair]['cathodic_peak']
 
@@ -269,10 +272,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     self._find_height_of_anodic_peak_current(cycle, pair, peak_anodic_number, filter_anodic_data )
 
                 log.info(f"Finished calculating the height of the peaks for cycle {cycle} and pair {pair}")
-                #self._find_tafel_region(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
-                #self._find_tafel_region(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
-                #log.info(f"Finished calculating the peak parameters for cycle {cycle} and pair {pair}")
-                #self._calculate_corrosion_point(cycle, peak_anodic_number, peak_cathodic_number)
+                self._find_tafel_region(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
+                self._find_tafel_region(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
+                log.info(f"Finished calculating the peak parameters for cycle {cycle} and pair {pair}")
+                self._calculate_corrosion_point(cycle, peak_anodic_number, peak_cathodic_number)
                 log.info(f"Finished calculating the corrosion point for cycle {cycle} and pair {pair}")
 
 
@@ -417,6 +420,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             reaction_type (str): Type of reaction (anodic or cathodic)
             max_points (int, optional): Maximum number of points to consider for the linear regression. Defaults to None.
         """
+        self.tafel_data[cycle][f"pair_{peak_number}"][reaction_type] = {}
         # fit the best line on the log-transformed current (y) and voltage (x)
         scan_direction = "B" if reaction_type == "cathodic" else "F"
         cycle_number = int(cycle.split("_")[1])
@@ -426,6 +430,12 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # filter the data between the peak voltage and the half voltage or between the peak voltage and the next peak voltage
         data_for_fitting = self._check_multiple_peaks(data=data, cycle=cycle, peak_number=peak_number,
                                                       reaction_type=reaction_type, e_half=e_half)
+        # add the self.tafel_data to the dictionary
+        if reaction_type == "anodic":
+            data_for_peak_one = data[data["voltage"] < self.anodic_peak_params[cycle][f"{peak_number}"]["voltage"]]
+        else:
+            data_for_peak_one = data[data["voltage"] > self.cathodic_peak_params[cycle][f"{peak_number}"]["voltage"]]
+        self.tafel_data[cycle][f"pair_{peak_number}"][reaction_type] = data_for_peak_one if peak_number == "peak_1" else data_for_fitting
 
         # remove the data points where the current is zero because it will cause an error in the log transformation
         data_for_fitting = data_for_fitting[data_for_fitting["current"] != 0]
@@ -438,6 +448,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             sorted_data = data_for_fitting.sort_values(by="voltage", ascending=True)
 
         sorted_data["log_current"] = np.log10(abs(sorted_data["current"]))
+
 
         # initialize the best fit parameters
         best_fit_slope = 0
@@ -459,7 +470,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
     # start the sorted data from the first point and iterate through the data
         for start_ind in range(0, len(sorted_data), 1):
             subset_of_sorted_data = sorted_data.iloc[start_ind:]
-            if best_fit_r2 > 0.98:
+            if best_fit_r2 > 0.99:
                 break
             for size in range(min_points, max_points + 1, 2):
                 subset = subset_of_sorted_data.head(size)
@@ -620,25 +631,42 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             # Drop the Peak scan plot from the list of plots
             plots = [plot for plot in plots if plot != "Peak Scan"]
 
+        tafel_present = True if "Tafel" in plots else False
+        cv_present = True if "CV" in plots else False
 
         if len(plots) != 0:
             fig, available_axes = plot.compose_volt_subplot(plots=plots)
             for sub_ax, plot_name in zip(available_axes, plots):
 
                 if plot_name == "E-t":
+                    sub_ax = available_axes[-1] if (tafel_present and cv_present and (len(plots) == 3)) else \
+                            available_axes[0] if (len(plots) == 5) else sub_ax
                     plot.potential_waveform(subplot_ax=sub_ax, data=self.data)
                 elif plot_name == "I-t":
+                    sub_ax = available_axes[-1] if (tafel_present and cv_present and (len(plots) == 3)) else \
+                            available_axes[4] if (len(plots) == 5) else sub_ax
+
                     plot.CA(subplot_ax=sub_ax, x_lim_min="auto", y_lim_min="auto", legend=False)
                 elif plot_name == "Peak Scan":
+                    sub_ax = available_axes[-1] if (tafel_present and cv_present and (len(plots) == 3)) else \
+                            available_axes[3] if (len(plots) == 5) else sub_ax
                     plot.peak_scan(subplot_ax=sub_ax, anodic_peak_params=self.anodic_peak_params,
                                 cathodic_peak_params=self.cathodic_peak_params, E_half_params=self.E_half_params)
 
                 elif plot_name == "CV":
+                    sub_ax = available_axes[-1] if ((not tafel_present) and (len(plots) == 3)) else \
+                        available_axes[0] if (tafel_present and (len(plots) == 3)) else \
+                        available_axes[2] if (tafel_present and (len(plots) == 5)) else sub_ax
                     plot.CV(subplot_ax=sub_ax, data=self.data, anodic_peak_params=self.anodic_peak_params,
                             cathodic_peak_params=self.cathodic_peak_params, E_half_params=self.E_half_params,
                             cycle_list=self.cycle_list)
                 elif plot_name == "Tafel":
-                    plot.Tafel(subplot_ax=sub_ax)
+                    sub_ax = available_axes[-1] if ((not cv_present) and (len(plots) == 3)) else\
+                        available_axes[1] if (cv_present and (len(plots) == 3)) else \
+                        available_axes[1] if (cv_present and (len(plots) == 5)) else sub_ax
+                    plot.Tafel(subplot_ax=sub_ax, data=self.tafel_data, anodic_peak_params=self.anodic_peak_params,
+                               cathodic_peak_params=self.cathodic_peak_params, E_half_params=self.E_half_params,
+                               cycle_list=self.cycle_list)
 
                 else:
                     log.error("Voltammetry CP class does not have the selected plot.")
