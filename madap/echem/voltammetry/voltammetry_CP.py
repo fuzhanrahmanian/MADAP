@@ -70,14 +70,14 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             elif plot_name == "CC":
                 plot.CC(subplot_ax=sub_ax)
             elif plot_name == "Cottrell":
-                plot.Cottrell(subplot_ax=sub_ax, diffusion_coefficient=self.d_coefficient)
+                plot.cottrell(subplot_ax=sub_ax, diffusion_coefficient=self.d_coefficient)
             elif plot_name == "Voltage_Profile":
-                plot.Voltage_Profile(subplot_ax=sub_ax)
+                plot.voltage_profile(subplot_ax=sub_ax)
             elif plot_name == "Potential_Rate":
-                plot.Potential_Rate(subplot_ax=sub_ax, dVdt=self.dVdt, transition_values=self.transition_values,
+                plot.potential_rate(subplot_ax=sub_ax, dVdt=self.dVdt, transition_values=self.transition_values,
                                     tao_initial=self.tao_initial)
             elif plot_name == "Differential_Capacity":
-                plot.Differential_Capacity(subplot_ax=sub_ax, dQdV_no_nan=self.dQdV,positive_peaks=self.positive_peaks,
+                plot.differential_capacity(subplot_ax=sub_ax, dQdV_no_nan=self.dQdV,positive_peaks=self.positive_peaks,
                                             negative_peaks=self.negative_peaks)
             else:
                 log.error("Voltammetry CP class does not have the selected plot.")

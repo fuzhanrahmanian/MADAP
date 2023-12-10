@@ -221,7 +221,7 @@ def call_impedance(data, result_dir, args):
         pass
 
     # Format plots arguments
-    plots = da.format_plots(args.plots)
+    plots = da.format_list(args.plots)
 
     # Perform all actions
     procedure.perform_all_actions(result_dir, plots=plots)
@@ -270,7 +270,7 @@ def call_arrhenius(data, result_dir, args):
     arrhenius_cls = arrhenius.Arrhenius(da.format_data(temp_data), da.format_data(cond_data))
 
     # Format the plots arguments
-    plots = da.format_plots(args.plots)
+    plots = da.format_list(args.plots)
 
     # Perform all actions
     arrhenius_cls.perform_all_actions(result_dir, plots = plots)
@@ -302,7 +302,8 @@ def call_voltammetry(data, result_dir, args):
         charge_data = da.format_data(data[header_names[3]])
     else:
         charge_data = None
-
+    cycle_list = da.format_list(eval(args.cycle_list)) if args.cycle_list else None
+    
     if args.voltammetry_procedure == "CA":
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
@@ -312,8 +313,9 @@ def call_voltammetry(data, result_dir, args):
     if args.voltammetry_procedure == "CV":
         voltammetry_cls = voltammetry_CV.Voltammetry_CV(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
-                                                        time =da.format_data(time_data),
+                                                        time_params =da.format_data(time_data),
                                                         scan_rate=charge_data,
+                                                        cycle_list=cycle_list,
                                                         args=args)
     if args.voltammetry_procedure == "CP":
         voltammetry_cls = voltammetry_CP.Voltammetry_CP(current=da.format_data(current_data),
@@ -323,8 +325,12 @@ def call_voltammetry(data, result_dir, args):
                                                         args=args)
 
     # Format plots arguments
-    plots = da.format_plots(args.plots)
-    voltammetry_cls.perform_all_actions(result_dir, plots=plots)
+    plots = da.format_list(args.plots)
+    try:
+        voltammetry_cls.perform_all_actions(result_dir, plots=plots)
+    except ValueError as e:
+        log.error("The plot you selected is not available. Please check the help.")
+        raise e
     return voltammetry_cls
 
 

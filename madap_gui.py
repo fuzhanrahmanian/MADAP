@@ -18,7 +18,7 @@ class MadapGui:
     arrhenius_plots = ["arrhenius", "arrhenius_fit"]
     ca_plots = ["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"]
     cp_plots = ["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"]
-    cv_plots = ["CV", "Tafel"]
+    cv_plots = ["E-t", "I-t", "Peak Scan", "CV", "Tafel"]
 
     def __init__(self):
         self.procedure = "Impedance"
@@ -36,7 +36,6 @@ class MadapGui:
         self.lower_limit_quantile = None
         self.voltammetry_procedure = None
         self.applied_current = None
-        self.scan_rate = None
         self.measured_current_units = None
         self.measured_time_units = None
         self.applied_voltage = None
@@ -45,7 +44,11 @@ class MadapGui:
         self.concentration_of_active_material = None
         self.number_of_electrons = None
         self.window_size = None
+        self.cycle_list = None
+        self.fitting_window_size = None
         self.penalty_value = None
+        self.expected_num_of_peaks = None
+        self.temperature = None
 
     # pylint: disable=inconsistent-return-statements
     def validate_fields(self):
@@ -196,8 +199,10 @@ def gui_layout(madap, colors):
                     [sg.Listbox([x for x in madap.cp_plots], key='-PLOTS_CP-',
                                 size=(50,len(madap.cp_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
                                 expand_x=True, expand_y=True)]]
-    tab_layout_cv = [[sg.Text('Applied Scan Rate [V/s] (optional)',justification='left', font=("Arial", 13))],
-                    [sg.Input(key='-inCVScanRate-')],
+    tab_layout_cv = [[sg.Text('Plotted Cycle [list] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.InputText(key='-inPlotCycleList-', default_text="1", tooltip=gui_elements.WINDOW_SIZE_HELP)],
+                    [sg.Text('Temperature [K] (optional)',justification='left', font=("Arial", 13))],
+                    [sg.Input(key='-inCVTemperature-', default_text="298.15")],
                     [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cv_plots], key='-PLOTS_CV-',
                                 size=(50,len(madap.cv_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
@@ -247,7 +252,7 @@ def gui_layout(madap, colors):
                         [sg.TabGroup([[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
                                     sg.Tab('Chrono-Amperomtery', tab_layout_ca, key='-TAB_CA-', expand_y=True),
                                     sg.Tab('Cyclic Voltammetry', tab_layout_cv, key='-TAB_CV-', expand_y=True)]],
-                                    tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True)]
+                                    tab_location='topleft', selected_title_color='black', enable_events=True, expand_y=True, pad=(1,(15,0)))]
 ]
 
 
@@ -291,7 +296,7 @@ def main():
     """
 
     # Select a theme
-    sg.theme("LightGreen6")
+    sg.theme("DarkGray3")
 
     # Create class with initial values
     madap_gui = MadapGui()
@@ -300,7 +305,7 @@ def main():
     colors = (sg.theme_text_color(), sg.theme_background_color())
     layout = gui_layout(madap_gui, colors)
     title = 'MADAP: Modular Automatic Data Analysis Platform'
-    window = sg.Window(title, layout, resizable=True)
+    window = sg.Window(title, layout, icon="logo.ico", resizable=True)
     # Shared variable for the return value and a flag to indicate completion
     procedure_result = [None]  # List to hold the return value
     procedure_complete = [False]  # Flag to indicate completion
@@ -309,7 +314,7 @@ def main():
     def procedure_wrapper():
         try:
             procedure_result[0] = start_procedure(madap_gui)
-        except Exception as e:
+        except ValueError as e:
             procedure_error[0] = e
         finally:
             procedure_complete[0] = True
@@ -350,7 +355,6 @@ def main():
         if event == '-initial_value-' and len(values['-initial_value-']) \
                                       and values['-initial_value-'][-1] not in '012345678890,.e-+[]':
             window['-initial_value-'].update(values['-initial_value-'][:-1])
-        
         if event == 'RUN':
             window['-LOG-'].update('Starting procedure...')
             madap_gui.file = values['-DATA_PATH-']
@@ -372,8 +376,6 @@ def main():
                                           if not values['-lower_limit_quantile-'] == '' else None
             madap_gui.applied_current = values['-inCPCurrent-'] \
                                             if not values['-inCPCurrent-'] == '' else None
-            madap_gui.scan_rate = values['-inCVScanRate-'] \
-                                            if not values['-inCVScanRate-'] == '' else None
             madap_gui.measured_current_units = values['-inVoltUnits-']
             madap_gui.measured_time_units = values['-inVoltTimeUnits-']
             madap_gui.applied_voltage = values['-inCAVoltage-'] \
@@ -388,8 +390,12 @@ def main():
                                             if not values['-inVoltNumberElectrons-'] == '' else None
             madap_gui.window_size = values['-inVoltWindowSize-'] \
                                             if not values['-inVoltWindowSize-'] == '' else None
+            madap_gui.cycle_list = values['-inPlotCycleList-'] \
+                                            if not values['-inPlotCycleList-'] == '' else None
             madap_gui.penalty_value = values['-inPenaltyValue-'] \
                                             if not values['-inPenaltyValue-'] == '' else None
+            madap_gui.temperature = values['-inCVTemperature-'] \
+                                            if not values['-inCVTemperature-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")
@@ -426,7 +432,6 @@ def main():
                 window['-IMAGE-']('')
                 draw_figure(window['-IMAGE-'], procedure_return_value.figure)
                 window['-LOG-'].update('DONE! Results and plots were saved in the given path')
-
             # Reset the completion flag and re-enable the RUN button
             #procedure_complete[0] = False
             window['RUN'].update(disabled=False)
