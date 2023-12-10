@@ -105,16 +105,16 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
                     y_data = np.log(self.np_current[1:])
                 elif self.reaction_order == 2:
                     y_data = 1/self.np_current[1:]
-                plot.Log_CA(subplot_ax=sub_ax, y_data = y_data,
+                plot.log_CA(subplot_ax=sub_ax, y_data = y_data,
                             reaction_rate=self.reaction_rate_constant,
                             reaction_order=self.reaction_order,
                             best_fit_reaction_rate=self.best_fit_reaction_rate)
             elif plot_name == "CC":
                 plot.CC(subplot_ax=sub_ax)
             elif plot_name == "Cottrell":
-                plot.Cottrell(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient, best_fit_diffusion=self.best_fit_diffusion)
+                plot.cottrell(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient, best_fit_diffusion=self.best_fit_diffusion)
             elif plot_name == "Anson":
-                plot.Anson(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient)
+                plot.anson(subplot_ax=sub_ax, diffusion_coefficient=self.diffusion_coefficient)
             elif plot_name == "Voltage":
                 plot.CP(subplot_ax=sub_ax)
             else:

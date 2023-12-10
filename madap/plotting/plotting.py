@@ -29,9 +29,10 @@ class Plots():
         self.plot_type = ""
         self.ax = None
 
+
     def plot_identity(self, ax, xlabel:str=None, ylabel:str=None, x_lim:list=None, y_lim:list=None,
                       rotation:float=0, ax_sci_notation:bool=False, scientific_limit=0,
-                      log_scale:str=None, step_size_x="auto", step_size_y="auto"):
+                      log_scale:str=None, step_size_x="auto", step_size_y="auto", x_label_fontsize=9, y_label_fontsize=9):
         """Defines the "identity" of the plot.
         This includes the x and y labels, the x and y limits, the rotation of the x labels,
         wether or not scientific notation should be used,
@@ -65,9 +66,9 @@ class Plots():
 
 
         if xlabel:
-            ax.set_xlabel(xlabel, fontsize=9)
+            ax.set_xlabel(xlabel, fontsize=x_label_fontsize)
         if ylabel:
-            ax.set_ylabel(ylabel, fontsize=9)
+            ax.set_ylabel(ylabel, fontsize=y_label_fontsize)
         if x_lim:
             #step = (max(x_lim)-min(x_lim))/5 if step_size_x=="auto" else step_size_x
             #ax.set_xlim([min(x_lim), max(x_lim)])
@@ -115,6 +116,7 @@ class Plots():
             color_bar.formatter.set_powerlimits((scientific_limit, scientific_limit))
             color_bar.update_ticks()
 
+
     def round_hundredth(self, nums):
         """Rounds a number to the nearest hundredth
 
@@ -132,6 +134,7 @@ class Plots():
                 int(math.ceil(max(nums) / 100.0)) * 100+ 100
         return min_num, max_num
 
+
     def round_tenth(self, nums):
         """Rounds a number to the nearest tenth
 
@@ -146,6 +149,7 @@ class Plots():
         else:
             min_num, max_num = round(min(nums), -1) , round(max(nums), -1) + 10
         return min_num, max_num
+
 
     def set_xtick_for_two_axes(self, ax1, ax2, ax1_ticks, ax2_ticks, invert_axes=False):
         """Sets the xticks for two axes
@@ -164,6 +168,7 @@ class Plots():
             ax1.invert_xaxis()
             ax2.invert_xaxis()
 
+
     def save_plot(self, fig, directory, name):
         """Saves a plot
 
@@ -175,3 +180,48 @@ class Plots():
         log.info(f"Saving .png and .svg in {directory}")
         fig.savefig(os.path.join(directory, f"{name}.svg"), dpi=900)
         fig.savefig(os.path.join(directory, f"{name}.png"), dpi=900)
+
+    def _cv_legend(self, subplot_ax):
+        """Create the legend for the CV plot. The legend is created by combining the legend entries
+        for each cycle into two groups: 'Cycle' and 'Other'. The 'Cycle' entries are sorted
+        alphabetically by label. The 'Other' entries are sorted by the order in which they appear
+        in the legend. Also, the legend is placed in the upper left corner of the plot and the entries
+        that come more than twice with the same color are removed.
+
+        Args:
+            subplot_ax (matplotlib.axes): axis to which the plot should be added
+        """
+        handles, labels = subplot_ax.get_legend_handles_labels()
+        color_count = {}
+        legend_entries = []
+
+        for handle, label in zip(handles, labels):
+            color = handle.get_color()  # Adjust this if using different types of plots
+
+            # Count the occurrences of each color
+            if color in color_count:
+                color_count[color] += 1
+            else:
+                color_count[color] = 1
+
+            # Add the handle/label to the list if the color count is less than or equal to 2
+            if color_count[color] <= 2:
+                legend_entries.append((handle, label))
+
+        # Split the legend entries into two groups
+        cycle_entries = []
+        other_entries = []
+        for handle, label in legend_entries:
+            if label.startswith("Cyc."):
+                cycle_entries.append((handle, label))
+            else:
+                other_entries.append((handle, label))
+
+        # Sort the 'Cycle' entries alphabetically by label
+        cycle_entries.sort(key=lambda x: x[1])
+
+        # Combine the sorted 'Cycle' entries with the other entries
+        sorted_entries = cycle_entries + other_entries
+
+        # Create the legend with the sorted entries
+        subplot_ax.legend(*zip(*sorted_entries), loc="upper left", fontsize=7, bbox_to_anchor=(1.05, 1.0))

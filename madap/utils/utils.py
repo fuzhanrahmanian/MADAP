@@ -37,6 +37,7 @@ def assemble_file_name(*args):
     timestamp = time.strftime("%Y%m%d_%H%M%S_")
     return timestamp+"_".join(list(args))
 
+
 def assemble_data_frame(**kwargs):
     """Assemble a data frame from the given arguments
 
@@ -125,3 +126,12 @@ def convert_numpy_to_python(data):
         return data.tolist()
 
     return data
+
+
+def get_complementary_color(rgb):
+    # Convert to 0-255 scale
+    rgb_255 = [int(x*255) for x in rgb[:3]]
+    # Calculate complementary color
+    comp_rgb_255 = [255 - x for x in rgb_255]
+    # Convert back to 0-1 scale
+    return [x / 255.0 for x in comp_rgb_255] + [1]  # Add alpha value of 1
