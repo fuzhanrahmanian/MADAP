@@ -470,7 +470,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
     # start the sorted data from the first point and iterate through the data
         for start_ind in range(0, len(sorted_data), 1):
             subset_of_sorted_data = sorted_data.iloc[start_ind:]
-            if best_fit_r2 > 0.99:
+            if best_fit_r2 > 0.98:
                 break
             for size in range(min_points, max_points + 1, 2):
                 subset = subset_of_sorted_data.head(size)
