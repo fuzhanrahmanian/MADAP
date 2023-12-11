@@ -101,7 +101,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         """
         log.info("Saving data...")
         # Create a directory for the data
-        name, save_dir = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
+        save_dir, name = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
         # add the settings and processed data to the dictionary
         added_data = {
             "Applied Current [A]": self.applied_current,

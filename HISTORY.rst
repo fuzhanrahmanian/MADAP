@@ -2,6 +2,13 @@
 History
 =======
 
+1.2.1 (2023-12-11)
+-------------------
+* Added Ciclic Voltammetry to the functions
+* CA, CP and CV can be used with multiple plots to chose from
+* New and Imrpoved GUI
+* Fixed saving bug
+
 1.1.0 (2023-08-07)
 -------------------
 * Fixes issue with mismatch array length when positive imaginary data is given

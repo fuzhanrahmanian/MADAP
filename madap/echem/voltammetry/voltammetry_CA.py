@@ -144,7 +144,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         """
         log.info("Saving data...")
         # Create a directory for the data
-        name, save_dir = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
+        save_dir, name = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
         if self.reaction_order == 1:
             reaction_rate_constant_unit = "1/s"
         elif self.reaction_order == 2:
