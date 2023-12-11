@@ -34,7 +34,6 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.cathodic_peak_params = {}
         self.E_half_params = {}
         self.smoothing_window_size = 1
-        self.fitting_window_size = int(args.fitting_window_size) if args.fitting_window_size is not None else 30
         self.data = None
         self.temperature = float(args.temperature) if args.temperature is not None else 298.15 # Unit: K
         self.cycle_list = cycle_list
@@ -245,10 +244,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
     def _find_peak_and_tafel_params(self):
         """ Find the peak parameters for each anodic and cathodic peak.
         """
-        for cycle, tafel_data in self.E_half_params.items():
-            tafel_data = {}
+        for cycle, _ in self.E_half_params.items():
+            self.tafel_data[cycle] = {}
             for pair in self.E_half_params[cycle].keys():
-                tafel_data[pair] = {}
+                self.tafel_data[cycle][pair] = {}
                 peak_anodic_number = self.E_half_params[cycle][pair]['anodic_peak']
                 peak_cathodic_number = self.E_half_params[cycle][pair]['cathodic_peak']
 
@@ -323,7 +322,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # find the index of the voltage where the current is half of the peak current
         index_of_I_half_voltage = max(filter_cathodic_data.index[filter_cathodic_data['voltage'] >= self.E_half_params[cycle][pair]['E_half']])
         # find the fitting window size
-        fitting_window = int(len(filter_cathodic_data[:index_of_I_half_voltage]) / 6) #self.fitting_window_size)
+        fitting_window = int(len(filter_cathodic_data[:index_of_I_half_voltage]) / 6)
 
         for i in range(len(smoothened_data.loc[:index_of_I_half_voltage])):
             # select two points and fit a line
@@ -374,7 +373,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # Smoothen the filtered data
         filter_anodic_data['current'] = filter_anodic_data['current'].rolling(window=self.smoothing_window_size).mean()
         index_of_I_half_voltage = max(filter_anodic_data.index[filter_anodic_data['voltage'] <= self.E_half_params[cycle][pair]['E_half']])
-        fitting_window = int(len(filter_anodic_data[:index_of_I_half_voltage]) / 6) #self.fitting_window_size)
+        fitting_window = int(len(filter_anodic_data[:index_of_I_half_voltage]) / 6)
 
         for i in range(len(filter_anodic_data.loc[:index_of_I_half_voltage-fitting_window])):
             # select two points and fit a line
@@ -733,10 +732,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
 
         added_data = {**self.E_half_params, **self.anodic_peak_params, **self.cathodic_peak_params,
                     "Smoothing window size": self.smoothing_window_size,
-                    "Fitting window size": self.fitting_window_size,
                     "Temperature [K]": self.temperature}
 
         processed_data = utils.convert_numpy_to_python(added_data)
+        processed_data = utils.convert_from_pd(processed_data)
         utils.save_data_as_json(save_dir, processed_data, name)
 
         self._save_data_with_name(optional_name, self.__class__.__name__, save_dir, self.data)
@@ -760,7 +759,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             self.plot(save_dir, plots, optional_name=optional_name)
         except ValueError as e:
             raise e
-        #self.save_data(save_dir=save_dir, optional_name=optional_name)
+        self.save_data(save_dir=save_dir, optional_name=optional_name)
 
 
     @property
