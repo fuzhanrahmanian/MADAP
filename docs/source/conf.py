@@ -60,3 +60,6 @@ html_static_path = ['_static']
 
 # Napoleon settings
 napoleon_google_docstring = True
+
+# Automatically generate autosummary pages
+autosummary_generate = True
