@@ -120,18 +120,18 @@ def gui_layout(madap, colors):
     """
 
     # ----------- Create a layout with 3 buttons for the different procedures ----------- #
-    layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('white', 'black')),
-                        sg.Button("Arrhenius", key="-BUT_Arrhenius-", button_color=colors),
-                        sg.Button("Voltammetry", key="-BUT_Voltammetry-", button_color=colors)]]
+    layout_buttons = [[ sg.Button("Impedance", key="-BUT_Impedance-", button_color=('#F23D91', 'black'), font=("Arial", 14, "bold")),
+                        sg.Button("Arrhenius", key="-BUT_Arrhenius-", button_color=colors, font=("Arial", 14, "bold")),
+                        sg.Button("Voltammetry", key="-BUT_Voltammetry-", button_color=colors, font=("Arial", 14, "bold"))]]
 
     # ----------- Create a layout with a field for a data path and a result path ----------- #
     layout_data = [[sg.Text('Data Path', size=(10, 1)), sg.InputText(key='-DATA_PATH-',
                                                                      size=(55,1),
-                                                                     default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CV/CV_Ru0001.xlsx"),
+                                                                     default_text="path/to/data"),
                     sg.FileBrowse(key='-BROWSE_DATA_PATH-')],
                    [sg.Text('Result Path', size=(10, 1)), sg.InputText(key='-RESULT_PATH-',
                                                                        size=(55,1),
-                                                                       default_text="C:/Users/lucaz/OneDrive/Fuzhi/KIT/madap_voltammetry/CV"),
+                                                                       default_text="path/to/results"),
                     sg.FolderBrowse(key='-BROWSE_RESULT_PATH-')],
                 ]
 
@@ -146,67 +146,66 @@ def gui_layout(madap, colors):
 
     # ----------- Create tabs for Impedance procedure ----------- #
     # pylint: disable=unnecessary-comprehension
-    tab_layout_eis = [[sg.Text('This are the parameters for the EIS procedure')],
-                    [sg.Text('Voltage (optional)',justification='left', font=("Arial", 13),
-                             pad=(1,(20,0)))],
-                    [ sg.InputText(key="-voltage-", tooltip=gui_elements.VOLTAGE_HELP, enable_events=True),
-                     sg.Text('[V]')],
-                    [sg.Text('Cell constant (optional)',justification='left', font=("Arial", 13),
-                             pad=(1,(20,0)))],
-                    [sg.InputText(key="-cell_constant-", tooltip=gui_elements.CELL_CONSTANT_HELP,
-                                  enable_events=True), sg.Text('[1/cm]')],
+    tab_layout_eis = [[sg.Text('This are the parameters for the EIS procedure', font=("Arial", 11))],
+                    [sg.Text('Voltage (optional)',justification='left', font=("Arial", 11),pad=(1,(10,0))),
+                    sg.InputText(key="-voltage-", tooltip=gui_elements.VOLTAGE_HELP,
+                                 enable_events=True, size=(10,1), pad=((97,0), (10,0))), sg.Text('[V]', pad=((7,0),(10,0)))],
+
+                    [sg.Text('Cell constant (optional)',justification='left', font=("Arial", 11),pad=(1,(10,0))),
+                     sg.InputText(key="-cell_constant-", tooltip=gui_elements.CELL_CONSTANT_HELP,
+                                  enable_events=True, size=(10,1), pad=((60,0), (10,0))), sg.Text('[1/cm]', pad=((7,0),(10,0)))],
                     [sg.Text("Upper limit of quantile (optional)",justification='left',
-                             font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-upper_limit_quantile-", tooltip=gui_elements.UPPER_LIMIT_QUANTILE_HELP,
-                                  enable_events=True, default_text="0.99")],
+                             font=("Arial", 11), pad=(1,(10,0))),
+                     sg.InputText(key="-upper_limit_quantile-", tooltip=gui_elements.UPPER_LIMIT_QUANTILE_HELP,
+                                  enable_events=True, default_text="0.99",  size=(10,1), pad=((5,0), (10,0)))],
                     [sg.Text("Lower limit of quantile (optional)",justification='left',
-                             font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-lower_limit_quantile-", tooltip=gui_elements.LOWER_LIMIT_QUANTILE_HELP,
-                                  enable_events=True, default_text="0.01")],
-                    [sg.Text('Suggested Circuit',justification='left', font=("Arial", 13),
-                             pad=(1,(20,0)))],
-                    [sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP,
-                                  default_text="R0-p(R1,CPE1)")],
-                    [sg.Text('Initial Value', justification='left', font=("Arial", 13), pad=(1,(20,0)))],
-                    [sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP,
-                                  default_text="[860, 3e+5, 1e-09, 0.90]")],
-                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                             font=("Arial", 11), pad=(1,(10,0))),
+                    sg.InputText(key="-lower_limit_quantile-", tooltip=gui_elements.LOWER_LIMIT_QUANTILE_HELP,
+                                  enable_events=True, default_text="0.01", size=(10,1), pad=((5,0), (10,0)))],
+                    [sg.Text('Suggested Circuit',justification='left', font=("Arial", 11),
+                             pad=(1,(10,0))),
+                     sg.InputText(key="-suggested_circuit-", tooltip=gui_elements.SUGGESTED_CIRCUIT_HELP,
+                                  default_text="R0-p(R1,CPE1)", size=(25,1), pad=((93,0), (10,0)))],
+                    [sg.Text('Initial Value', justification='left', font=("Arial", 11), pad=(1,(10,0))),
+                     sg.InputText(key="-initial_value-", enable_events=True, tooltip=gui_elements.INITIAL_VALUES_HELP,
+                                  default_text="[860, 3e+5, 1e-09, 0.90]", size=(25,1), pad=((137,0), (10,0)))],
+                    [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.eis_plots], key='-PLOTS_Impedance-',
-                                size=(50,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
+                                size=(33,len(madap.eis_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
                                 expand_x=True, expand_y=True)]]
 
-    tab_layout_liss = [[sg.Text('This is inside Lissajous')],
+    tab_layout_liss = [[sg.Text('WORK IN PROGRESS: Lissajous')],
                 [sg.Input(key='-inLiss-')]]
 
-    tab_layout_mott = [[sg.Text('This is inside Mottschosky')],
+    tab_layout_mott = [[sg.Text('WORK IN PROGRESS: Mottschosky')],
                     [sg.Input(key='-inMott-')]]
 
     # ----------- Create tabs for Voltammetry procedure ----------- #
     tab_layout_ca = [
-                    [sg.Text('Applied Voltage [V] (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inCAVoltage-', default_text="0.43", tooltip=gui_elements.VOLTAGE_HELP)],
-                    [sg.Text('Window size (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inVoltWindowSize-', default_text="20000", tooltip=gui_elements.WINDOW_SIZE_HELP)],
-                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+                    [sg.Text('Applied Voltage (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                     sg.InputText(key='-inCAVoltage-', default_text="0.43", tooltip=gui_elements.VOLTAGE_HELP, size=(10, 1), pad=((5,0),(10,0))), sg.Text('[V]', pad=((7,0),(10,0)))],
+                    [sg.Text('Window size (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
+                     sg.InputText(key='-inVoltWindowSize-', default_text="20000", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1), pad=((20,0),(10,0)))],
+                    [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.ca_plots], key='-PLOTS_CA-',
-                                size=(50,len(madap.ca_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
-                                expand_x=True, expand_y=True)]]
-    tab_layout_cp = [[sg.Text('Applied Current (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inCPCurrent-',  default_text="0.000005", tooltip=gui_elements.APPLIED_CURRENT_HELP), sg.Text('[A]')],
-                    [sg.Text('Penalty value (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inPenaltyValue-', default_text="0.25", tooltip=gui_elements.PENALTY_VALUE_HELP)],
-                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(10,0)))],
+                                size=(33,len(madap.ca_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
+                                expand_x=False, expand_y=False)]]
+    tab_layout_cp = [[sg.Text('Applied Current (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                      sg.InputText(key='-inCPCurrent-',  default_text="0.000005", tooltip=gui_elements.APPLIED_CURRENT_HELP, size=(10, 1), pad=((5,0),(10,0))), sg.Text('[A]', pad=((7,0),(10,0)))],
+                    [sg.Text('Penalty value (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
+                    sg.InputText(key='-inPenaltyValue-', default_text="0.25", tooltip=gui_elements.PENALTY_VALUE_HELP, size=(10, 1), pad=((20,1), (10,0)))],
+                    [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cp_plots], key='-PLOTS_CP-',
-                                size=(50,len(madap.cp_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
-                                expand_x=True, expand_y=True)]]
-    tab_layout_cv = [[sg.Text('Plotted Cycle [list] (optional)',justification='left', font=("Arial", 13))],
-                    [sg.InputText(key='-inPlotCycleList-', default_text="1", tooltip=gui_elements.WINDOW_SIZE_HELP)],
-                    [sg.Text('Temperature [K] (optional)',justification='left', font=("Arial", 13))],
-                    [sg.Input(key='-inCVTemperature-', default_text="298.15")],
-                    [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(10,0)))],
+                                size=(33,len(madap.cp_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
+                                expand_x=False, expand_y=False)]]
+    tab_layout_cv = [[sg.Text('Plotted Cycle(s) (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                      sg.InputText(key='-inPlotCycleList-', default_text="1", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1), pad=(1,(10,0)))],
+                    [sg.Text('Temperature (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
+                      sg.Input(key='-inCVTemperature-', default_text="298.15", size=(10, 1), pad=((20,0),(10,0))), sg.Text('[K]', pad=((7,0),(10,0)))],
+                    [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cv_plots], key='-PLOTS_CV-',
-                                size=(50,len(madap.cv_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
-                                expand_x=True, expand_y=True)]]
+                                size=(33,len(madap.cv_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
+                                expand_x=False, expand_y=False)]]
 
     # ----------- Layout the Impedance Options (Three TABS) ----------- #
     layout_impedance = [[sg.TabGroup(
@@ -215,44 +214,45 @@ def gui_layout(madap, colors):
                                key='-TAB_Lissajous-', expand_y=True),
                         sg.Tab('Mottschosky', tab_layout_mott, background_color='darkgreen',
                                key='-TAB_Mottschosky-', expand_y=True)]],
-                        tab_location='topleft', selected_title_color='#0CF2F2', enable_events=True,
-                        expand_y=True)]]
+                        tab_location='topleft', selected_title_color='#F23D91', tab_background_color = "#FF7F69",
+                        enable_events=True, expand_y=True, font=("Arial", 12, "bold"), pad=(1,(5,0)))]]
 
     # ----------- Layout the Arrhenius Options ----------- #
-    layout_arrhenius = [[sg.Text('This are the parameters for the Arrhenius procedure')],
-                        [sg.Text('Plots',justification='left', font=("Arial", 13), pad=(1,(20,0)))],
+    layout_arrhenius = [[sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(20,0)))],
                         [sg.Listbox([x for x in madap.arrhenius_plots], key='-PLOTS_Arrhenius-',
-                                    size=(50,len(madap.arrhenius_plots)+1),
+                                    size=(33,len(madap.arrhenius_plots)+1),
                                     select_mode=sg.SELECT_MODE_MULTIPLE, expand_x=True,
                                     expand_y=True)]]
 
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_voltammetry = [
-                        [sg.Text('Measured Current Units', justification='left', font=("Arial", 12), pad=(1,(15,0))),
-                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True, pad=(10,(15,0)), tooltip=gui_elements.MEASURED_CURRENT_UNITS_HELP)],
+                        [sg.Text('Measured Current Units', justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True, pad=(10,(15,0)), tooltip=gui_elements.MEASURED_CURRENT_UNITS_HELP, size=(5, 1))],
 
-                        [sg.Text('Measured Time Units', justification='left', font=("Arial", 12), pad=(1,(15,0))),
-                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True, pad=(25,(15,0)), tooltip=gui_elements.MEASURED_TIME_UNITS_HELP)],
+                        [sg.Text('Measured Time Units', justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True, pad=(25,(15,0)), tooltip=gui_elements.MEASURED_TIME_UNITS_HELP, size=(5, 1))],
 
-                        [sg.Text('Number of electrons n', justification='left', font=("Arial", 12), pad=(1,(15,0))),
-                        sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1), pad=(22,(15,0)))],
+                        [sg.Text('Number of electrons n', justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                        sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1), pad=(20,(15,0)))],
 
-                        [sg.Text('Concentration of active material (optional)', justification='left', font=("Arial", 12),  pad=(1,(15,0))),
-                        sg.InputText(key='-inVoltConcentration-', default_text="1", size=(5, 1), pad=(5,(15,0))),
-                        sg.Text('[mol/cm3]', justification='left', font=("Arial", 12), pad=(1,(15,0)))],
+                        [sg.Text('Concentration of active material (optional)', justification='left', font=("Arial", 11),  pad=(1,(15,0))),
+                        sg.InputText(key='-inVoltConcentration-', default_text="1", size=(5, 1), pad=(10,(15,0))),
+                        sg.Text('[mol/cm3]', justification='left', font=("Arial", 11), pad=(1,(15,0)))],
 
-                        [sg.Text('Mass of active material (optional)',justification='left', font=("Arial", 13), pad=(1,(15,0))),
-                        sg.InputText(key='-inCAMass-', default_text="0.0001", size=(10, 1), pad=(25,(15,0))),
-                        sg.Text('[g]', justification='left', font=("Arial", 12), pad=(1,(15,0)))],
+                        [sg.Text('Mass of active material (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                        sg.InputText(key='-inCAMass-', default_text="0.0001", size=(10, 1), pad=((65,5),(15,0))),
+                        sg.Text('[g]', justification='left', font=("Arial", 11), pad=(1,(15,0)))],
 
-                        [sg.Text('Electrode area (optional)',justification='left', font=("Arial", 13), pad=(1,(15,0))),
-                        sg.InputText(key='-inCAArea-', default_text="0.196", size=(10, 1), pad=(30,(15,0))),
-                        sg.Text('[cm2]', justification='left', font=("Arial", 12), pad=(1,(15,0)))],
+                        [sg.Text('Electrode area (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
+                        sg.InputText(key='-inCAArea-', default_text="0.196", size=(10, 1), pad=((120,5),(15,0))),
+                        sg.Text('[cm2]', justification='left', font=("Arial", 11), pad=(1,(15,0)))],
 
                         [sg.TabGroup([[sg.Tab('Chrono-Potentiometry', tab_layout_cp, key='-TAB_CP-', expand_y=True),
                                     sg.Tab('Chrono-Amperomtery', tab_layout_ca, key='-TAB_CA-', expand_y=True),
                                     sg.Tab('Cyclic Voltammetry', tab_layout_cv, key='-TAB_CV-', expand_y=True)]],
-                                    tab_location='topleft', selected_title_color='#0CF2F2', enable_events=True, expand_y=True, pad=(1,(15,0)))]
+                                    tab_location='topleft', selected_title_color='#F23D91', background_color='#282312',
+                                    tab_background_color = "#FF7F69",
+                                    enable_events=True, expand_y=True, font=("Arial", 12, "bold"), pad=(1,(40,0)))]
 ]
 
 
@@ -268,14 +268,14 @@ def gui_layout(madap, colors):
                                   expand_y=True)]]
 
     # ----------- Assemble the left Column Element ----------- #
-    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15),
+    col1 = sg.Column([[sg.Frame('Data Selection:', layout_data_selection, font=("Arial", 15, "bold"),
                                 size=(550, 120), expand_y=True)],
-                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15), size=(550, 650),
+                      [sg.Frame('Methods:', procedure_column, font=("Arial", 15, "bold"), size=(550, 550),
                                 expand_y=True)]],
                       expand_x=True, expand_y=True)
 
     # ----------- Layout the right Column Element ----------- #
-    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False,
+    col2 = sg.Column([[sg.Frame('Plots:', [[sg.Image(key='-IMAGE-')]], visible=False, font=("Arial", 15, "bold"),
                                 key='-COL_PLOTS-')]])
 
     # ----------- Assemble the main layout ----------- #
@@ -286,7 +286,7 @@ def gui_layout(madap, colors):
         [sg.Text('',justification='left', font=("Arial", 13), pad=(1,(20,0)), key='-LOG-',
                  enable_events=True)],
         [sg.Button('RUN'), sg.Button('EXIT')],
-        [sg.Multiline(size=(100, 5), key='LogOutput', autoscroll=True, background_color='black', text_color='white')],]
+        [sg.Multiline(size=(100, 5), key='LogOutput', autoscroll=True, background_color='black', text_color='#0CF2F2')],]
 
     return layout
 
@@ -297,13 +297,13 @@ def main():
 
     # Defining the custom theme 'MADAP' using the provided hex values
     sg.LOOK_AND_FEEL_TABLE['MADAP'] = {
-        'BACKGROUND': '#0D0D0D',        # A dark shade for the background for contrast
-        'TEXT': '#0CF2F2',              # Light grey for text, providing readability against the dark background
-        'INPUT': '#D6BBAF',            # A deep color for input fields, distinguishing them from the background
-        'TEXT_INPUT': '#2B2840',        # Light grey for input text to contrast with the dark input field
-        'SCROLL': '#2B2840',            # A bright, noticeable color for the scrollbar
-        'BUTTON': ('white', '#2B2840'), # A combination of white text on a vibrant button background
-        'PROGRESS': ('#F27166', '#0D0D0D'), # A contrasting progress bar with a dark background
+        'BACKGROUND': '#0D0D0D',
+        'TEXT': '#0CF2F2',
+        'INPUT': '#E5B9AB',
+        'TEXT_INPUT': '#2B2840',
+        'SCROLL': '#2B2840',
+        'BUTTON': ('white', '#2B2840'),
+        'PROGRESS': ('#F27166', '#0D0D0D'),
         'BORDER': 1, 'SLIDER_DEPTH': 0, 'PROGRESS_DEPTH': 0,
     }
 
@@ -322,6 +322,10 @@ def main():
     procedure_result = [None]  # List to hold the return value
     procedure_complete = [False]  # Flag to indicate completion
     procedure_error = [None]
+    # Initialization for log update
+    log_update_counter = 0
+    log_update_max = 30
+    is_procedure_running = False
 
     def procedure_wrapper():
         try:
@@ -343,7 +347,7 @@ def main():
             window[f'-COL_{madap_gui.procedure}-'].update(visible=False)
             window[f'-BUT_{madap_gui.procedure}-'].update(button_color=colors)
             window[f'-COL_{event}-'].update(visible=True)
-            window[f'-BUT_{event}-'].update(button_color=('white', 'black'))
+            window[f'-BUT_{event}-'].update(button_color=('#F23D91', 'black'))
             madap_gui.procedure = event
         if values[0] in ['-TAB_EIS-', '-TAB_Lissajous-', '-TAB_Mottschotcky-']:
             madap_gui.impedance_procedure = values[0].strip('-TAB_')
@@ -426,12 +430,22 @@ def main():
             window['RUN'].update(disabled=True)
             procedure_thread = threading.Thread(target=procedure_wrapper)
             procedure_thread.start()
+            is_procedure_running = True
+            log_update_counter = 0  # Reset the counter
         # Update log output while the procedure is running or GUI is active
         update_log_output(window)
-
+        
+        # Update log message periodically
+        if is_procedure_running and not procedure_complete[0]:
+            log_update_counter = (log_update_counter + 1) % log_update_max
+            num_dots = (log_update_counter // 10) % 3 + 1  # Cycle the dots
+            log_message = "Analysing" + "." * num_dots
+            window['-LOG-'].update(log_message)
+        
         # Check for completion or errors from the background process
         if procedure_complete[0]:
             # Reset the completion flag
+            is_procedure_running = False
             procedure_complete[0] = False
 
             if procedure_error[0]:
