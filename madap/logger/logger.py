@@ -1,15 +1,15 @@
 """This module defines the logger for the MADAP application."""
-import logging
-from logging.handlers import QueueHandler
-import os
 import sys
 import queue
+
+import logging
+from logging.handlers import QueueHandler
+
 APP_LOGGER_NAME = 'MADAP'
 log_queue = queue.Queue()  # Queue for log messages
 
 class QueueLoggerHandler(QueueHandler):
     """Custom handler for logging messages to queue"""
-    pass
 
 def setup_applevel_logger(logger_name=APP_LOGGER_NAME, file_name=None):
     """Sets up the app level logger

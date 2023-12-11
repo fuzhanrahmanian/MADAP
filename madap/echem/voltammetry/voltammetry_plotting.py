@@ -1,18 +1,19 @@
-
+""" This module defines the plotting of the cyclic voltammetry studies. """
 import numpy as np
+
 from matplotlib import pyplot as plt
-from matplotlib.colors import ListedColormap
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-import matplotlib.gridspec as gridspec
+from matplotlib import gridspec
+from matplotlib.legend_handler import HandlerTuple
+
 from madap.logger import logger
 from madap.utils import utils
 from madap.plotting.plotting import Plots
-from matplotlib.legend_handler import HandlerTuple
+
 
 log = logger.get_logger("voltammetry_plotting")
 
 class VoltammetryPlotting(Plots):
-
+    """This class defines the plotting of the cyclic voltammetry studies."""
     def __init__(self, current, time, voltage,
                  electrode_area, mass_of_active_material,
                  cumulative_charge, procedure_type,
@@ -218,7 +219,8 @@ class VoltammetryPlotting(Plots):
         # Define a textbox under the legend with the transition and stabilization values
         if transition_values:
             transition_times = [round(i,2) for i in transition_values.keys()]
-            textbox_text = r"$\tau_{stabilization}$"+f"={round(tao_initial,2)} [s]\n"+r"$\tau_{transition} \in $"+"{"+f"{str(transition_times)[1:-1]}"+"} [s]"
+            textbox_text = r"$\tau_{stabilization}$"+f"={round(tao_initial,2)} [s]\n"+\
+                r"$\tau_{transition} \in $"+"{"+f"{str(transition_times)[1:-1]}"+"} [s]"
         else:
             textbox_text = r"$\tau_{stabilization}$"+f"={round(tao_initial,2)} [s]"
 
@@ -320,7 +322,7 @@ class VoltammetryPlotting(Plots):
         subplot_ax.axis('off')
 
 
-    def CV(self, subplot_ax, data, anodic_peak_params, cathodic_peak_params, E_half_params, cycle_list):
+    def CV(self, subplot_ax, data, anodic_peak_params, cathodic_peak_params, cycle_list):
         """Plot the CV plot.
 
         Args:
@@ -354,8 +356,8 @@ class VoltammetryPlotting(Plots):
                 label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
             else:
                 label_name = f"Cyc. {cycle_num}"
-            subplot_ax.plot(data[data["cycle_number"] == cycle_num]["voltage"], data[data["cycle_number"] == cycle_num]["current"], linewidth=0.9, color=colors[cycle_num-1],
-                            label=label_name)
+            subplot_ax.plot(data[data["cycle_number"] == cycle_num]["voltage"], data[data["cycle_number"] == cycle_num]["current"],\
+                            linewidth=0.9, color=colors[cycle_num-1], label=label_name)
 
             cycle = f"cycle_{cycle_num}"
             for peak in anodic_peak_params[cycle]:
@@ -364,14 +366,16 @@ class VoltammetryPlotting(Plots):
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
                                     [anodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
-                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+anodic_peak_params[cycle][peak]["capacitative_line"][1]],
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][1]],
                                     linestyle=':', linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
                                     label=r"$h_{pa}, h_{pc}$")
 
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
                                     [anodic_peak_params[cycle][peak]["current"],
-                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+anodic_peak_params[cycle][peak]["capacitative_line"][1]],
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][1]],
                                     linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])
 
             for peak in cathodic_peak_params[cycle]:
@@ -379,13 +383,15 @@ class VoltammetryPlotting(Plots):
                     subplot_ax.plot([cathodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
                                     cathodic_peak_params[cycle][peak]["voltage"]],
                                     [cathodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
-                                    cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
+                                    cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
+                                    cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
                                     linestyle=':',  linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
                                     label=r"$h_{pa}, h_{pc}$")
 
                     subplot_ax.plot([cathodic_peak_params[cycle][peak]["voltage"],
                                     cathodic_peak_params[cycle][peak]["voltage"]],
-                                    [cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+cathodic_peak_params[cycle][peak]["capacitative_line"][1],
+                                    [cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
+                                    cathodic_peak_params[cycle][peak]["capacitative_line"][1],
                                     cathodic_peak_params[cycle][peak]["current"]],
                                     linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])
 
@@ -395,6 +401,7 @@ class VoltammetryPlotting(Plots):
                             y_lim=[min(data["current"]), max(data["current"])])
 
         self._cv_legend(subplot_ax)
+
 
     def Tafel(self, subplot_ax, data, anodic_peak_params, cathodic_peak_params, E_half_params, cycle_list):
         """Plot the Tafel plot.
@@ -455,7 +462,7 @@ class VoltammetryPlotting(Plots):
 
                 subplot_ax.plot(E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["voltage"],
                                 E_half_params[f"cycle_{cycle_number}"][peak]["corrosion_point"]["log_current"],
-                                "ro", label=f"Corrosion", markersize=1)
+                                "ro", label="Corrosion", markersize=1)
 
         self.plot_identity(subplot_ax, xlabel="Voltage (V)", ylabel="Log(Current) (Log(A))")
         # Add the legend outside the plot
@@ -488,6 +495,7 @@ class VoltammetryPlotting(Plots):
 
         # Creating custom legend
         subplot_ax.legend(new_handles, new_labels, handler_map={tuple: HandlerTuple(ndivide=None)}, loc='upper left', bbox_to_anchor=(1.05, 1))
+
 
     def peak_scan(self, subplot_ax, anodic_peak_params, cathodic_peak_params, E_half_params):
         """Plot the peak scan plot.
@@ -533,7 +541,8 @@ class VoltammetryPlotting(Plots):
         ax_1.plot(data["scan_rate"], data["current_anodic"], linewidth=0.9, color="#4b3b75")
         ax_1.scatter(data["scan_rate"], data["current_cathodic"], color="#9ac64d", label="Cathodic")
         ax_1.plot(data["scan_rate"], data["current_cathodic"], linewidth=0.9, color="#9ac64d")
-        self.plot_identity(ax_1, ylabel=r"$I_{p} (A)$", y_lim=[min(data["current_cathodic"])*1.5, max(data["current_anodic"])*1.5], y_label_fontsize=6)
+        self.plot_identity(ax_1, ylabel=r"$I_{p} (A)$", y_lim=[min(data["current_cathodic"])*1.5,\
+                           max(data["current_anodic"])*1.5], y_label_fontsize=6)
 
         ax_2 = subplot_ax.figure.add_subplot(gs[1, 0], sharex=ax_1)
         ax_2.scatter(data["scan_rate"], data["voltage_anodic"], color="#4b3b75", label="Anodic")
@@ -541,18 +550,21 @@ class VoltammetryPlotting(Plots):
 
         ax_2.scatter(data["scan_rate"], data["voltage_cathodic"], color="#9ac64d", label="Cathodic")
         ax_2.plot(data["scan_rate"], data["voltage_cathodic"], linewidth=0.9, color="#9ac64d")
-        self.plot_identity(ax_2, ylabel=r"$E_{op} (V)$", y_lim=[min(data["voltage_cathodic"])*2, max(data["voltage_anodic"])*2], y_label_fontsize=6)
+        self.plot_identity(ax_2, ylabel=r"$E_{op} (V)$", y_lim=[min(data["voltage_cathodic"])*2,\
+                            max(data["voltage_anodic"])*2], y_label_fontsize=6)
         # scan rate vs peak to peak seperation
         ax_3 = subplot_ax.figure.add_subplot(gs[2, 0], sharex=ax_1)
         ax_3.scatter(data["scan_rate"], data["peak_to_peak_seperation"], color="#3b9f7a")
         ax_3.plot(data["scan_rate"], data["peak_to_peak_seperation"], linewidth=0.9, color="#3b9f7a")
-        self.plot_identity(ax_3, ylabel=r"$E_{p2p} (V)$", y_lim=[min(data["peak_to_peak_seperation"])*0.8, max(data["peak_to_peak_seperation"])*1.2], y_label_fontsize=6)
+        self.plot_identity(ax_3, ylabel=r"$E_{p2p} (V)$", y_lim=[min(data["peak_to_peak_seperation"])*0.8,\
+                            max(data["peak_to_peak_seperation"])*1.2], y_label_fontsize=6)
 
         # scan rate vs half voltage
         ax_4 = subplot_ax.figure.add_subplot(gs[3, 0], sharex=ax_1)
         ax_4.scatter(data["scan_rate"], data["voltage_half"], color="#3b9f7a")
         ax_4.plot(data["scan_rate"], data["voltage_half"], linewidth=0.9, color="#3b9f7a")
-        self.plot_identity(ax_4, xlabel="Scan rate (V/s)", ylabel=r"$E_{1/2} (V)$", y_lim=[min(data["voltage_half"])*0.8, max(data["voltage_half"])*1.2], y_label_fontsize=6)
+        self.plot_identity(ax_4, xlabel="Scan rate (V/s)", ylabel=r"$E_{1/2} (V)$", y_lim=[min(data["voltage_half"])*0.8,\
+                            max(data["voltage_half"])*1.2], y_label_fontsize=6)
         for ax in [ax_1, ax_2, ax_3, ax_4]:
             # set the second and second to last y ticks
             len_y_ticks = len(ax.get_yticks())
@@ -563,6 +575,7 @@ class VoltammetryPlotting(Plots):
 
 
     def _charge_conversion(self):
+        """Convert the charge to the correct units."""
         # Change the unit of charge from As to mAh
         cumulative_charge_mAh = [i*1e3/3600 for i in self.cumulative_charge]
         # Convert self.time from s to h

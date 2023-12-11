@@ -1,9 +1,15 @@
 """ This module contains the Voltammetry class, which is used to analyze voltammetry data."""
+import os
+
 import numpy as np
 import scipy.constants as const
 from scipy.stats import linregress
+
+from madap.utils import utils
 from madap.logger import logger
 from madap.echem.procedure import EChemProcedure
+
+
 
 
 log = logger.get_logger("voltammetry")
@@ -19,6 +25,7 @@ class Voltammetry(EChemProcedure):
             charge (list): list of charges
             args (argparse.Namespace): arguments
         """
+        self.figure = None
         self.faraday_constant = const.physical_constants["Faraday constant"][0] # Unit: C/mol
         # gas constant
         self.gas_constant = const.physical_constants["molar gas constant"][0] # Unit: J/mol/K
@@ -47,6 +54,50 @@ class Voltammetry(EChemProcedure):
 
         self.convert_current()
         self.convert_time()
+
+    def save_figure(self, fig, plot, optional_name=None, plot_dir=None):
+        """Save the figure in the plot directory.
+
+        Args:
+            fig (matplotlib.figure.Figure): figure to save
+            plot (madap.plot.plot): plot object
+            optional_name (str): optional name for the figure
+            plot_dir (str): plot directory
+        """
+        fig.tight_layout()
+        self.figure = fig
+        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
+                    optional_name else utils.assemble_file_name(self.__class__.__name__)
+        plot.save_plot(fig, plot_dir, name)
+
+
+    def _save_data_with_name(self, optional_name, class_name, save_dir, data):
+        """Save the data in the save directory.
+
+        Args:
+            optional_name (str): optional name for the data
+            class_name (str): class name
+            save_dir (str): save directory
+            data (pd.DataFrame): data to save
+        """
+        data_name = utils.assemble_file_name(optional_name, class_name, "data.csv") if \
+                    optional_name else utils.assemble_file_name(class_name, "data.csv")
+        utils.save_data_as_csv(save_dir, data, data_name)
+
+
+    def _assemble_name(self, save_dir, optional_name, class_name):
+        """Assemble the name of the file.
+        
+        Args:
+            save_dir (str): save directory
+            optional_name (str): optional name for the file
+            class_name (str): class name
+        """
+        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
+
+        name = utils.assemble_file_name(optional_name, class_name, "params.json") if \
+                    optional_name else utils.assemble_file_name(class_name, "params.json")
+        return save_dir, name
 
     def convert_current(self):
         """Convert the current to A indipendently from the unit of measure
