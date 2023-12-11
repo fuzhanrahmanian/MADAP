@@ -93,7 +93,7 @@ MADAP can also be used via a GUI:
 
    python -m madap_gui
 
-.. image:: GUI.png
+.. image:: https://github.com/fuzhanrahmanian/MADAP/raw/master/GUI.png
     :align: center
     :width: 800px
 
