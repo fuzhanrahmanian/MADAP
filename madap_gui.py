@@ -1,17 +1,18 @@
 """This module implements the GUI application for MADAP """
 import io
-
-import PySimpleGUI as sg
-import matplotlib.pyplot as plt
 import queue
-from madap.logger.logger import log_queue
 import threading
 
+import PySimpleGUI as sg
+
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 
+from madap.logger.logger import log_queue
 from madap.utils import gui_elements
 from madap_cli import start_procedure
 class MadapGui:
+    # pylint: disable=too-many-instance-attributes
     """This class implements the GUI application for MADAP
     """
     eis_plots = ["nyquist" ,"nyquist_fit", "residual", "bode"]
@@ -45,12 +46,11 @@ class MadapGui:
         self.number_of_electrons = None
         self.window_size = None
         self.cycle_list = None
-        self.fitting_window_size = None
         self.penalty_value = None
-        self.expected_num_of_peaks = None
         self.temperature = None
 
     # pylint: disable=inconsistent-return-statements
+    # pylint: disable=too-many-return-statements
     def validate_fields(self):
         """ This function validates the fields in the GUI
 
@@ -183,25 +183,31 @@ def gui_layout(madap, colors):
     # ----------- Create tabs for Voltammetry procedure ----------- #
     tab_layout_ca = [
                     [sg.Text('Applied Voltage (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
-                     sg.InputText(key='-inCAVoltage-', default_text="0.43", tooltip=gui_elements.VOLTAGE_HELP, size=(10, 1), pad=((5,0),(10,0))), sg.Text('[V]', pad=((7,0),(10,0)))],
+                     sg.InputText(key='-inCAVoltage-', default_text="0.43", tooltip=gui_elements.VOLTAGE_HELP, size=(10, 1),
+                                  pad=((5,0),(10,0))), sg.Text('[V]', pad=((7,0),(10,0)))],
                     [sg.Text('Window size (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
-                     sg.InputText(key='-inVoltWindowSize-', default_text="20000", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1), pad=((20,0),(10,0)))],
+                     sg.InputText(key='-inVoltWindowSize-', default_text="20000", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1),
+                                  pad=((20,0),(10,0)))],
                     [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.ca_plots], key='-PLOTS_CA-',
                                 size=(33,len(madap.ca_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
                                 expand_x=False, expand_y=False)]]
     tab_layout_cp = [[sg.Text('Applied Current (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
-                      sg.InputText(key='-inCPCurrent-',  default_text="0.000005", tooltip=gui_elements.APPLIED_CURRENT_HELP, size=(10, 1), pad=((5,0),(10,0))), sg.Text('[A]', pad=((7,0),(10,0)))],
+                      sg.InputText(key='-inCPCurrent-',  default_text="0.000005", tooltip=gui_elements.APPLIED_CURRENT_HELP, size=(10, 1),
+                                   pad=((5,0),(10,0))), sg.Text('[A]', pad=((7,0),(10,0)))],
                     [sg.Text('Penalty value (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
-                    sg.InputText(key='-inPenaltyValue-', default_text="0.25", tooltip=gui_elements.PENALTY_VALUE_HELP, size=(10, 1), pad=((20,1), (10,0)))],
+                    sg.InputText(key='-inPenaltyValue-', default_text="0.25", tooltip=gui_elements.PENALTY_VALUE_HELP, size=(10, 1),
+                                 pad=((20,1), (10,0)))],
                     [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cp_plots], key='-PLOTS_CP-',
                                 size=(33,len(madap.cp_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
                                 expand_x=False, expand_y=False)]]
     tab_layout_cv = [[sg.Text('Plotted Cycle(s) (optional)',justification='left', font=("Arial", 11), pad=(1,(15,0))),
-                      sg.InputText(key='-inPlotCycleList-', default_text="1", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1), pad=(1,(10,0)))],
+                      sg.InputText(key='-inPlotCycleList-', default_text="1", tooltip=gui_elements.WINDOW_SIZE_HELP, size=(10, 1),
+                                   pad=(1,(10,0)))],
                     [sg.Text('Temperature (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
-                      sg.Input(key='-inCVTemperature-', default_text="298.15", size=(10, 1), pad=((20,0),(10,0))), sg.Text('[K]', pad=((7,0),(10,0)))],
+                      sg.Input(key='-inCVTemperature-', default_text="298.15", size=(10, 1), pad=((20,0),(10,0))), sg.Text('[K]',
+                                    pad=((7,0),(10,0)))],
                     [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cv_plots], key='-PLOTS_CV-',
                                 size=(33,len(madap.cv_plots)), select_mode=sg.SELECT_MODE_MULTIPLE,
@@ -227,10 +233,12 @@ def gui_layout(madap, colors):
     # ----------- TODO Layout the Voltammetry Options ----------- #
     layout_voltammetry = [
                         [sg.Text('Measured Current Units', justification='left', font=("Arial", 11), pad=(1,(15,0))),
-                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True, pad=(10,(15,0)), tooltip=gui_elements.MEASURED_CURRENT_UNITS_HELP, size=(5, 1))],
+                        sg.Combo(['A', 'mA', 'uA'], key='-inVoltUnits-', default_value='A', enable_events=True, pad=(10,(15,0)),
+                                 tooltip=gui_elements.MEASURED_CURRENT_UNITS_HELP, size=(5, 1))],
 
                         [sg.Text('Measured Time Units', justification='left', font=("Arial", 11), pad=(1,(15,0))),
-                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True, pad=(25,(15,0)), tooltip=gui_elements.MEASURED_TIME_UNITS_HELP, size=(5, 1))],
+                        sg.Combo(['h', 'min', 's', 'ms'], key='-inVoltTimeUnits-', default_value='s', enable_events=True, pad=(25,(15,0)),
+                                 tooltip=gui_elements.MEASURED_TIME_UNITS_HELP, size=(5, 1))],
 
                         [sg.Text('Number of electrons n', justification='left', font=("Arial", 11), pad=(1,(15,0))),
                         sg.InputText(key='-inVoltNumberElectrons-', default_text="1", size=(5, 1), pad=(20,(15,0)))],
@@ -292,6 +300,7 @@ def gui_layout(madap, colors):
 
 
 def main():
+    # pylint: disable=too-many-branches
     """Main function of the GUI
     """
 
@@ -376,7 +385,7 @@ def main():
             madap_gui.file = values['-DATA_PATH-']
             madap_gui.results = values['-RESULT_PATH-']
             # TODO: this needs to be expanded for Voltammetry
-            if madap_gui.procedure == 'Impedance' or madap_gui.procedure == 'Arrhenius':
+            if madap_gui.procedure in ('Impedance', 'Arrhenius'):
                 madap_gui.plots = values[f'-PLOTS_{madap_gui.procedure}-']
             if madap_gui.procedure == 'Voltammetry':
                 madap_gui.plots = values[f'-PLOTS_{madap_gui.voltammetry_procedure}-']
@@ -434,14 +443,14 @@ def main():
             log_update_counter = 0  # Reset the counter
         # Update log output while the procedure is running or GUI is active
         update_log_output(window)
-        
+
         # Update log message periodically
         if is_procedure_running and not procedure_complete[0]:
             log_update_counter = (log_update_counter + 1) % log_update_max
             num_dots = (log_update_counter // 10) % 3 + 1  # Cycle the dots
             log_message = "Analysing" + "." * num_dots
             window['-LOG-'].update(log_message)
-        
+
         # Check for completion or errors from the background process
         if procedure_complete[0]:
             # Reset the completion flag

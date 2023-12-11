@@ -1,6 +1,5 @@
 """ This module is the main entry point for MADAP. It defines the CLI to be used by the user."""
 import os
-import sys
 import argparse
 import re
 
@@ -83,10 +82,13 @@ def _analyze_parser_args():
         proc = first_parser.parse_known_args()[0]
         if proc.voltammetry_procedure == "cv":
             cv = first_parser.add_argument_group("Options for the CV procedure")
-            cv.add_argument("-pl", "--plots", required=True, choices=["cv"],
+            cv.add_argument("-plcy", "--cycle_list", required=False, default=None,
+                            help="list of cycles to be plotted. \n format: [1, 2, 3] \n if it is not specified, all cycles will be plotted",
+                            required=False, default=None)
+            cv.add_argument("-pl", "--plots", required=True, choices=["E-t", "I-t", "Peak Scan", "CV", "Tafel"],
                             nargs="+", help="plots to be generated")
-            cv.add_argument("-s", "--scan_rate", type=float, required=False, default=None,
-                            help="scan rate [V/s] if applicable")
+            cv.add_argument("-temp", "--temperature", type=float, required=False, default=None,
+                            help="temperature [K] if applicable")
         elif proc.voltammetry_procedure == "ca":
             ca = first_parser.add_argument_group("Options for the CA procedure")
             ca.add_argument("-pl", "--plots", required=True, choices=["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"],
@@ -96,7 +98,8 @@ def _analyze_parser_args():
             ca.add_argument("-w", "--window_size", type=int, required=False, default=None, help="window size for the moving average")
         elif proc.voltammetry_procedure == "cp":
             cp = first_parser.add_argument_group("Options for the CP procedure")
-            cp.add_argument("-pl", "--plots", required=True, choices=["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"],
+            cp.add_argument("-pl", "--plots", required=True, \
+                choices=["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"],
                             nargs="+", help="plots to be generated")
             cp.add_argument("-ap", "--applied_potential", type=float, required=False, default=None,
                             help="applied potential [V] if applicable")
@@ -303,7 +306,7 @@ def call_voltammetry(data, result_dir, args):
     else:
         charge_data = None
     cycle_list = da.format_list(eval(args.cycle_list)) if args.cycle_list else None
-    
+
     if args.voltammetry_procedure == "CA":
         voltammetry_cls = voltammetry_CA.Voltammetry_CA(current=da.format_data(current_data),
                                                         voltage=da.format_data(voltage_data),
