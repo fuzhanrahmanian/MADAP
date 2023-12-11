@@ -12,9 +12,9 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath("../.."))
-sys.path.insert(0, os.path.abspath(os.path.join("..","..","madap", "logger")))
-sys.path.insert(0, os.path.abspath(os.path.join("..","..","madap", "echem")))
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath(os.path.join("..","madap", "logger")))
+sys.path.insert(0, os.path.abspath(os.path.join("..","madap", "echem")))
 # -- Project information -----------------------------------------------------
 
 project = 'MADAP'

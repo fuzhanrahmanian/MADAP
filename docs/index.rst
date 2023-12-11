@@ -37,15 +37,15 @@ can find the source code and releases.
    :maxdepth: 2
    :caption: Usage:
 
-   usage/usage
+   source/usage/usage
 
 .. toctree::
    :maxdepth: 6
    :caption: Packages:
 
-   generated_arrhenius/modules
-   generated_impedance/modules
-   generated_voltammetry/modules
+   source/generated_arrhenius/modules
+   source/generated_impedance/modules
+   source/generated_voltammetry/modules
 
 Indices and tables
 ==================
