@@ -83,8 +83,7 @@ def _analyze_parser_args():
         if proc.voltammetry_procedure == "cv":
             cv = first_parser.add_argument_group("Options for the CV procedure")
             cv.add_argument("-plcy", "--cycle_list", required=False, default=None,
-                            help="list of cycles to be plotted. \n format: [1, 2, 3] \n if it is not specified, all cycles will be plotted",
-                            required=False, default=None)
+                            help="list of cycles to be plotted. \n format: [1, 2, 3] \n if it is not specified, all cycles will be plotted")
             cv.add_argument("-pl", "--plots", required=True, choices=["E-t", "I-t", "Peak Scan", "CV", "Tafel"],
                             nargs="+", help="plots to be generated")
             cv.add_argument("-temp", "--temperature", type=float, required=False, default=None,

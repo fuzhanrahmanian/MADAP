@@ -1,8 +1,11 @@
-.. image:: logo.png
-    :align: center
+
 
 MADAP
 ~~~~~
+
+.. image:: logo.png
+    :align: center
+    :width: 240px
 
 Modular and Autonomous Data Analysis Platform (MADAP) is a
 well-documented python package which can be used for electrochmeical

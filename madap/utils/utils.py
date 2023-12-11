@@ -103,6 +103,25 @@ def append_to_save_data(directory, added_data, name):
     save_data_as_json(directory, data, name)
 
 
+def convert_from_pd(obj):
+    """Helper to convert pandas data to python data
+
+    Args:
+        obj (pandas.DataFrame): The data that should be converted
+    Returns:
+        dict: The converted data
+    """
+
+    if isinstance(obj, pd.Series):
+        return obj.to_dict()
+    if isinstance(obj, dict):
+        return {k: convert_from_pd(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [convert_from_pd(x) for x in obj]
+    else:
+        return obj
+
+
 def convert_numpy_to_python(data):
     """Convert numpy data to python data
 
