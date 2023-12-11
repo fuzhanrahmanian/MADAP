@@ -42,7 +42,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.tafel_data = {}
 
 
-    def analyze(self):
+    def analyze(self, regression):
         """ Analyze the cyclic voltammetry data.
         """
         # create a dataframe from self.scan_rate and self.np_time, self.np_current, self.np_voltage
@@ -59,7 +59,8 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # calculate the diffusion coefficient from Randles-Sevcik equation
         self._calculate_diffusion_coefficient_anodic_cathodic()
         # calculate the overpotential from the E half for both anodic and cathodic peaks, and height of the peaks
-        self._find_peak_and_tafel_params()
+        if regression:
+            self._find_peak_and_tafel_params()
 
 
     def _find_fwd_bwd_scans(self):
@@ -709,7 +710,10 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
 
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
-        self.analyze()
+        regresion = False
+        if "Tafel" in plots:
+            regression = True
+        self.analyze(regression=regression)
         try:
             self.plot(save_dir, plots, optional_name=optional_name)
         except ValueError as e:
