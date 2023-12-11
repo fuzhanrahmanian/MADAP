@@ -67,7 +67,7 @@ class VoltammetryPlotting(Plots):
 
         # Plot a scatterplot where x is time and y is current with a label of applied voltage
         if legend:
-            subplot_ax.scatter(self.time, current_mA, label=f"{measured_voltage:.2f} V", s=3, color="#435a82")
+            subplot_ax.scatter(self.time, current_mA, label=f"{measured_voltage:.2f} V", s=2, color="#435a82")
         else:
             subplot_ax.plot(self.time, current_mA, linewidth=0.9, color="#435a82")
         if y_lim_min == "auto":
@@ -101,10 +101,10 @@ class VoltammetryPlotting(Plots):
 
         x_vals = np.array([self.time[best_fit_reaction_rate['start']], self.time[best_fit_reaction_rate['end']]])
         y_vals = best_fit_reaction_rate['slope']*x_vals + best_fit_reaction_rate['intercept']
-        subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Instantaneous rate")
+        subplot_ax.plot(x_vals, y_vals, color="#a8212a", linewidth=2, linestyle='--', label="Instantaneous rate")
         # MArk the instantaneous rate on the plot
         #subplot_ax.scatter(x_vals, y_vals, color="#660d33", s=5, marker='x', linewidth=2, label="Intercept")
-        subplot_ax.scatter(self.time[1:], y_data, s=3, label=label)
+        subplot_ax.scatter(self.time[1:], y_data, s=2, label=label, color="#396b82", zorder=0)
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel=y_label, ax_sci_notation="x",
                             x_lim=[0, max(self.time)], y_lim=[min(y_data)*0.6, max(y_data)*1.1])
         subplot_ax.legend(loc="upper right")
@@ -131,7 +131,7 @@ class VoltammetryPlotting(Plots):
         # Change the unit of charge from As to mAh
         charge, y_label = self._charge_conversion()
         charge = np.abs(charge)
-        subplot_ax.scatter(time_h, charge, label=label, s=3, color="#2e8b7e")
+        subplot_ax.scatter(time_h, charge, label=label, s=2, color="#2e8b7e")
         self.plot_identity(subplot_ax, xlabel="Time (h)", ylabel=y_label,
                            ax_sci_notation="both", x_lim=[0, max(time_h)], y_lim=[0, max(charge)])
         # If the charge increases the legend is placed in the lower right corner
@@ -152,12 +152,12 @@ class VoltammetryPlotting(Plots):
             x_vals = np.array([x_data[best_fit_diffusion['start']], x_data[best_fit_diffusion['end']]])
             y_data = self.current
             y_vals = best_fit_diffusion['slope']*x_vals + best_fit_diffusion['intercept']
-            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
-            subplot_ax.plot(x_vals, y_vals, color="#f48024", linewidth=2, linestyle='--', label="Diffusion coefficient")
+            subplot_ax.scatter(x_data[1:], y_data[1:], s=2, label="D="+f"{diffusion_coefficient:.2e} cm^2/s", color="#4a467b")
+            subplot_ax.plot(x_vals, y_vals, color="#a8212a", linewidth=1.5, linestyle='--', label="Diffusion coefficient")
             y_label = r"$I (A)$"
         elif self.procedure_type == "Voltammetry_CP":
             y_data = self.voltage
-            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e}"+r"$\cdot \tau$"+" cm^2/s", color="#4a467b")
+            subplot_ax.scatter(x_data[1:], y_data[1:], s=2, label="D="+f"{diffusion_coefficient:.2e}"+r"$\cdot \tau$"+" cm^2/s", color="#4a467b")
             y_label = r"$Voltage (V)$"
 
         self.plot_identity(subplot_ax, xlabel=r"$t^{-1/2}  [s^{-1/2}]$", ylabel=y_label,
@@ -178,10 +178,10 @@ class VoltammetryPlotting(Plots):
         log.info("Creating Anson plot")
         x_data = (self.time)**(0.5)
         y_data = self.cumulative_charge
-        subplot_ax.scatter(x_data, y_data, s=3, label="D="+f"{diffusion_coefficient:.2e} cm^2/s")
+        subplot_ax.scatter(x_data, y_data, s=2, label="D="+f"{diffusion_coefficient:.2e} cm^2/s", color="#317a80")
         self.plot_identity(subplot_ax, xlabel=r"$t^{1/2}  [s^{1/2}]$", ylabel="Charge (C)",
                             ax_sci_notation="both", x_lim=[0, max(x_data)], y_lim=[0, max(y_data)])
-        subplot_ax.legend(loc="upper right")
+        subplot_ax.legend(loc="upper left")
 
 
     def voltage_profile(self, subplot_ax):
@@ -260,7 +260,7 @@ class VoltammetryPlotting(Plots):
                             ax_sci_notation="y", x_lim=[min(self.voltage), max(self.voltage)], y_lim=[min(dQdV_no_nan), max(dQdV_no_nan)*1.1])
 
 
-    def CP(self, subplot_ax, y_lim_min=0):
+    def CP(self, subplot_ax, y_lim_min=0, y_lim_max=0):
         """Plot the voltage plot.
 
         Args:
@@ -269,15 +269,19 @@ class VoltammetryPlotting(Plots):
         """
         log.info("Creating voltage plot")
         if self.procedure_type == "Voltammetry_CP":
-            subplot_ax.scatter(self.time, self.voltage, s=3, label=f"{np.abs(np.mean(self.current)):.2e} A", color="#482b68")
+            subplot_ax.scatter(self.time, self.voltage, s=2, label=f"{np.abs(np.mean(self.current)):.2e} A", color="#482b68")
         elif self.procedure_type == "Voltammetry_CA":
-            subplot_ax.scatter(self.time, self.voltage, s=3, color="#482b68")
+            subplot_ax.scatter(self.time, self.voltage, s=2, color="#482b68")
         if y_lim_min == "auto":
             y_lim_min = min(self.voltage)
         else:
             y_lim_min = min(self.voltage)*0.6
+        if y_lim_max == "auto":
+            y_lim_max = max(self.voltage)
+        else:
+            y_lim_max = max(self.voltage)*1.1
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="Voltage (V)",
-                            ax_sci_notation="x", x_lim=[0, max(self.time)], y_lim=[y_lim_min, max(self.voltage)*1.1])
+                            ax_sci_notation="x", x_lim=[0, max(self.time)], y_lim=[y_lim_min, y_lim_max])
         subplot_ax.legend(loc="upper right")
 
 
