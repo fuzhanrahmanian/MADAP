@@ -1,23 +1,20 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Voltammetry package &mdash; MADAP 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,17 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../generated_impedance/modules.html">Impedance</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Voltammetry</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Voltammetry package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry">voltammetry.voltammetry</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#voltammetry.voltammetry.Voltammetry"><code class="docutils literal notranslate"><span class="pre">Voltammetry</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#voltammetry-voltammetry-ca">voltammetry.voltammetry_CA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry">voltammetry.voltammetry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry_CA">voltammetry.voltammetry_CA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#voltammetry-voltammetry-cp">voltammetry.voltammetry_CP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#voltammetry-voltammetry-cv">voltammetry.voltammetry_CV</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry_plotting">voltammetry.voltammetry_plotting</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting"><code class="docutils literal notranslate"><span class="pre">VoltammetryPlotting</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry_CP">voltammetry.voltammetry_CV</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-voltammetry.voltammetry_plotting">voltammetry.voltammetry_plotting</a></li>
 </ul>
 </li>
 </ul>
@@ -96,27 +87,27 @@
            <div itemprop="articleBody">
              
   <section id="voltammetry-package">
-<h1>Voltammetry package<a class="headerlink" href="#voltammetry-package" title="Permalink to this heading"></a></h1>
+<h1>Voltammetry package<a class="headerlink" href="#voltammetry-package" title="Permalink to this headline"></a></h1>
 <section id="module-voltammetry.voltammetry">
-<span id="voltammetry-voltammetry"></span><h2>voltammetry.voltammetry<a class="headerlink" href="#module-voltammetry.voltammetry" title="Permalink to this heading"></a></h2>
+<span id="voltammetry-voltammetry"></span><h2>voltammetry.voltammetry<a class="headerlink" href="#module-voltammetry.voltammetry" title="Permalink to this headline"></a></h2>
 <p>This module contains the Voltammetry class, which is used to analyze voltammetry data.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="voltammetry.voltammetry.Voltammetry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">voltammetry.voltammetry.</span></span><span class="sig-name descname"><span class="pre">Voltammetry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry.Voltammetry" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EChemProcedure</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
 <p>This class defines the voltammetry method.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="voltammetry.voltammetry.Voltammetry.analyze_best_linear_fit">
 <span class="sig-name descname"><span class="pre">analyze_best_linear_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry.Voltammetry.analyze_best_linear_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Find the best linear region for the provided data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_data</strong> (<em>np.array</em>) – Transformed time array (e.g., t^(-1/2) for diffusion or time for kinetics).</p></li>
 <li><p><strong>y_data</strong> (<em>np.array</em>) – Current array or transformed current array (e.g., log(current)).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>Dictionary containing the best linear fit parameters:</dt><dd><p>start_index (int): Start index of the best linear region.
 end_index (int): End index of the best linear region.
@@ -127,7 +118,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>best fit (dict)</p>
 </dd>
 </dl>
@@ -150,7 +141,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">save_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry.Voltammetry.save_figure" title="Permalink to this definition"></a></dt>
 <dd><p>Save the figure in the plot directory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – figure to save</p></li>
 <li><p><strong>plot</strong> (<em>madap.plot.plot</em>) – plot object</p></li>
@@ -164,22 +155,242 @@ r_squared (float): R-squared value of the best linear fit.</p>
 </dd></dl>
 
 </section>
-<section id="voltammetry-voltammetry-ca">
-<h2>voltammetry.voltammetry_CA<a class="headerlink" href="#voltammetry-voltammetry-ca" title="Permalink to this heading"></a></h2>
+<section id="module-voltammetry.voltammetry_CA">
+<span id="voltammetry-voltammetry-ca"></span><h2>voltammetry.voltammetry_CA<a class="headerlink" href="#module-voltammetry.voltammetry_CA" title="Permalink to this headline"></a></h2>
+<p>This module defines the cyclic amperometry methods. It is a subclass of the Voltammetry class  and the EChemProcedure class.
+It contains the cyclic amperometry methods for analyzing the data and plotting the results.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">voltammetry.voltammetry_CA.</span></span><span class="sig-name descname"><span class="pre">Voltammetry_CA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.voltammetry.voltammetry.Voltammetry</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<p>This class defines the chrono amperometry method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA.analyze" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze the data to calculate the diffusion coefficient and reaction rate constant:
+1. Calculate the diffusion coefficient using Cottrell analysis.
+2. Analyze the reaction kinetics to determine if the reaction is first or second order.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA.figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA.figure" title="Permalink to this definition"></a></dt>
+<dd><p>Get the figure of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Figure object for ca plot.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA.perform_all_actions">
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA.perform_all_actions" title="Permalink to this definition"></a></dt>
+<dd><p>Perform all the actions for the cyclic amperometry method: analyze, plot, and save data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the plot should be saved.</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – A list of plots to be plotted.</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CA.Voltammetry_CA.save_data">
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CA.Voltammetry_CA.save_data" title="Permalink to this definition"></a></dt>
+<dd><p>Save the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data should be saved</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="voltammetry-voltammetry-cp">
-<h2>voltammetry.voltammetry_CP<a class="headerlink" href="#voltammetry-voltammetry-cp" title="Permalink to this heading"></a></h2>
+<h2>voltammetry.voltammetry_CP<a class="headerlink" href="#voltammetry-voltammetry-cp" title="Permalink to this headline"></a></h2>
+<p>This module contains the cyclic potentiometry class.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">voltammetry.voltammetry_CP.</span></span><span class="sig-name descname"><span class="pre">Voltammetry_CP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.voltammetry.voltammetry.Voltammetry</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<p>This class defines the cyclic potentiometry method.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Analyze the cyclic potentiometry data. These analysis include:
+1. Calculate dQ/dV
+2. Calculate dV/dt
+3. Calculate initial stabilization time
+4. Find potential transition times
+5. Calculate diffusion coefficient</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span></dt>
+<dd><p>Get the figure of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Figure object for ca plot.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Perform all the actions for the cyclic potentiometry method: analyze, plot, and save data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data should be saved</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – The list of plots to be plotted</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Plot the cyclic potentiometry data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the plot should be saved</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – The list of plots to be plotted</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Save the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data should be saved</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="voltammetry-voltammetry-cv">
-<h2>voltammetry.voltammetry_CV<a class="headerlink" href="#voltammetry-voltammetry-cv" title="Permalink to this heading"></a></h2>
+<section id="module-voltammetry.voltammetry_CP">
+<span id="voltammetry-voltammetry-cv"></span><h2>voltammetry.voltammetry_CV<a class="headerlink" href="#module-voltammetry.voltammetry_CP" title="Permalink to this headline"></a></h2>
+<p>This module contains the cyclic potentiometry class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">voltammetry.voltammetry_CP.</span></span><span class="sig-name descname"><span class="pre">Voltammetry_CP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.voltammetry.voltammetry.Voltammetry</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<p>This class defines the cyclic potentiometry method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP.analyze" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze the cyclic potentiometry data. These analysis include:
+1. Calculate dQ/dV
+2. Calculate dV/dt
+3. Calculate initial stabilization time
+4. Find potential transition times
+5. Calculate diffusion coefficient</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP.figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP.figure" title="Permalink to this definition"></a></dt>
+<dd><p>Get the figure of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Figure object for ca plot.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP.perform_all_actions">
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP.perform_all_actions" title="Permalink to this definition"></a></dt>
+<dd><p>Perform all the actions for the cyclic potentiometry method: analyze, plot, and save data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data should be saved</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – The list of plots to be plotted</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the cyclic potentiometry data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the plot should be saved</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – The list of plots to be plotted</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="voltammetry.voltammetry_CP.Voltammetry_CP.save_data">
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_CP.Voltammetry_CP.save_data" title="Permalink to this definition"></a></dt>
+<dd><p>Save the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data should be saved</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-voltammetry.voltammetry_plotting">
-<span id="voltammetry-voltammetry-plotting"></span><h2>voltammetry.voltammetry_plotting<a class="headerlink" href="#module-voltammetry.voltammetry_plotting" title="Permalink to this heading"></a></h2>
+<span id="voltammetry-voltammetry-plotting"></span><h2>voltammetry.voltammetry_plotting<a class="headerlink" href="#module-voltammetry.voltammetry_plotting" title="Permalink to this headline"></a></h2>
 <p>This module defines the plotting of the cyclic voltammetry studies.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="voltammetry.voltammetry_plotting.VoltammetryPlotting">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">voltammetry.voltammetry_plotting.</span></span><span class="sig-name descname"><span class="pre">VoltammetryPlotting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrode_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_of_active_material</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative_charge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procedure_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">applied_voltage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">applied_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plots</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.plotting.plotting.Plots</span></code></p>
 <p>This class defines the plotting of the cyclic voltammetry studies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="voltammetry.voltammetry_plotting.VoltammetryPlotting.CA">
@@ -194,7 +405,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">CC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.CC" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the CC plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p>
 </dd>
 </dl>
@@ -205,7 +416,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">CP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.CP" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the voltage plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>y_lim_min</strong> (<em>float</em>) – minimum value of the y axis</p></li>
@@ -219,7 +430,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">CV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cathodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.CV" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the CV plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – dataframe of the data</p></li>
@@ -235,7 +446,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">Tafel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cathodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_half_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.Tafel" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the Tafel plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – dataframe of the data</p></li>
@@ -251,7 +462,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">anson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffusion_coefficient</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.anson" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the Anson plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p>
 </dd>
 </dl>
@@ -264,10 +475,10 @@ r_squared (float): R-squared value of the best linear fit.</p>
 :param plots: List of plots to be composed.
 :type plots: list</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Figure and axis of the subplot.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>fig, ax</p>
 </dd>
 </dl>
@@ -286,7 +497,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">differential_capacity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dQdV_no_nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_peaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.differential_capacity" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the differential capacity plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>dQdV_no_nan</strong> (<em>list</em>) – list of differential capacity</p></li>
@@ -302,7 +513,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">log_CA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_fit_reaction_rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.log_CA" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the Log CA plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p>
 </dd>
 </dl>
@@ -313,7 +524,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">peak_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cathodic_peak_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_half_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.peak_scan" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the peak scan plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – dataframe of the data</p></li>
@@ -330,7 +541,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">potential_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dVdt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tao_initial</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.potential_rate" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the potential rate plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>dVdt</strong> (<em>list</em>) – list of potential rates</p></li>
@@ -346,7 +557,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">potential_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.potential_waveform" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the potential waveform plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p></li>
 <li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – dataframe of the data</p></li>
@@ -360,7 +571,7 @@ r_squared (float): R-squared value of the best linear fit.</p>
 <span class="sig-name descname"><span class="pre">voltage_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#voltammetry.voltammetry_plotting.VoltammetryPlotting.voltage_profile" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the voltage profile plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>subplot_ax</strong> (<em>matplotlib.axes</em>) – axis to which the plot should be added</p>
 </dd>
 </dl>

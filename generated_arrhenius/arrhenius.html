@@ -1,23 +1,20 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arrhenius package &mdash; MADAP 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,11 +49,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Arrhenius</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Arrhenius package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#arrhenius-arrhenius">arrhenius.arrhenius</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-arrhenius.arrhenius_plotting">arrhenius.arrhenius_plotting</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#arrhenius.arrhenius_plotting.ArrheniusPlotting"><code class="docutils literal notranslate"><span class="pre">ArrheniusPlotting</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-arrhenius.arrhenius">arrhenius.arrhenius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-arrhenius.arrhenius_plotting">arrhenius.arrhenius_plotting</a></li>
 </ul>
 </li>
 </ul>
@@ -91,20 +85,209 @@
            <div itemprop="articleBody">
              
   <section id="arrhenius-package">
-<h1>Arrhenius package<a class="headerlink" href="#arrhenius-package" title="Permalink to this heading"></a></h1>
-<section id="arrhenius-arrhenius">
-<h2>arrhenius.arrhenius<a class="headerlink" href="#arrhenius-arrhenius" title="Permalink to this heading"></a></h2>
+<h1>Arrhenius package<a class="headerlink" href="#arrhenius-package" title="Permalink to this headline"></a></h1>
+<section id="module-arrhenius.arrhenius">
+<span id="arrhenius-arrhenius"></span><h2>arrhenius.arrhenius<a class="headerlink" href="#module-arrhenius.arrhenius" title="Permalink to this headline"></a></h2>
+<p>This module defines the Arrhenius procedure</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arrhenius.arrhenius.</span></span><span class="sig-name descname"><span class="pre">Arrhenius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperatures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<p>Class definition for visualization and analysis of Arrhenius equation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.temperatures">
+<span class="sig-name descname"><span class="pre">temperatures</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.temperatures" title="Permalink to this definition"></a></dt>
+<dd><p>Array of temperatures in Celcius.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.conductivity">
+<span class="sig-name descname"><span class="pre">conductivity</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.conductivity" title="Permalink to this definition"></a></dt>
+<dd><p>Array of conductivity in S/cm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.gas_constant">
+<span class="sig-name descname"><span class="pre">gas_constant</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.gas_constant" title="Permalink to this definition"></a></dt>
+<dd><p>Gas constant in [J/mol.K].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.activation">
+<span class="sig-name descname"><span class="pre">activation</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.activation" title="Permalink to this definition"></a></dt>
+<dd><p>Activation energy in [mJ/mol].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.arrhenius_constant">
+<span class="sig-name descname"><span class="pre">arrhenius_constant</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.arrhenius_constant" title="Permalink to this definition"></a></dt>
+<dd><p>Arrhenius constant in [S.cm⁻¹].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.inverted_scale_temperatures">
+<span class="sig-name descname"><span class="pre">inverted_scale_temperatures</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.inverted_scale_temperatures" title="Permalink to this definition"></a></dt>
+<dd><p>Array of temperatures in 1000/K.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.fit_score">
+<span class="sig-name descname"><span class="pre">fit_score</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.fit_score" title="Permalink to this definition"></a></dt>
+<dd><p>R2 score of the fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.ln_conductivity_fit">
+<span class="sig-name descname"><span class="pre">ln_conductivity_fit</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.ln_conductivity_fit" title="Permalink to this definition"></a></dt>
+<dd><p>Array of log conductivity fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.intercept">
+<span class="sig-name descname"><span class="pre">intercept</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.intercept" title="Permalink to this definition"></a></dt>
+<dd><p>Intercept of the fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.coefficients">
+<span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>Slope of the fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.analyze" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze the data and fit the Arrhenius equation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.figure" title="Permalink to this definition"></a></dt>
+<dd><p>Get the figure of the analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.perform_all_actions">
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.perform_all_actions" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper function to perform all actions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Analyze the data</p></li>
+<li><p>Plot the data</p></li>
+<li><p>Save the data</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – plots to be included in the analysis.</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – Optional name for the analysis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the raw data and/or the results of the Arrhenius analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the plots should be saved.</p></li>
+<li><p><strong>plots</strong> (<em>list</em>) – List of plots included in the analysis.</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – Optional name for the analysis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arrhenius.arrhenius.Arrhenius.save_data">
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius.Arrhenius.save_data" title="Permalink to this definition"></a></dt>
+<dd><p>Save the results of the analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
+<li><p><strong>optional_name</strong> (<em>str</em>) – Optional name for the analysis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-arrhenius.arrhenius_plotting">
-<span id="arrhenius-arrhenius-plotting"></span><h2>arrhenius.arrhenius_plotting<a class="headerlink" href="#module-arrhenius.arrhenius_plotting" title="Permalink to this heading"></a></h2>
+<span id="arrhenius-arrhenius-plotting"></span><h2>arrhenius.arrhenius_plotting<a class="headerlink" href="#module-arrhenius.arrhenius_plotting" title="Permalink to this headline"></a></h2>
 <p>This module handles the plotting of the Arrhenius procedure</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="arrhenius.arrhenius_plotting.ArrheniusPlotting">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arrhenius.arrhenius_plotting.</span></span><span class="sig-name descname"><span class="pre">ArrheniusPlotting</span></span><a class="headerlink" href="#arrhenius.arrhenius_plotting.ArrheniusPlotting" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plots</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.plotting.plotting.Plots</span></code></p>
 <p>General Plotting class for Arrhenius method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>Plots</strong> (<em>class</em>) – Parent class for plotting all methods.</p>
 </dd>
 </dl>
@@ -113,7 +296,7 @@
 <span class="sig-name descname"><span class="pre">arrhenius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_conductivity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverted_scale_temperatures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius_plotting.ArrheniusPlotting.arrhenius" title="Permalink to this definition"></a></dt>
 <dd><p>Defines the Arrhenius plot for raw data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis</p></li>
 <li><p><strong>temperatures</strong> (<em>np.array</em>) – Array of temperatures</p></li>
@@ -131,7 +314,7 @@
 <span class="sig-name descname"><span class="pre">arrhenius_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_conductivity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverted_scale_temperatures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ln_conductivity_fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrhenius_constant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r2_score</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius_plotting.ArrheniusPlotting.arrhenius_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Defines the Arrhenius plot for fitted data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis</p></li>
 <li><p><strong>temperatures</strong> (<em>np.array</em>) – Array of temperatures</p></li>
@@ -153,13 +336,13 @@
 <span class="sig-name descname"><span class="pre">compose_arrhenius_subplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#arrhenius.arrhenius_plotting.ArrheniusPlotting.compose_arrhenius_subplot" title="Permalink to this definition"></a></dt>
 <dd><p>Creates subplots template for the Arrhenius plots.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>plots</strong> (<em>list</em>) – List of plots to be composed.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Figure and axis of the subplot.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>fig, ax</p>
 </dd>
 </dl>
