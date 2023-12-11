@@ -3,7 +3,7 @@
 MADAP
 ~~~~~
 
-.. image:: logo.png
+.. image:: https://github.com/fuzhanrahmanian/MADAP/blob/master/logo.png?raw=true
     :align: center
     :width: 240px
 
@@ -92,6 +92,10 @@ MADAP can also be used via a GUI:
 .. code:: bash
 
    python -m madap_gui
+
+.. image:: https://github.com/fuzhanrahmanian/MADAP/assets/52014627/e5c85b46-d5a9-44cb-8fa3-2fba0f3accbf
+    :align: center
+    :width: 600px
 
 
 License
