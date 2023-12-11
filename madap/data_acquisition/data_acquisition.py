@@ -98,7 +98,7 @@ def format_list(list_data):
     Returns:
         list: The list of plots selected by the user
     # """
-    if isinstance(list_data, str) or isinstance(list_data, int):
+    if isinstance(list_data, (int, str)):
         list_data = [list_data]
     if isinstance(list_data, tuple):
         list_data = list(list_data)

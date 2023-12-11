@@ -1,4 +1,5 @@
-""" This module defines the cyclic amperometry methods. It is a subclass of the Voltammetry class  and the EChemProcedure class. It contains the cyclic amperometry methods for analyzing the data and plotting the results."""
+""" This module defines the cyclic amperometry methods. It is a subclass of the Voltammetry class  and the EChemProcedure class.
+It contains the cyclic amperometry methods for analyzing the data and plotting the results."""
 import os
 
 import numpy as np
@@ -25,6 +26,10 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         self.best_fit_diffusion = None
 
     def analyze(self):
+        """ Analyze the data to calculate the diffusion coefficient and reaction rate constant:
+        1. Calculate the diffusion coefficient using Cottrell analysis.
+        2. Analyze the reaction kinetics to determine if the reaction is first or second order.
+        """
         # Calculate diffusion coefficient
         self._calculate_diffusion_coefficient()
 
@@ -83,6 +88,13 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
 
     def plot(self, save_dir, plots, optional_name: str = None):
+        """Plot the data.
+
+        Args:
+            save_dir (str): The directory where the plot should be saved.
+            plots (list): A list of plots to be plotted.
+            optional_name (str): The optional name of the plot.
+        """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = voltPlot(current=self.np_current, time=self.np_time,
                         voltage=self.voltage,
@@ -121,12 +133,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
                 log.error("Voltammetry CA class does not have the selected plot.")
                 continue
 
-        fig.tight_layout()
-        self.figure = fig
-        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__)
-        plot.save_plot(fig, plot_dir, name)
-
+        self.save_figure(fig, plot, optional_name=optional_name, plot_dir=plot_dir)
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the data
@@ -137,11 +144,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         """
         log.info("Saving data...")
         # Create a directory for the data
-        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
-
-        name = utils.assemble_file_name(optional_name, self.__class__.__name__, "params.json") if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__, "params.json")
-
+        name, save_dir = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
         if self.reaction_order == 1:
             reaction_rate_constant_unit = "1/s"
         elif self.reaction_order == 2:
@@ -168,11 +171,13 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             "time [s]": self.time,
             "cumulative_charge [C]": self.cumulative_charge
         })
-        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__, "data.csv")
-        utils.save_data_as_csv(save_dir, data, data_name)
+
+        self._save_data_with_name(optional_name, self.__class__.__name__, save_dir, data)
+
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
+        """Perform all the actions for the cyclic amperometry method: analyze, plot, and save data."""
+
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)

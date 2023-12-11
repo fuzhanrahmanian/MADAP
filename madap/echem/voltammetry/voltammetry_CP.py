@@ -55,6 +55,13 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
 
     def plot(self, save_dir, plots, optional_name: str = None):
+        """Plot the cyclic potentiometry data.
+
+        Args:
+            save_dir (str): The directory where the plot should be saved
+            plots (list): The list of plots to be plotted
+            optional_name (str): The optional name of the plot.
+        """
         plot_dir = utils.create_dir(os.path.join(save_dir, "plots"))
         plot = voltPlot(current=self.np_current, time=self.np_time,
                         voltage=self.np_voltage,
@@ -82,12 +89,8 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             else:
                 log.error("Voltammetry CP class does not have the selected plot.")
                 continue
+        self.save_figure(fig, plot, optional_name=optional_name, plot_dir=plot_dir)
 
-        fig.tight_layout()
-        self.figure = fig
-        name = utils.assemble_file_name(optional_name, self.__class__.__name__) if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__)
-        plot.save_plot(fig, plot_dir, name)
 
     def save_data(self, save_dir:str, optional_name:str = None):
         """Save the data
@@ -98,10 +101,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         """
         log.info("Saving data...")
         # Create a directory for the data
-        save_dir = utils.create_dir(os.path.join(save_dir, "data"))
-
-        name = utils.assemble_file_name(optional_name, self.__class__.__name__, "params.json") if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__, "params.json")
+        name, save_dir = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
         # add the settings and processed data to the dictionary
         added_data = {
             "Applied Current [A]": self.applied_current,
@@ -125,12 +125,18 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             "dQdV" + f"{self.dQdV_unit}": self.dQdV,
             "dVdt [V/h]": self.dVdt
         })
-        data_name = utils.assemble_file_name(optional_name, self.__class__.__name__, "data.csv") if \
-                    optional_name else utils.assemble_file_name(self.__class__.__name__, "data.csv")
-        utils.save_data_as_csv(save_dir, data, data_name)
+
+        self._save_data_with_name(optional_name, self.__class__.__name__, save_dir, data)
 
 
     def perform_all_actions(self, save_dir:str, plots:list, optional_name:str = None):
+        """ Perform all the actions for the cyclic potentiometry method: analyze, plot, and save data.
+
+        Args:
+            save_dir (str): The directory where the data should be saved
+            plots (list): The list of plots to be plotted
+            optional_name (str): The optional name of the data.
+        """
         self.analyze()
         self.plot(save_dir, plots, optional_name=optional_name)
         self.save_data(save_dir=save_dir, optional_name=optional_name)
@@ -138,6 +144,7 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
     def _impute_mean_nearest_neighbors(self, data):
         """Impute NaN values using the mean of nearest neighbors.
+
         Args:
             data (np.array): data where the NaN values should be imputed
         """

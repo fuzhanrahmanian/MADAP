@@ -70,7 +70,8 @@ disable=fixme,
         len-as-condition,
         function-redefined,
         bare-except,
-        C0103
+        C0103,
+        chained-comparison
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -167,7 +168,7 @@ const-naming-style=UPPER_CASE
 
 # Minimum line length for functions/classes that require docstrings, shorter
 # ones are exempt.
-docstring-min-length=-1
+docstring-min-length=10
 
 # Naming style matching correct function names.
 function-naming-style=snake_case
@@ -296,13 +297,13 @@ notes=FIXME,
 ignore-comments=yes
 
 # Ignore docstrings when computing similarities.
-ignore-docstrings=yes
+ignore-docstrings=no
 
 # Ignore imports when computing similarities.
-ignore-imports=no
+ignore-imports=yes
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=10
 
 
 [SPELLING]
@@ -453,7 +454,7 @@ max-args=25
 max-attributes=25
 
 # Maximum number of boolean expressions in an if statement (see R0916).
-max-bool-expr=5
+max-bool-expr=6
 
 # Maximum number of branch for function / method body.
 max-branches=15

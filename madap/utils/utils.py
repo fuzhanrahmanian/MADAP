@@ -116,19 +116,26 @@ def convert_numpy_to_python(data):
     if isinstance(data, dict):
         return {k: convert_numpy_to_python(v) for k, v in data.items()}
     # serializing numpy int to python int
-    elif isinstance(data, (np.int64, np.int32, np.int16, np.int8)):
+    if isinstance(data, (np.int64, np.int32, np.int16, np.int8)):
         return int(data)
     # serializing numpy float to python float
-    elif isinstance(data, (np.float64, np.float32, np.float16)):
+    if isinstance(data, (np.float64, np.float32, np.float16)):
         return float(data)
     # serializing numpy array to python list
-    elif isinstance(data, (np.ndarray,)):
+    if isinstance(data, (np.ndarray,)):
         return data.tolist()
 
     return data
 
 
 def get_complementary_color(rgb):
+    """Returns the complementary color of the given rgb color
+
+    Args:
+        rgb (list): rgb color
+    Returns:
+        list: complementary color
+    """
     # Convert to 0-255 scale
     rgb_255 = [int(x*255) for x in rgb[:3]]
     # Calculate complementary color

@@ -365,7 +365,7 @@ class EIS(EChemProcedure):
         self.z_fit_clean = np.empty(len(self.z_fit) + len(self.pos_img_index[0]), dtype=np.complex128)
         self.z_fit_clean[:] = np.nan
         j = 0
-        for i in range(len(self.z_fit_clean)):
+        for i in enumerate(self.z_fit_clean):
             if i in self.pos_img_index[0].tolist():
                 continue
             self.z_fit_clean[i] = self.z_fit[j]
