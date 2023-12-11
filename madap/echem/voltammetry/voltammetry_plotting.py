@@ -131,7 +131,7 @@ class VoltammetryPlotting(Plots):
         # Change the unit of charge from As to mAh
         charge, y_label = self._charge_conversion()
         charge = np.abs(charge)
-        subplot_ax.scatter(time_h, charge, label=label, s=3)
+        subplot_ax.scatter(time_h, charge, label=label, s=3, color="#2e8b7e")
         self.plot_identity(subplot_ax, xlabel="Time (h)", ylabel=y_label,
                            ax_sci_notation="both", x_lim=[0, max(time_h)], y_lim=[0, max(charge)])
         # If the charge increases the legend is placed in the lower right corner
@@ -157,7 +157,7 @@ class VoltammetryPlotting(Plots):
             y_label = r"$I (A)$"
         elif self.procedure_type == "Voltammetry_CP":
             y_data = self.voltage
-            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e}"+r"$\cdot \tau$"+" cm^2/s")
+            subplot_ax.scatter(x_data[1:], y_data[1:], s=3, label="D="+f"{diffusion_coefficient:.2e}"+r"$\cdot \tau$"+" cm^2/s", color="#4a467b")
             y_label = r"$Voltage (V)$"
 
         self.plot_identity(subplot_ax, xlabel=r"$t^{-1/2}  [s^{-1/2}]$", ylabel=y_label,
@@ -194,7 +194,7 @@ class VoltammetryPlotting(Plots):
 
         charge, x_label = self._charge_conversion()
         charge = np.abs(charge)
-        subplot_ax.scatter(charge, self.voltage, s=3)
+        subplot_ax.scatter(charge, self.voltage, s=3, color="#3b9f7a")
         self.plot_identity(subplot_ax, xlabel=x_label, ylabel="Voltage (V)",
                            ax_sci_notation="both", x_lim=[min(charge), max(charge)], y_lim=[min(self.voltage), max(self.voltage)])
 
@@ -210,7 +210,7 @@ class VoltammetryPlotting(Plots):
         """
         log.info("Creating potential rate, dVdt plot")
 
-        subplot_ax.plot(self.time, dVdt, linewidth=1)
+        subplot_ax.plot(self.time, dVdt, linewidth=2, color="#317a80")
         #subplot_ax.plot(self.time, dVdt_smoothed, color="#f48024", linewidth=2, label="Smoothed")
         self.plot_identity(subplot_ax, xlabel="Time (s)", ylabel="dV/dt (V/s)",
                            ax_sci_notation="y", x_lim=[0, max(self.time)], y_lim=[min(dVdt), max(dVdt)*1.1])
@@ -240,14 +240,14 @@ class VoltammetryPlotting(Plots):
             negative_peaks (list): list of negative peaks
         """
         log.info("Creating differential capacity plot")
-        subplot_ax.plot(self.voltage, dQdV_no_nan, linewidth=1)
+        subplot_ax.plot(self.voltage, dQdV_no_nan, linewidth=2, color="#425a81")
         # PLot the positive peaks as upper triangles
         for i in positive_peaks:
-            subplot_ax.scatter(i, positive_peaks[i], marker='^', color='green', s=15)
+            subplot_ax.scatter(i, positive_peaks[i], marker='^', color='red', s=30)
         if negative_peaks:
             # PLot the negative peaks as lower triangles
             for i in negative_peaks:
-                subplot_ax.scatter(i, negative_peaks[i], marker='v', color='red', s=15)
+                subplot_ax.scatter(i, negative_peaks[i], marker='v', color='red', s=30)
 
         if self.mass_of_active_material is not None:
             y_label = "Differential Capacity (mAh/g/V)"
@@ -269,9 +269,9 @@ class VoltammetryPlotting(Plots):
         """
         log.info("Creating voltage plot")
         if self.procedure_type == "Voltammetry_CP":
-            subplot_ax.scatter(self.time, self.voltage, s=3, label=f"{np.abs(np.mean(self.current)):.2e} A")
+            subplot_ax.scatter(self.time, self.voltage, s=3, label=f"{np.abs(np.mean(self.current)):.2e} A", color="#482b68")
         elif self.procedure_type == "Voltammetry_CA":
-            subplot_ax.scatter(self.time, self.voltage, s=3)
+            subplot_ax.scatter(self.time, self.voltage, s=3, color="#482b68")
         if y_lim_min == "auto":
             y_lim_min = min(self.voltage)
         else:
