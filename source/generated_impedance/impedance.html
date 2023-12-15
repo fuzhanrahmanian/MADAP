@@ -167,7 +167,7 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EImpedance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EImpedance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for data definition that will be used during the Impedance analysis.
 The data includes the following: frequency, real impedance, imaginary impedance,
@@ -175,22 +175,22 @@ and the phase shift. These attributes are all pandas.Series
 and will stay immutable except the phase shift.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.frequency">
-<span class="sig-name descname"><span class="pre">frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.frequency" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">frequency</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.frequency" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.imaginary_impedance">
-<span class="sig-name descname"><span class="pre">imaginary_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.imaginary_impedance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">imaginary_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.imaginary_impedance" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.phase_shift">
-<span class="sig-name descname"><span class="pre">phase_shift</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.phase_shift" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">phase_shift</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.phase_shift" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.real_impedance">
-<span class="sig-name descname"><span class="pre">real_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.real_impedance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">real_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.real_impedance" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
