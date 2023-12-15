@@ -11,12 +11,13 @@ with open('HISTORY.rst', encoding="utf-8") as history_file:
     history = history_file.read()
 
 requirements = ["attrs==21.4.0",
-        "matplotlib==3.5.3",
-        "numpy==1.22.4",
-        "pandas==1.4.2",
-        "PySimpleGUI==4.60.3",
-        "pytest==7.1.2",
-        "scikit_learn==1.1.2",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "PySimpleGUI",
+        "pytest",
+        "scikit_learn",
+        "ruptures"
         "impedance==1.4.1"]
 
 test_requirements = ['pytest>=3', ]
@@ -24,7 +25,7 @@ test_requirements = ['pytest>=3', ]
 setup(
     author="Fuzhan Rahmanian",
     author_email='fuzhanrahmanian@gmail.com',
-    python_requires='>=3.9',
+    python_requires='>=3.8',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -33,7 +34,9 @@ setup(
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Topic :: Scientific/Engineering :: Physics',
         'Topic :: Scientific/Engineering :: Visualization',
@@ -60,6 +63,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/fuzhanrahmanian/MADAP',
-    version='1.2.1',
+    version='1.2.3',
     zip_safe=False,
 )

@@ -39,10 +39,10 @@ class EImpedance:
         and the phase shift. These attributes are all pandas.Series
         and will stay immutable except the phase shift.
     """
-    frequency : list[float] = field(on_setattr=frozen)
-    real_impedance : list[float] = field(on_setattr=frozen)
-    imaginary_impedance : list[float] = field( on_setattr=frozen)
-    phase_shift : list[float] = field(default=None)
+    frequency = field(on_setattr=frozen)
+    real_impedance = field(on_setattr=frozen)
+    imaginary_impedance = field( on_setattr=frozen)
+    phase_shift = field(default=None)
 
     def __repr__(self) -> str:
         """Returns a string representation of the object."""
@@ -331,7 +331,7 @@ class EIS(EChemProcedure):
         log.info(f"The calculated conductivity is {conductivity} [S.cm⁻¹]")
         return conductivity
 
-    def _calculate_phase_shift(self) -> list[float]:
+    def _calculate_phase_shift(self):
         """calculate phase shift
 
         Args:

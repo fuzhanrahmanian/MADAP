@@ -2,6 +2,10 @@
 History
 =======
 
+1.2.3 (2023-12-11)
+-------------------
+* Include python 3.8
+
 1.2.1 (2023-12-11)
 -------------------
 * Added Ciclic Voltammetry to the functions

@@ -16,7 +16,7 @@ log = logger.get_logger("cyclic_amperometry")
 
 class Voltammetry_CA(Voltammetry, EChemProcedure):
     """ This class defines the chrono amperometry method."""
-    def __init__(self, current, voltage, time, args, charge:list[float]=None) -> None:
+    def __init__(self, current, voltage, time, args, charge=None) -> None:
         super().__init__(voltage, current, time, args, charge=charge)
         self.applied_voltage = float(args.applied_voltage) if args.applied_voltage is not None else None # Unit: V
         self.diffusion_coefficient = None # Unit: cm^2/s

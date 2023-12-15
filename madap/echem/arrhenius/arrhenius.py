@@ -31,8 +31,8 @@ class Arrhenius(EChemProcedure):
         intercept (float): Intercept of the fit.
         coefficients (float): Slope of the fit.
     """
-    temperatures: list[float] = field(on_setattr=frozen)
-    conductivity: list[float] = field(on_setattr=frozen)
+    temperatures = field(on_setattr=frozen)
+    conductivity = field(on_setattr=frozen)
     gas_constant = 8.314        # [J/mol.K]
     activation = None           # [mJ/mol]
     arrhenius_constant = None   # [S.cm⁻¹]
