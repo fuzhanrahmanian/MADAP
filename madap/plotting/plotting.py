@@ -54,6 +54,11 @@ class Plots():
             step_size_y (str, optional): step size of the y axis. Defaults to "auto".
         """
         def calculate_ticks(lim, step_size, num_steps=5):
+            if max(lim) == min(lim):
+                # find index of max value
+                max_index = np.where(lim == max(lim))[0][0]
+                # Replace max value with max value * 1.5
+                lim[max_index] = lim[max_index] * 1.5
             if step_size == "auto":
                 raw_step = (max(lim) - min(lim)) / num_steps
                 step = round(raw_step, -int(np.floor(np.log10(raw_step))))  # Adjust rounding precision
