@@ -46,7 +46,7 @@ class Voltammetry(EChemProcedure):
         self.concentration_of_active_material = \
         float(args.concentration_of_active_material) if args.concentration_of_active_material is not None else 1 # Unit: mol/cm^3
 
-        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time)
+        self.window_size = int(args.window_size) if args.window_size is not None else len(self.np_time) - 1
 
         self.measured_current_unit = args.measured_current_units
         self.measured_time_unitis = args.measured_time_units
