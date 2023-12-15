@@ -57,11 +57,15 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
     def _analyze_reaction_kinetics(self):
         """
-        Analyze the reaction kinetics to determine if the reaction is first or second order.
+        Analyze the reaction kinetics to determine if the reaction is zero, first or second order. Higher order reactions are not considered here.
+        for the zero order, the rate low: I = I0 - kt
         for the first order, the rate low: ln(I) = ln(I0) - kt
         for the second order, the rate low: 1/I = 1/I0 + kt
         and calculate the rate constant accordingly.
         """
+        # Analyze for zero-order kinetics
+        log.info("Analyzing reaction kinetics for zero kinetic order...")
+        zero_order_fit = self.analyze_best_linear_fit(x_data=self.np_time[1:], y_data=self.np_current[1:])
         # Analyze for first-order kinetics
         log.info("Analyzing reaction kinetics for first kinetic order...")
         first_order_fit = self.analyze_best_linear_fit(x_data=self.np_time[1:], y_data=np.log(self.np_current[1:]))
@@ -71,7 +75,16 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
 
 
         # Determine which order fits best
+        if (zero_order_fit['r_squared'] > first_order_fit['r_squared']) and (zero_order_fit['r_squared'] > second_order_fit['r_squared']):
+            log.info("The reaction is zero-order.")
+            self.reaction_order = 0
+            self.reaction_rate_constant = -zero_order_fit['slope']
+            self.best_fit_reaction_rate = zero_order_fit
+            log.info(f"Reaction rate constant for zero order: {self.reaction_rate_constant} A/s")
+            log.info("A positive rate constant indicates a decay process, while a negative one indicates an increasing process or growth.")
+
         if first_order_fit['r_squared'] > second_order_fit['r_squared']:
+            log.info("The reaction is first-order.")
             self.reaction_order = 1
             # Assigning the negative of the slope for first-order kinetics
             self.reaction_rate_constant = -first_order_fit['slope']
@@ -80,6 +93,7 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             log.info("A positive rate constant indicates a decay process, while a negative one indicates an increasing process or growth.")
 
         else:
+            log.info("The reaction is second-order.")
             self.reaction_order = 2
             self.reaction_rate_constant = second_order_fit['slope']
             self.best_fit_reaction_rate = second_order_fit
@@ -113,7 +127,9 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
             if plot_name == "CA":
                 plot.CA(subplot_ax=sub_ax)
             elif plot_name == "Log_CA":
-                if self.reaction_order == 1:
+                if self.reaction_order == 0:
+                    y_data = self.np_current[1:]
+                elif self.reaction_order == 1:
                     y_data = np.log(self.np_current[1:])
                 elif self.reaction_order == 2:
                     y_data = 1/self.np_current[1:]
@@ -145,7 +161,9 @@ class Voltammetry_CA(Voltammetry, EChemProcedure):
         log.info("Saving data...")
         # Create a directory for the data
         save_dir, name = self._assemble_name(save_dir, optional_name, self.__class__.__name__)
-        if self.reaction_order == 1:
+        if self.reaction_order == 0:
+            reaction_rate_constant_unit = "A/s"
+        elif self.reaction_order == 1:
             reaction_rate_constant_unit = "1/s"
         elif self.reaction_order == 2:
             reaction_rate_constant_unit = "cm^3/mol/s"

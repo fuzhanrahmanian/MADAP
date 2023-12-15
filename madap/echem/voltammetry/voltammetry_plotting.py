@@ -93,7 +93,10 @@ class VoltammetryPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
         log.info("Creating Log CA plot")
-        if reaction_order == 1:
+        if reaction_order == 0:
+            y_label = "Current (A)"
+            label = r"$\kappa$"+f"={reaction_rate:.2e} A/s"
+        elif reaction_order == 1:
             y_label = "Log(Current) (A)"
             label = r"$\kappa$"+f"={reaction_rate:.2e} 1/s"
         elif reaction_order == 2:
