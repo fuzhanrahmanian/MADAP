@@ -2,6 +2,12 @@
 History
 =======
 
+1.2.5 (2023-12-11)
+-------------------
+* Fixed bug in CA for zero reaction rate constant
+* Fixed bug in index handling for CA
+* Fixed bug in plot ticks
+
 1.2.3 (2023-12-11)
 -------------------
 * Include python 3.8
