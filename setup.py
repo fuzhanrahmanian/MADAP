@@ -17,7 +17,7 @@ requirements = ["attrs==21.4.0",
         "PySimpleGUI",
         "pytest",
         "scikit_learn",
-        "ruptures"
+        "ruptures",
         "impedance==1.4.1"]
 
 test_requirements = ['pytest>=3', ]
@@ -63,6 +63,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/fuzhanrahmanian/MADAP',
-    version='1.2.3',
+    version='1.2.5',
     zip_safe=False,
 )
