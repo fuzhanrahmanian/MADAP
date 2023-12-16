@@ -111,7 +111,6 @@ def convert_from_pd(obj):
     Returns:
         dict: The converted data
     """
-
     if isinstance(obj, pd.Series):
         return obj.to_dict()
     if isinstance(obj, dict):

@@ -2,7 +2,14 @@
 History
 =======
 
-1.2.5 (2023-12-11)
+1.2.6 (2023-12-16)
+-------------------
+* Fixed bug in CP for differential capacity plot
+* Handled None and Infinite values in CP plots
+* Fixed index in CV
+
+
+1.2.5 (2023-12-15)
 -------------------
 * Fixed bug in CA for zero reaction rate constant
 * Fixed bug in index handling for CA

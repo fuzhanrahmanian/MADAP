@@ -48,6 +48,7 @@ class MadapGui:
         self.cycle_list = None
         self.penalty_value = None
         self.temperature = None
+        self.applied_scan_rate = None
 
     # pylint: disable=inconsistent-return-statements
     # pylint: disable=too-many-return-statements
@@ -207,6 +208,9 @@ def gui_layout(madap, colors):
                                    pad=(1,(10,0)))],
                     [sg.Text('Temperature (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
                       sg.Input(key='-inCVTemperature-', default_text="298.15", size=(10, 1), pad=((20,0),(10,0))), sg.Text('[K]',
+                                    pad=((7,0),(10,0)))],
+                    [sg.Text('Applied Scan Rate (optional)',justification='left', font=("Arial", 11), pad=(1,(10,0))),
+                        sg.Input(key='-inCVScanRate-', default_text="0.1", size=(10, 1), pad=((20,0),(10,0))), sg.Text('[V/s]',
                                     pad=((7,0),(10,0)))],
                     [sg.Text('Plots',justification='left', font=("Arial", 11), pad=(1,(10,0)))],
                     [sg.Listbox([x for x in madap.cv_plots], key='-PLOTS_CV-',
@@ -421,6 +425,8 @@ def main():
                                             if not values['-inPenaltyValue-'] == '' else None
             madap_gui.temperature = values['-inCVTemperature-'] \
                                             if not values['-inCVTemperature-'] == '' else None
+            madap_gui.applied_scan_rate = values['-inCVScanRate-'] \
+                                            if not values['-inCVScanRate-'] == '' else None
             if values['-HEADER_OR_SPECIFIC-'] == 'Headers':
                 madap_gui.specific = None
                 madap_gui.header_list = values['-HEADER_OR_SPECIFIC_VALUE-'].replace(" ","")

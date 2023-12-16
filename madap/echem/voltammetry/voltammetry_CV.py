@@ -39,6 +39,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         self.cycle_list = cycle_list
         self.tafel_data = {}
         self.regression = False
+        self.applied_scan_rate = float(args.applied_scan_rate) if args.applied_scan_rate is not None else None # Unit: V/s
 
 
     def analyze(self):
@@ -58,8 +59,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # calculate the diffusion coefficient from Randles-Sevcik equation
         self._calculate_diffusion_coefficient_anodic_cathodic()
         # calculate the overpotential from the E half for both anodic and cathodic peaks, and height of the peaks
-        if self.regression:
-            self._find_peak_and_tafel_params()
+        self._find_peak_and_tafel_params()
 
 
     def _find_fwd_bwd_scans(self):
@@ -72,13 +72,16 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         direction = initial_direction
         scan_directions = []
 
-        for i, voltage in enumerate(self.np_voltage):
+        for i, voltage in enumerate(self.np_voltage[:-1]):
             # Check if the voltage has reached its extremum and switch direction
             if ((direction=='F') and (voltage < self.np_voltage[i-1]) and (voltage > self.np_voltage[i+1])) or \
                     ((direction=='B') and (voltage > self.np_voltage[i-1]) and (voltage < self.np_voltage[i+1])):
                 direction = 'B' if direction == 'F' else 'F'
 
             scan_directions.append(direction)
+
+        # get the same direction for the last point
+        scan_directions.append(direction)
 
         # Add the scan direction data to the dataframe
         self.data['scan_direction'] = scan_directions
@@ -138,6 +141,13 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         peak_dict = self.cathodic_peak_params if peak_type == 'cathodic' else self.anodic_peak_params
         peak_dict[f'cycle_{cycle_num}'] = {}
         for peak in peaks:
+            if self.applied_scan_rate is not None:
+                peak_scan_rate = self.applied_scan_rate
+            elif data.iloc[peak]['scan_rate'] is not None:
+                peak_scan_rate = data.iloc[peak]['scan_rate']
+            else:
+                log.warning("No scan rate found in the data. Using 1 V/s as default.")
+                peak_scan_rate = 1
             peak_data = {
                 'current': data.iloc[peak]['current'],
                 'voltage': data.iloc[peak]['voltage'],
@@ -145,7 +155,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                 'cycle_num': cycle_num,
                 'direction': scan_direction,
                 'peak_type': 'cathodic' if scan_direction == 'B' else 'anodic',
-                'scan_rate': data.iloc[peak]['scan_rate']}
+                'scan_rate': peak_scan_rate}
             peak_dict[f'cycle_{cycle_num}'][f'peak_{len(peak_dict[f"cycle_{cycle_num}"]) + 1}'] = peak_data
 
 
@@ -222,9 +232,6 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # Constants
         const_298K = 2.69 * 10**5
         const_other_temp = 0.4463
-        if scan_rate is None:
-            log.warning("No scan rate found in the data. Using 1 V/s as default.")
-            scan_rate = 1
 
         if int(self.temperature) == 298:
             # Randles-Sevcik equation
@@ -275,13 +282,13 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     # filtered anodic data
                     filter_anodic_data = self.data[(self.data['cycle_number'] == cycle_number) & (self.data['scan_direction'] == "F")].copy()
                     self._find_height_of_anodic_peak_current(cycle, pair, peak_anodic_number, filter_anodic_data )
-
-                log.info(f"Finished calculating the height of the peaks for cycle {cycle} and pair {pair}")
-                self._find_tafel_region(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
-                self._find_tafel_region(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
-                log.info(f"Finished calculating the peak parameters for cycle {cycle} and pair {pair}")
-                self._calculate_corrosion_point(cycle, peak_anodic_number, peak_cathodic_number)
-                log.info(f"Finished calculating the corrosion point for cycle {cycle} and pair {pair}")
+                if self.regression:
+                    log.info(f"Finished calculating the height of the peaks for cycle {cycle} and pair {pair}")
+                    self._find_tafel_region(cycle, peak_number=peak_cathodic_number, reaction_type="cathodic")
+                    self._find_tafel_region(cycle, peak_number=peak_anodic_number, reaction_type="anodic")
+                    log.info(f"Finished calculating the peak parameters for cycle {cycle} and pair {pair}")
+                    self._calculate_corrosion_point(cycle, peak_anodic_number, peak_cathodic_number)
+                    log.info(f"Finished calculating the corrosion point for cycle {cycle} and pair {pair}")
 
 
     def _find_overpotential(self, cycle, pair, peak_anodic_number, peak_cathodic_number):
@@ -351,8 +358,8 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
             # store the height of the peak current
             self.cathodic_peak_params[cycle][peak_cathodic_number]["height"] = max_distance
             self.cathodic_peak_params[cycle][peak_cathodic_number]["capacitative_line"] = best_line
-            self.cathodic_peak_params[cycle][peak_cathodic_number]["capacitative_start_point"] = best_point1
-            self.cathodic_peak_params[cycle][peak_cathodic_number]["capacitative_end_point"] = best_point2
+            self.cathodic_peak_params[cycle][peak_cathodic_number]["capacitative_start_point"] = {"voltage": best_point1["voltage"], "current": best_point1["current"]}
+            self.cathodic_peak_params[cycle][peak_cathodic_number]["capacitative_end_point"] = {"voltage": best_point2["voltage"], "current": best_point2["current"]}
             self.E_half_params[cycle][pair]['cathodic_peak_height'] = max_distance
 
 
@@ -395,8 +402,8 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         else:
             self.anodic_peak_params[cycle][peak_anodic_number]["height"] = max_distance
             self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_line"] = best_line
-            self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_start_point"] = best_point1
-            self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_end_point"] = best_point2
+            self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_start_point"] = {"voltage": best_point1["voltage"], "current": best_point1["current"]}
+            self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_end_point"] = {"voltage": best_point2["voltage"], "current": best_point2["current"]}
             self.E_half_params[cycle][pair]['anodic_peak_height'] = max_distance
 
 
@@ -664,7 +671,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                         mass_of_active_material=self.mass_of_active_material,
                         cumulative_charge = self.cumulative_charge,
                         procedure_type=self.__class__.__name__)
-        if (self.data["scan_rate"].isnull().values.all()) and ("Peak Scan" in plots):
+        if ((self.data["scan_rate"].isnull().values.all()) or (self.applied_scan_rate is None)) and ("Peak Scan" in plots):
             log.warning("Scan rate is not found in the data so no Plot is possible. Please provide the scan rate.")
             # Drop the Peak scan plot from the list of plots
             plots = [plot for plot in plots if plot != "Peak Scan"]
@@ -737,7 +744,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     "Temperature [K]": self.temperature}
 
         processed_data = utils.convert_numpy_to_python(added_data)
-        processed_data = utils.convert_from_pd(processed_data)
+        #processed_data = utils.convert_from_pd(processed_data)
         utils.save_data_as_json(save_dir, processed_data, name)
 
         self._save_data_with_name(optional_name, self.__class__.__name__, save_dir, self.data)

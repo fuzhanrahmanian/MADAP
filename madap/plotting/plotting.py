@@ -75,20 +75,18 @@ class Plots():
         if ylabel:
             ax.set_ylabel(ylabel, fontsize=y_label_fontsize)
         if x_lim:
-            #step = (max(x_lim)-min(x_lim))/5 if step_size_x=="auto" else step_size_x
-            #ax.set_xlim([min(x_lim), max(x_lim)])
-            #ax.set_xticks(np.arange(min(x_lim), max(x_lim), step))
-            x_ticks, x_lim_adj = calculate_ticks(x_lim, step_size_x)
-            ax.set_xlim(x_lim_adj)
-            ax.set_xticks(x_ticks)
+
+            if not np.isnan(x_lim).any() and not np.isinf(x_lim).any():
+                x_ticks, x_lim_adj = calculate_ticks(x_lim, step_size_x)
+                ax.set_xlim(x_lim_adj)
+                ax.set_xticks(x_ticks)
 
         if y_lim:
-            # step = (max(y_lim)-min(y_lim))/5 if step_size_y=="auto" else step_size_y
-            # ax.set_ylim([min(y_lim), max(y_lim)])
-            # ax.set_yticks(np.arange(min(y_lim), max(y_lim), step))
-            y_ticks, y_lim_adj = calculate_ticks(y_lim, step_size_y)
-            ax.set_ylim(y_lim_adj)
-            ax.set_yticks(y_ticks)
+
+            if not np.isnan(y_lim).any() and not np.isinf(y_lim).any():
+                y_ticks, y_lim_adj = calculate_ticks(y_lim, step_size_y)
+                ax.set_ylim(y_lim_adj)
+                ax.set_yticks(y_ticks)
 
         if rotation:
             ax.xaxis.set_tick_params(rotation=rotation)

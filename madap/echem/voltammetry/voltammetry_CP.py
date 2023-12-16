@@ -199,24 +199,26 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
 
         # Apply k-means clustering to categorize into two clusters
         n_possible_reactions = self._determine_cluster_number(all_peaks)
-        kmeans = KMeans(n_clusters=n_possible_reactions, random_state=42).fit(self.np_voltage[all_peaks].reshape(-1, 1))
-        labels = kmeans.labels_
-        if np.any(dQdV_no_nan < 0):
-            negative_labels = kmeans.predict(self.np_voltage[negative_peaks].reshape(-1, 1))
-        # Find the most significant peak in each cluster
-        for i in range(n_possible_reactions):
-            # Positive Peaks
-            cluster_peaks_of_dqdv = dQdV_no_nan[all_peaks][labels == i]
-            index_of_max_peak = np.argmax(cluster_peaks_of_dqdv)
-            self.positive_peaks[self.np_voltage[all_peaks][labels == i][index_of_max_peak]] =\
-                                                dQdV_no_nan[all_peaks][labels == i][index_of_max_peak]
+        # Just check for the number of k-means clusters if there are peaks
+        if len(all_peaks) != 0:
+            kmeans = KMeans(n_clusters=n_possible_reactions, random_state=42).fit(self.np_voltage[all_peaks].reshape(-1, 1))
+            labels = kmeans.labels_
+            if np.any(dQdV_no_nan < 0) and len(negative_peaks) != 0:
+                negative_labels = kmeans.predict(self.np_voltage[negative_peaks].reshape(-1, 1))
+            # Find the most significant peak in each cluster
+            for i in range(n_possible_reactions):
+                # Positive Peaks
+                cluster_peaks_of_dqdv = dQdV_no_nan[all_peaks][labels == i]
+                index_of_max_peak = np.argmax(cluster_peaks_of_dqdv)
+                self.positive_peaks[self.np_voltage[all_peaks][labels == i][index_of_max_peak]] =\
+                                                    dQdV_no_nan[all_peaks][labels == i][index_of_max_peak]
 
-            if np.any(dQdV_no_nan < 0):
-                # Negative Peaks
-                cluster_neg_peaks = dQdV_no_nan[negative_peaks][negative_labels == i]
-                min_peak = np.argmin(cluster_neg_peaks)
-                self.negative_peaks[self.np_voltage[negative_peaks][negative_labels == i][min_peak]] =\
-                                                dQdV_no_nan[negative_peaks][negative_labels == i][min_peak]
+                if np.any(dQdV_no_nan < 0) and len(negative_peaks) != 0:
+                    # Negative Peaks
+                    cluster_neg_peaks = dQdV_no_nan[negative_peaks][negative_labels == i]
+                    min_peak = np.argmin(cluster_neg_peaks)
+                    self.negative_peaks[self.np_voltage[negative_peaks][negative_labels == i][min_peak]] =\
+                                                    dQdV_no_nan[negative_peaks][negative_labels == i][min_peak]
 
         self.dQdV = dQdV_no_nan
 
@@ -257,10 +259,14 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
         model = "l1"  # L1 norm minimization
         algo = rpt.Pelt(model=model).fit(self.np_voltage)
         result = algo.predict(pen=self.penalty_value)
-
-        # The first change point is the end of the initial stabilization phase
-        self.tao_initial = self.np_time[result[0]] if result else None
-        self.stabilization_values[self.tao_initial] = self.np_voltage[result[0]] if result else None
+        if result:
+            if result[0] == len(self.np_voltage):
+                self.tao_initial = self.np_time[-1]
+                self.stabilization_values[self.tao_initial] = self.np_voltage[-1]
+            else:
+                # The first change point is the end of the initial stabilization phase
+                self.tao_initial = self.np_time[result[0]]
+                self.stabilization_values[self.tao_initial] = self.np_voltage[result[0]]
 
 
     def _find_potential_transition_times(self, window_length=73, polyorder=3):
@@ -271,6 +277,12 @@ class Voltammetry_CP(Voltammetry, EChemProcedure):
             window_length (int): length of the filter window
             polyorder (int): order of the polynomial to fit
         """
+        # Check if window_length is less than the length of the data
+        if window_length > len(self.dVdt):
+            window_length = polyorder + 2
+            # check that windowlength is odd, and if not, make it odd
+            if window_length % 2 == 0:
+                window_length += 1
         # Apply Savitzky-Golay filter to smooth dV/dt data
         self.dVdt_smoothed = savgol_filter(self.dVdt, window_length, polyorder)
 
