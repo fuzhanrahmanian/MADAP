@@ -355,48 +355,52 @@ class VoltammetryPlotting(Plots):
         # Loop through cycle with the plotted_cycle_frequency
         for cycle_num in cycle_list:
             # check if data['scan_rate'] is not None
-            if not data['scan_rate'].isnull().values.any():
-                label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
-            else:
-                label_name = f"Cyc. {cycle_num}"
+            # if not data['scan_rate'].isnull().values.any():
+            #     label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
+            # else:
+            #     label_name = f"Cyc. {cycle_num}"
+            #label_name = f"Cyc. {cycle_num+1}"
             subplot_ax.plot(data[data["cycle_number"] == cycle_num]["voltage"], data[data["cycle_number"] == cycle_num]["current"],\
-                            linewidth=0.9, color=colors[cycle_num-1], label=label_name)
+                            linewidth=0.9, color=colors[cycle_num-1])#, label=label_name)
 
             cycle = f"cycle_{cycle_num}"
             for peak in anodic_peak_params[cycle]:
                 # check if the capacitative_start_point exists
                 if "capacitative_start_point" in anodic_peak_params[cycle][peak]:
-                    subplot_ax.plot([anodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
-                                    anodic_peak_params[cycle][peak]["voltage"]],
-                                    [anodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
-                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
-                                    anodic_peak_params[cycle][peak]["capacitative_line"][1]],
-                                    linestyle=':', linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
-                                    label=r"$h_{pa}, h_{pc}$")
-
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
                                     [anodic_peak_params[cycle][peak]["current"],
                                     anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
                                     anodic_peak_params[cycle][peak]["capacitative_line"][1]],
-                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])
+                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1], label=r"$h_{pa}, h_{pc}$")
+
+                    subplot_ax.plot([anodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
+                                    anodic_peak_params[cycle][peak]["voltage"]],
+                                    [anodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
+                                    anodic_peak_params[cycle][peak]["capacitative_line"][1]],
+                                    linestyle=':', linewidth=0.5, color=colors[cycle_num-1], alpha=0.7)
+
+
 
             for peak in cathodic_peak_params[cycle]:
-                if "capacitative_start_point" in cathodic_peak_params[cycle][peak]:
-                    subplot_ax.plot([cathodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
-                                    cathodic_peak_params[cycle][peak]["voltage"]],
-                                    [cathodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
-                                    cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
-                                    cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
-                                    linestyle=':',  linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
-                                    label=r"$h_{pa}, h_{pc}$")
 
+                if "capacitative_start_point" in cathodic_peak_params[cycle][peak]:
                     subplot_ax.plot([cathodic_peak_params[cycle][peak]["voltage"],
                                     cathodic_peak_params[cycle][peak]["voltage"]],
                                     [cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][1],
                                     cathodic_peak_params[cycle][peak]["current"]],
-                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])
+                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])#,label=r"$h_{pa}, h_{pc}$"
+
+                    subplot_ax.plot([cathodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
+                                    cathodic_peak_params[cycle][peak]["voltage"]],
+                                    [cathodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
+                                    cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
+                                    cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
+                                    linestyle=':',  linewidth=0.5, color=colors[cycle_num-1], alpha=0.7)
+
+
 
 
         self.plot_identity(subplot_ax, xlabel="Voltage (V)", ylabel="Current (A)",

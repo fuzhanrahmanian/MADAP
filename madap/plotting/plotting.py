@@ -200,7 +200,9 @@ class Plots():
 
         for handle, label in zip(handles, labels):
             color = handle.get_color()  # Adjust this if using different types of plots
-
+            # check if color is list then convert it to tuple
+            if isinstance(color, list):
+                color = tuple(color)
             # Count the occurrences of each color
             if color in color_count:
                 color_count[color] += 1
