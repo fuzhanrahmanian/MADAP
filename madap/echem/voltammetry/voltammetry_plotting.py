@@ -355,13 +355,12 @@ class VoltammetryPlotting(Plots):
         # Loop through cycle with the plotted_cycle_frequency
         for cycle_num in cycle_list:
             # check if data['scan_rate'] is not None
-            # if not data['scan_rate'].isnull().values.any():
-            #     label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
-            # else:
-            #     label_name = f"Cyc. {cycle_num}"
-            #label_name = f"Cyc. {cycle_num+1}"
+            if not data['scan_rate'].isnull().values.any():
+                label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
+            else:
+                label_name = f"Cyc. {cycle_num}"
             subplot_ax.plot(data[data["cycle_number"] == cycle_num]["voltage"], data[data["cycle_number"] == cycle_num]["current"],\
-                            linewidth=0.9, color=colors[cycle_num-1])#, label=label_name)
+                            linewidth=0.9, color=colors[cycle_num-1], label=label_name)
 
             cycle = f"cycle_{cycle_num}"
             for peak in anodic_peak_params[cycle]:
