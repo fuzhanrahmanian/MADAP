@@ -508,7 +508,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         # start the sorted data from the first point and iterate through the data
         for start_ind in range(0, len(sorted_data), 1):
             subset_of_sorted_data = sorted_data.iloc[start_ind:]
-            if best_fit_r2 > 0.96:
+            if best_fit_r2 > 0.99:
                 break
             for size in range(min_points, max_points + 1, 2):
                 subset = subset_of_sorted_data.head(size)
@@ -535,7 +535,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                     best_fit_r2 = r2
                     best_fit_size = size
 
-        if best_fit_r2 < 0.96:
+        if best_fit_r2 < 0.99:
             log.warning(f"R^2 value is {best_fit_r2:.2f}. The slope and intercept of the Tafel region might not be accurate.")
         # Slope = (alpha*F*n)/(2.3*R*T). Find alpha
         alpha = (best_fit_slope * 2.3 * self.gas_constant * self.temperature) /(self.faraday_constant * self.number_of_electrons)
