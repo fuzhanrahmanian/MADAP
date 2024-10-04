@@ -31,7 +31,7 @@ voltammetry.voltammetry\_CP
 voltammetry.voltammetry\_CV
 -------------------------------
 
-.. automodule:: voltammetry.voltammetry_CP
+.. automodule:: voltammetry.voltammetry_CV
    :members:
    :undoc-members:
    :show-inheritance:
