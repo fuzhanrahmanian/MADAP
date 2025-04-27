@@ -2,6 +2,11 @@
 History
 =======
 
+1.2.7 (2025-04-24)
+-------------------
+* Added support for no time data in CV
+* Fixed bug in CV for no time data and CLI
+
 1.2.6 (2023-12-16)
 -------------------
 * Fixed bug in CP for differential capacity plot

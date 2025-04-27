@@ -2,7 +2,7 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('README.rst', encoding="utf-8") as readme_file:
     readme = readme_file.read()
@@ -63,6 +63,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/fuzhanrahmanian/MADAP',
-    version='1.2.6',
+    version='1.2.7',
     zip_safe=False,
 )
