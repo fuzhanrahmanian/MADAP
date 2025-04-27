@@ -491,6 +491,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
         best_fit_slope = 0
         best_fit_r2 = float("-inf")
         best_fit_size = None
+        best_fit_intercept = float("-inf")
 
         # Determine the maximum number of points to consider if not specified
         if max_points is None:
