@@ -1,19 +1,18 @@
 """ This module is the main entry point for MADAP. It defines the CLI to be used by the user."""
-import os
 import argparse
+import os
 import re
-
 from pathlib import Path
+
 import pandas as pd
 
-from madap.utils import utils
-from madap.logger import logger
 from madap.data_acquisition import data_acquisition as da
-from madap.echem.e_impedance import e_impedance
 from madap.echem.arrhenius import arrhenius
-from madap.echem.voltammetry import voltammetry_CA, voltammetry_CP, voltammetry_CV
-
-
+from madap.echem.e_impedance import e_impedance
+from madap.echem.voltammetry import (voltammetry_CA, voltammetry_CP,
+                                     voltammetry_CV)
+from madap.logger import logger
+from madap.utils import utils
 
 log = logger.setup_applevel_logger(file_name = 'madap_debug.log')
 
@@ -66,21 +65,21 @@ def _analyze_parser_args():
     elif proc.procedure == "voltammetry":
         voltammetry_pars = first_parser.add_argument_group("Options for the Arrhenius procedure")
         voltammetry_pars.add_argument("-vp", "--voltammetry_procedure", type=str, required=True,
-                            choices=['cv', 'ca', "cp"],)
+                            choices=['CV', 'CA', "CP"],)
         voltammetry_pars.add_argument("-mc", "--measured_current_units", type=str, required=True,
                             default="uA", choices=["uA", "mA", "A"], help="Measured current units")
-        voltammetry_pars.add_argument("-mt", "--measured_time_units", type=str, required=True,
+        voltammetry_pars.add_argument("-mt", "--measured_time_units", type=str, required=False,
                             default="s", choices=["ms", "s", "min", "h"], help="Measured time units")
-        voltammetry_pars.add_argument("-ne", "--number_of_electrons", type=int, required=True,
+        voltammetry_pars.add_argument("-ne", "--number_of_electrons", type=int, required=False,
                             default=1, help="Number of electrons involved in the reaction")
         voltammetry_pars.add_argument("-cam", "--concentration_of_active_material", type=float, required=False,
                             default=None, help="Concentration of the active material [mol/cm^3]")
-        voltammetry_pars.add_argument("mam", "--mass_of_active_material", type=float, required=False,
+        voltammetry_pars.add_argument("-mam", "--mass_of_active_material", type=float, required=False,
                             default=None, help="Mass of the active material [g]")
         voltammetry_pars.add_argument("-ea", "--electrode_area", type=float, required=False,
                             default=None, help="Electrode area [cm^2]")
         proc = first_parser.parse_known_args()[0]
-        if proc.voltammetry_procedure == "cv":
+        if proc.voltammetry_procedure == "CV":
             cv = first_parser.add_argument_group("Options for the CV procedure")
             cv.add_argument("-plcy", "--cycle_list", required=False, default=None,
                             help="list of cycles to be plotted. \n format: [1, 2, 3] \n if it is not specified, all cycles will be plotted")
@@ -88,14 +87,17 @@ def _analyze_parser_args():
                             nargs="+", help="plots to be generated")
             cv.add_argument("-temp", "--temperature", type=float, required=False, default=None,
                             help="temperature [K] if applicable")
-        elif proc.voltammetry_procedure == "ca":
+            cv.add_argument("-w", "--window_size", type=int, required=True, default=1, help="window size for the moving average")
+            cv.add_argument("-sc", "--applied_scan_rate", type=float, required=False, default=0.1,
+                            help="Applied scan rate [V/s] if applicable. Default is 0.1 V/s")
+        elif proc.voltammetry_procedure == "CA":
             ca = first_parser.add_argument_group("Options for the CA procedure")
             ca.add_argument("-pl", "--plots", required=True, choices=["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"],
                             nargs="+", help="plots to be generated")
             ca.add_argument("-a", "--applied_voltage", type=float, required=False, default=None,
                             help="applied voltage [V] if applicable")
             ca.add_argument("-w", "--window_size", type=int, required=False, default=None, help="window size for the moving average")
-        elif proc.voltammetry_procedure == "cp":
+        elif proc.voltammetry_procedure == "CP":
             cp = first_parser.add_argument_group("Options for the CP procedure")
             cp.add_argument("-pl", "--plots", required=True, \
                 choices=["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"],
@@ -295,10 +297,33 @@ def call_voltammetry(data, result_dir, args):
         else:
             header_names = args.header_list
 
-        # extracting the data
-        current_data, voltage_data, time_data = data[header_names[0]],\
-                                                data[header_names[1]],\
-                                                data[header_names[2]]
+        
+        if len(header_names) == 2:
+            current_data, voltage_data = data[header_names[0]], data[header_names[1]]
+            time_data = None
+            unavailable_plots = []
+            # Define unavailable plots based on voltammetry procedure
+            if args.voltammetry_procedure == "CV":
+                unavailable_plots = ["E-t", "I-t", "Peak Scan"]
+                # Tafel analysis might be limited without time data
+                if "Tafel" in args.plots:
+                    log.warning("Tafel analysis may be limited without time data.")
+            elif args.voltammetry_procedure == "CA":
+                unavailable_plots = ["CA", "Log_CA", "CC", "Cottrell", "Anson"]
+            elif args.voltammetry_procedure == "CP":
+                unavailable_plots = ["CP", "CC", "Cottrell", "Potential_Rate"]
+            
+            # Check if any requested plots are unavailable
+            unavailable_requested = [plot for plot in args.plots if plot in unavailable_plots]
+            if unavailable_requested:
+                log.warning(f"The following plots are not available without time data: {unavailable_requested}")
+                log.info("Will proceed with generating available plots only.")
+            
+        elif len(header_names) == 3:
+            # extracting the data
+            current_data, voltage_data, time_data = data[header_names[0]],\
+                                                    data[header_names[1]],\
+                                                    data[header_names[2]]
 
     if len(header_names) == 4:
         charge_data = da.format_data(data[header_names[3]])
@@ -326,8 +351,23 @@ def call_voltammetry(data, result_dir, args):
                                                         charge=charge_data,
                                                         args=args)
 
-    # Format plots arguments
+    # Format plots arguments and filter out unavailable plots if time_data is None
     plots = da.format_list(args.plots)
+    if time_data is None:
+        if args.voltammetry_procedure == "cv":
+            unavailable_plots = ["E-t", "I-t", "Peak Scan"]
+        elif args.voltammetry_procedure == "ca":
+            unavailable_plots = ["CA", "Log_CA", "CC", "Cottrell", "Anson"]
+        elif args.voltammetry_procedure == "cp":
+            unavailable_plots = ["CP", "CC", "Cottrell", "Potential_Rate"]
+        
+        # Filter out unavailable plots
+        plots = [plot for plot in plots if plot not in unavailable_plots]
+        
+        if not plots:
+            log.error("All requested plots require time data which is not available.")
+            raise ValueError("No available plots to generate. Please provide time data or select plots that don't require it.")
+    
     try:
         voltammetry_cls.perform_all_actions(result_dir, plots=plots)
     except ValueError as e:

@@ -53,8 +53,10 @@ class ImpedancePlotting(Plots):
         nyquist_plot.set_clim(min(frequency), max(frequency))
 
         self.plot_identity(subplot_ax, xlabel=r"Z' $[\Omega]$", ylabel=r"-Z'' $[\Omega]$",
-                            x_lim=[0, max(real_impedance)+200],
-                            y_lim=[0, max(-imaginary_impedance)+200],
+                            #x_lim=[0, max(real_impedance)+200],
+                            #y_lim=[0, max(-imaginary_impedance)+200],
+                            x_lim=[0, max(np.max(real_impedance), np.max(-imaginary_impedance)) + 200],
+                            y_lim=[0, max(np.max(real_impedance), np.max(-imaginary_impedance)) + 200],
                             ax_sci_notation=ax_sci_notation,
                             scientific_limit=scientific_limit)
 
@@ -140,10 +142,12 @@ class ImpedancePlotting(Plots):
                         label=f"Fitted with {suggested_circuit}", color="k")
 
         self.plot_identity(subplot_ax, xlabel=r"Z' $[\Omega]$", ylabel=r"-Z'' $[\Omega]$",
-                               x_lim=[0, max(real_impedance) +200],
-                               y_lim=[0, max(-imaginary_impedance) +200],
-                               ax_sci_notation=ax_sci_notation,
-                               scientific_limit=scientific_limit)
+                            #    x_lim=[0, max(real_impedance) +200],
+                            #    y_lim=[0, max(-imaginary_impedance) +200],
+                            x_lim=[0, max(np.max(real_impedance), np.max(-imaginary_impedance)) + 200],
+                            y_lim=[0, max(np.max(real_impedance), np.max(-imaginary_impedance)) + 200],
+                            ax_sci_notation=ax_sci_notation,
+                            scientific_limit=scientific_limit)
 
         if legend_label:
             _, labels = subplot_ax.get_legend_handles_labels()

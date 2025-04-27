@@ -692,7 +692,7 @@ class Voltammetry_CV(Voltammetry, EChemProcedure):
                             available_axes[4] if (len(plots) == 5) else sub_ax
 
                     plot.CA(subplot_ax=sub_ax, x_lim_min="auto", y_lim_min="auto", legend=False)
-                elif plot_name == "Peak Scan":
+                elif plot_name == "Peak-Scan":
                     sub_ax = available_axes[-1] if (tafel_present and cv_present and (len(plots) == 3)) else \
                             available_axes[3] if (len(plots) == 5) else sub_ax
                     plot.peak_scan(subplot_ax=sub_ax, anodic_peak_params=self.anodic_peak_params,

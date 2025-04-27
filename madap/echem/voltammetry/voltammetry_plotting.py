@@ -1,14 +1,12 @@
 """ This module defines the plotting of the cyclic voltammetry studies. """
 import numpy as np
-
-from matplotlib import pyplot as plt
 from matplotlib import gridspec
+from matplotlib import pyplot as plt
 from matplotlib.legend_handler import HandlerTuple
 
 from madap.logger import logger
-from madap.utils import utils
 from madap.plotting.plotting import Plots
-
+from madap.utils import utils
 
 log = logger.get_logger("voltammetry_plotting")
 
@@ -23,7 +21,7 @@ class VoltammetryPlotting(Plots):
 
         Args:
             current (list): list of currents
-            time (list): list of times
+            time (list): list of times (can be None)
             voltage (list): list of voltages
             applied_voltage (float): applied voltage
             electrode_area (float): area of active material
@@ -46,6 +44,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create CA plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for CA plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating CA plot")
 
         # Change the unit of current from A to mA
@@ -92,6 +97,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create Log CA plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for Log CA plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating Log CA plot")
         if reaction_order == 0:
             y_label = "Current (A)"
@@ -120,6 +132,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create CC plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for CC plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating CC plot")
         if self.procedure_type == "Voltammetry_CA":
             if self.applied_voltage is None:
@@ -148,7 +167,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
-
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create Cottrell plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for Cottrell plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating Cottrell plot")
 
         x_data = (self.time)**(-0.5)
@@ -178,7 +203,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
-
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create Anson plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for Anson plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating Anson plot")
         x_data = (self.time)**(0.5)
         y_data = self.cumulative_charge
@@ -194,6 +225,13 @@ class VoltammetryPlotting(Plots):
         Args:
             subplot_ax (matplotlib.axes): axis to which the plot should be added
         """
+        if self.cumulative_charge is None:
+            log.warning("Charge data is missing. Cannot create Voltage Profile plot.")
+            subplot_ax.text(0.5, 0.5, 'Charge data required for Voltage Profile plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating voltage profile plot")
 
         charge, x_label = self._charge_conversion()
@@ -212,6 +250,13 @@ class VoltammetryPlotting(Plots):
             transition_values (dict): dictionary of transition values
             tao_initial (float): initial stabilization time
         """
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create Potential Rate plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for Potential Rate plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating potential rate, dVdt plot")
 
         subplot_ax.plot(self.time, dVdt, linewidth=2, color="#317a80")
@@ -244,6 +289,13 @@ class VoltammetryPlotting(Plots):
             positive_peaks (list): list of positive peaks
             negative_peaks (list): list of negative peaks
         """
+        if self.voltage is None:
+            log.warning("Voltage data is missing. Cannot create Differential Capacity plot.")
+            subplot_ax.text(0.5, 0.5, 'Voltage data required for Differential Capacity plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating differential capacity plot")
         subplot_ax.plot(self.voltage, dQdV_no_nan, linewidth=2, color="#425a81")
         # PLot the positive peaks as upper triangles
@@ -272,6 +324,13 @@ class VoltammetryPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
             y_lim_min (float): minimum value of the y axis
         """
+        if self.time is None:
+            log.warning("Time data is missing. Cannot create CP plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for CP plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating voltage plot")
         if self.procedure_type == "Voltammetry_CP":
             subplot_ax.scatter(self.time, self.voltage, s=2, label=f"{np.abs(np.mean(self.current)):.2e} A", color="#482b68")
@@ -297,31 +356,38 @@ class VoltammetryPlotting(Plots):
             subplot_ax (matplotlib.axes): axis to which the plot should be added
             data (pandas.DataFrame): dataframe of the data
         """
+        if "time" not in data.columns:
+            log.warning("Time data is missing in dataframe. Cannot create Potential Waveform plot.")
+            subplot_ax.text(0.5, 0.5, 'Time data required for Potential Waveform plot', 
+                         horizontalalignment='center', verticalalignment='center', 
+                         transform=subplot_ax.transAxes)
+            return
+            
         # normalize the time for each cycle
         data_forward = data[data["scan_direction"] == "F"]
         data_backward = data[data["scan_direction"] == "B"]
 
+        # Determine which dataset has the lower minimum x value
+        min_time_forward = data_forward["time"].min()
+        min_time_backward = data_backward["time"].min()
+
+        # Assign zorder based on the minimum time comparison
+        forward_zorder = 1 if min_time_forward < min_time_backward else 2
+        backward_zorder = 1 if min_time_backward < min_time_forward else 2
+
         # check if the subplot_ax is part of a GridSpec layout
         if hasattr(subplot_ax, "get_subplotspec"):
             subplot_spec = subplot_ax.get_subplotspec()
-        gs = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=subplot_spec, hspace=0.2)
-        # create a subplot with 2 rows and 1 column with subplot_ax as the first subplot
+        gs = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=subplot_spec, hspace=0.2)
         ax_1 = subplot_ax.figure.add_subplot(gs[0, 0])
-        ax_1.plot(data_forward["time"], data_forward["voltage"], linewidth=0.9, color="#4b3b75")
-        # make the x_axis to have scientific notation if it is more than 4 orders of magnitude
-        self.plot_identity(ax_1, xlabel="Time (s)", ylabel=r"$V_{Anodic}$"+"(V)",
-                           y_lim=[min(data_forward["voltage"]), max(data_forward["voltage"])],
+        ax_1.plot(data_forward["time"], data_forward["voltage"], linewidth=0.9, color="#4b3b75", label="Anodic", zorder=forward_zorder)
+        ax_1.plot(data_backward["time"], data_backward["voltage"], linewidth=0.9, color="#9ac64d", label="Cathodic", zorder=backward_zorder)
+        self.plot_identity(ax_1, xlabel="Time (s)", ylabel="E (V)",
+                           y_lim=[min(data_backward["voltage"]), max(data_forward["voltage"])],
                            ax_sci_notation = "x" if max(data_forward["time"]) > 1e3 else None)
-        # put the y ticks for every 2 ticks
+        ax_1.legend(loc="best")
         ax_1.set_yticks(ax_1.get_yticks()[::2])
-        ax_2 = subplot_ax.figure.add_subplot(gs[1, 0])
-        ax_2.plot(data_backward["time"], data_backward["voltage"], linewidth=0.9, color="#9ac64d")
-        self.plot_identity(ax_2, xlabel="Time (s)", ylabel=r"$V_{Cathodic}$"+"(V)",
-                            y_lim=[min(data_backward["voltage"]), max(data_backward["voltage"])],
-                            ax_sci_notation = "x" if max(data_backward["time"]) > 1e3 else None)
-        # put the y ticks for every 2 ticks
-        ax_2.set_yticks(ax_2.get_yticks()[::2])
-        # remove the x ticks from the first subplot
+
         subplot_ax.axis('off')
 
 
@@ -334,8 +400,13 @@ class VoltammetryPlotting(Plots):
             anodic_peak_params (dict): dictionary of anodic peak parameters
             cathodic_peak_params (dict): dictionary of cathodic peak parameters
         """
-        # self.anodic_peak_params[cycle][peak_anodic_number]["capacitative_end_point"]
-        # TODO: add height
+        if "voltage" not in data.columns or "current" not in data.columns:
+            log.warning("Voltage or current data is missing. Cannot create CV plot.")
+            subplot_ax.text(0.5, 0.5, 'Voltage and current data required for CV plot', 
+                        horizontalalignment='center', verticalalignment='center', 
+                        transform=subplot_ax.transAxes)
+            return
+            
         log.info("Creating CV plot")
         # increase the width size of the axis
         current_width, current_height = subplot_ax.get_figure().get_size_inches()
@@ -349,30 +420,23 @@ class VoltammetryPlotting(Plots):
             # Take the first 10 colors from tab10 colormap
             colors = plt.get_cmap("tab10").colors
             tab10_colors = [colors[i] for i in range(10)]
-            complementary_colors = [utils.get_complementary_color(color) for color in tab10_colors]
+            complementary_colors = [tuple(utils.get_complementary_color(color)) for color in tab10_colors]
         else:
             colors = plt.cm.winter(np.linspace(0, 1, len(cycle_list)))
         # Loop through cycle with the plotted_cycle_frequency
         for cycle_num in cycle_list:
-            # check if data['scan_rate'] is not None
-            if not data['scan_rate'].isnull().values.any():
-                label_name = f"Cyc. {cycle_num}@"+r"$\nu $"+"="+f"{data['scan_rate'][data['cycle_number']==cycle_num].mean() :.1f} V/s"
-            else:
-                label_name = f"Cyc. {cycle_num}"
             subplot_ax.plot(data[data["cycle_number"] == cycle_num]["voltage"], data[data["cycle_number"] == cycle_num]["current"],\
-                            linewidth=0.9, color=colors[cycle_num-1], label=label_name)
+                            linewidth=0.9, color=colors[cycle_num-1])#, label=label_name)
 
             cycle = f"cycle_{cycle_num}"
             for peak in anodic_peak_params[cycle]:
-                # check if the capacitative_start_point exists
                 if "capacitative_start_point" in anodic_peak_params[cycle][peak]:
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["capacitative_start_point"]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
                                     [anodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
                                     anodic_peak_params[cycle][peak]["capacitative_line"][0]*anodic_peak_params[cycle][peak]["voltage"]+\
                                     anodic_peak_params[cycle][peak]["capacitative_line"][1]],
-                                    linestyle=':', linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
-                                    label=r"$h_{pa}, h_{pc}$")
+                                    linestyle=':', linewidth=0.5, color=colors[cycle_num-1])
 
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
@@ -388,15 +452,15 @@ class VoltammetryPlotting(Plots):
                                     [cathodic_peak_params[cycle][peak]["capacitative_start_point"]["current"],
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
-                                    linestyle=':',  linewidth=0.5, color=colors[cycle_num-1], alpha=0.7,
-                                    label=r"$h_{pa}, h_{pc}$")
+                                    linestyle=':',  linewidth=0.5, color=colors[cycle_num-1])
 
                     subplot_ax.plot([cathodic_peak_params[cycle][peak]["voltage"],
                                     cathodic_peak_params[cycle][peak]["voltage"]],
                                     [cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][1],
                                     cathodic_peak_params[cycle][peak]["current"]],
-                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1])
+                                    linestyle='--',  linewidth=0.3, color=complementary_colors[cycle_num-1], alpha=0.7,
+                                    label=r"$h_{pa}, h_{pc}$")
 
 
         self.plot_identity(subplot_ax, xlabel="Voltage (V)", ylabel="Current (A)",
@@ -605,6 +669,16 @@ class VoltammetryPlotting(Plots):
             fig, ax: Figure and axis of the subplot.
         """
         plt.close('all')
+        if len(plots)==0:
+            log.warning("No plots were selected or all selected plots require time data (which is not available).")
+            fig = plt.figure(figsize=(3,2.5))
+            spec = fig.add_gridspec(1, 1)
+            ax = fig.add_subplot(spec[0,0])
+            ax.text(0.5, 0.5, 'No plots available - time data required for selected plots', 
+                 horizontalalignment='center', verticalalignment='center', 
+                 transform=ax.transAxes)
+            return fig, [ax]
+            
         if len(plots)==1:
             fig = plt.figure(figsize=(3,2.5))
             spec = fig.add_gridspec(1, 1)
@@ -657,10 +731,6 @@ class VoltammetryPlotting(Plots):
             ax5 = fig.add_subplot(spec[1, 1])
             ax6 = fig.add_subplot(spec[1, 2])
             return fig, [ax1, ax2, ax3, ax4, ax5, ax6]
-
-        if len(plots) == 0:
-            log.error("No plots for EIS were selected.")
-            return Exception(f"No plots for EIS were selected for plot {self.procedure_type}.")
 
         log.error("Maximum plots for EIS is exceeded.")
         return Exception(f"Maximum plots for EIS is exceeded for plot {self.procedure_type}.")

@@ -159,4 +159,4 @@ def get_complementary_color(rgb):
     # Calculate complementary color
     comp_rgb_255 = [255 - x for x in rgb_255]
     # Convert back to 0-1 scale
-    return [x / 255.0 for x in comp_rgb_255] + [1]  # Add alpha value of 1
+    return [x / 255.0 for x in comp_rgb_255] #+ [1]  # Add alpha value of 1

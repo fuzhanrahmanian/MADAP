@@ -266,7 +266,10 @@ class EIS(EChemProcedure):
         utils.append_to_save_data(directory=save_dir, added_data=added_data, name=name)
         # check if the positive index is available
         if self.pos_img_index is not None:
-            self._insert_nan_values()
+            try:
+                self._insert_nan_values()
+            except Exception as e:
+                log.error(e)
         else:
             self.z_fit_clean = self.z_fit
 

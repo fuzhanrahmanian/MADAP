@@ -19,7 +19,7 @@ class MadapGui:
     arrhenius_plots = ["arrhenius", "arrhenius_fit"]
     ca_plots = ["CA", "Log_CA", "CC", "Cottrell", "Anson", "Voltage"]
     cp_plots = ["CP", "CC", "Cottrell", "Voltage_Profile", "Potential_Rate", "Differential_Capacity"]
-    cv_plots = ["E-t", "I-t", "Peak Scan", "CV", "Tafel"]
+    cv_plots = ["E-t", "I-t", "Peak-Scan", "CV", "Tafel"]
 
     def __init__(self):
         self.procedure = "Impedance"
