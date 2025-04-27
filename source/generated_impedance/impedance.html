@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Impedance package &mdash; MADAP 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -50,8 +51,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../generated_arrhenius/modules.html">Arrhenius</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Impedance</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Impedance package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-e_impedance.e_impedance">e_impedance.e_impedance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-e_impedance.e_impedance_plotting">e_impedance.e_impedance_plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-e_impedance.e_impedance">e_impedance.e_impedance</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#e_impedance.e_impedance.EIS"><code class="docutils literal notranslate"><span class="pre">EIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#e_impedance.e_impedance.EImpedance"><code class="docutils literal notranslate"><span class="pre">EImpedance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#e_impedance.e_impedance.Lissajous"><code class="docutils literal notranslate"><span class="pre">Lissajous</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#e_impedance.e_impedance.Mottschotcky"><code class="docutils literal notranslate"><span class="pre">Mottschotcky</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-e_impedance.e_impedance_plotting">e_impedance.e_impedance_plotting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#e_impedance.e_impedance_plotting.ImpedancePlotting"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -85,36 +95,36 @@
            <div itemprop="articleBody">
              
   <section id="impedance-package">
-<h1>Impedance package<a class="headerlink" href="#impedance-package" title="Permalink to this headline"></a></h1>
+<h1>Impedance package<a class="headerlink" href="#impedance-package" title="Link to this heading"></a></h1>
 <section id="module-e_impedance.e_impedance">
-<span id="e-impedance-e-impedance"></span><h2>e_impedance.e_impedance<a class="headerlink" href="#module-e_impedance.e_impedance" title="Permalink to this headline"></a></h2>
+<span id="e-impedance-e-impedance"></span><h2>e_impedance.e_impedance<a class="headerlink" href="#module-e_impedance.e_impedance" title="Link to this heading"></a></h2>
 <p>Impedance Analysis module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rc_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'complex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_low_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.009</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rc_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'complex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_low_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.009</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EChemProcedure</span></code></p>
 <p>General EIS class for the analysis of the EIS data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>EChemProcedure</strong> (<em>cls</em>) – Parent abstract class</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS.analyze">
-<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.analyze" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.analyze" title="Link to this definition"></a></dt>
 <dd><p>General function for performing the impedance analysis.
 This will fit the circuit and calculate the conductivity if is applicable.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS.figure">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#e_impedance.e_impedance.EIS.figure" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#e_impedance.e_impedance.EIS.figure" title="Link to this definition"></a></dt>
 <dd><p>Get the figure of the plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Figure object for e_impendance plot.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>obj</p>
 </dd>
 </dl>
@@ -122,10 +132,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS.perform_all_actions">
-<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.perform_all_actions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.perform_all_actions" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function for executing all action</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – List of plot types to be plotted.</p></li>
@@ -136,10 +146,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.plot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.plot" title="Link to this definition"></a></dt>
 <dd><p>Plot the results of the analysis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – directory where to save the data</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – list of plot types to be plotted</p></li>
@@ -151,10 +161,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EIS.save_data">
-<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.save_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EIS.save_data" title="Link to this definition"></a></dt>
 <dd><p>Save the results of the analysis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
 <li><p><strong>optional_name</strong> (<em>None</em>) – Optional name for the data.</p></li>
@@ -167,7 +177,7 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EImpedance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">EImpedance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for data definition that will be used during the Impedance analysis.
 The data includes the following: frequency, real impedance, imaginary impedance,
@@ -175,43 +185,43 @@ and the phase shift. These attributes are all pandas.Series
 and will stay immutable except the phase shift.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.frequency">
-<span class="sig-name descname"><span class="pre">frequency</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.frequency" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">frequency</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.frequency" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.imaginary_impedance">
-<span class="sig-name descname"><span class="pre">imaginary_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.imaginary_impedance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">imaginary_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.imaginary_impedance" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.phase_shift">
-<span class="sig-name descname"><span class="pre">phase_shift</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.phase_shift" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">phase_shift</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.phase_shift" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.EImpedance.real_impedance">
-<span class="sig-name descname"><span class="pre">real_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.real_impedance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">real_impedance</span></span><a class="headerlink" href="#e_impedance.e_impedance.EImpedance.real_impedance" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Lissajous">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">Lissajous</span></span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">Lissajous</span></span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EChemProcedure</span></code></p>
 <p>Class for performing the Lissajous procedure.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Lissajous.analyze">
-<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.analyze" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.analyze" title="Link to this definition"></a></dt>
 <dd><p>Abstract method for the analysis of the data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Lissajous.perform_all_actions">
-<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.perform_all_actions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.perform_all_actions" title="Link to this definition"></a></dt>
 <dd><p>Abstract method for the performing of all actions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data is saved.</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – The plots that are saved.</p></li>
@@ -223,10 +233,10 @@ and will stay immutable except the phase shift.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Lissajous.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.plot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.plot" title="Link to this definition"></a></dt>
 <dd><p>Abstract method for the plotting of the data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the plots are saved.</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – The plots that are saved.</p></li>
@@ -238,10 +248,10 @@ and will stay immutable except the phase shift.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Lissajous.save_data">
-<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.save_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Lissajous.save_data" title="Link to this definition"></a></dt>
 <dd><p>Abstract method for the saving of the data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – The directory where the data is saved.</p></li>
 <li><p><strong>optional_name</strong> (<em>str</em>) – The optional name of the data.</p></li>
@@ -254,11 +264,11 @@ and will stay immutable except the phase shift.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Mottschotcky">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">Mottschotcky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rc_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'complex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_low_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#e_impedance.e_impedance.EIS" title="e_impedance.e_impedance.EIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">e_impedance.e_impedance.EIS</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.echem.procedure.EChemProcedure</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance.</span></span><span class="sig-name descname"><span class="pre">Mottschotcky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rc_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'complex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_low_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#e_impedance.e_impedance.EIS" title="e_impedance.e_impedance.EIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">EIS</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EChemProcedure</span></code></p>
 <p>Class for performing the Mottschotcky procedure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>EIS</strong> (<em>class</em>) – General EIS class</p></li>
 <li><p><strong>EChemProcedure</strong> (<em>class</em>) – General abstract EChem Procedure class</p></li>
@@ -267,17 +277,17 @@ and will stay immutable except the phase shift.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Mottschotcky.analyze">
-<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.analyze" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.analyze" title="Link to this definition"></a></dt>
 <dd><p>General function for performing the impedance analysis.
 This will fit the circuit and calculate the conductivity if is applicable.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Mottschotcky.perform_all_actions">
-<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.perform_all_actions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">perform_all_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.perform_all_actions" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function for executing all action</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – List of plot types to be plotted.</p></li>
@@ -288,10 +298,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Mottschotcky.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.plot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.plot" title="Link to this definition"></a></dt>
 <dd><p>Plot the results of the analysis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – directory where to save the data</p></li>
 <li><p><strong>plots</strong> (<em>list</em>) – list of plot types to be plotted</p></li>
@@ -303,10 +313,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance.Mottschotcky.save_data">
-<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.save_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance.Mottschotcky.save_data" title="Link to this definition"></a></dt>
 <dd><p>Save the results of the analysis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_dir</strong> (<em>str</em>) – Directory where the data should be saved.</p></li>
 <li><p><strong>optional_name</strong> (<em>None</em>) – Optional name for the data.</p></li>
@@ -319,24 +329,24 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 </section>
 <section id="module-e_impedance.e_impedance_plotting">
-<span id="e-impedance-e-impedance-plotting"></span><h2>e_impedance.e_impedance_plotting<a class="headerlink" href="#module-e_impedance.e_impedance_plotting" title="Permalink to this headline"></a></h2>
+<span id="e-impedance-e-impedance-plotting"></span><h2>e_impedance.e_impedance_plotting<a class="headerlink" href="#module-e_impedance.e_impedance_plotting" title="Link to this heading"></a></h2>
 <p>Impedance Plotting module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance_plotting.</span></span><span class="sig-name descname"><span class="pre">ImpedancePlotting</span></span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">madap.plotting.plotting.Plots</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e_impedance.e_impedance_plotting.</span></span><span class="sig-name descname"><span class="pre">ImpedancePlotting</span></span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plots</span></code></p>
 <p>General Plotting class for Impedance method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>Plots</strong> (<em>class</em>) – Parent class for plotting all methods.</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting.bode">
-<span class="sig-name descname"><span class="pre">bode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.bode" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">bode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.bode" title="Link to this definition"></a></dt>
 <dd><p>Defines the bode plot for raw data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis</p></li>
 <li><p><strong>frequency</strong> (<em>np.array</em>) – Frequency array.</p></li>
@@ -353,16 +363,16 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting.compose_eis_subplot">
-<span class="sig-name descname"><span class="pre">compose_eis_subplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.compose_eis_subplot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">compose_eis_subplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.compose_eis_subplot" title="Link to this definition"></a></dt>
 <dd><p>Compose the EIS subplot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>plots</strong> (<em>list</em>) – List of plots to be composed.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Figure and axis of the subplot.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>fig, ax</p>
 </dd>
 </dl>
@@ -370,10 +380,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist">
-<span class="sig-name descname"><span class="pre">nyquist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_label_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nyquist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_label_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist" title="Link to this definition"></a></dt>
 <dd><p>Defines the nyquist plot for raw data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis</p></li>
 <li><p><strong>frequency</strong> (<em>np.array</em>) – Frequency array.</p></li>
@@ -394,10 +404,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist_fit">
-<span class="sig-name descname"><span class="pre">nyquist_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_label_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist_fit" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nyquist_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_impedance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggested_circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_label_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist_fit" title="Link to this definition"></a></dt>
 <dd><p>Defines the nyquist plot for fitted data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis</p></li>
 <li><p><strong>frequency</strong> (<em>np.array</em>) – Frequency array.</p></li>
@@ -421,10 +431,10 @@ This will fit the circuit and calculate the conductivity if is applicable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="e_impedance.e_impedance_plotting.ImpedancePlotting.residual">
-<span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_imag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.residual" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplot_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_imag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_sci_notation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#e_impedance.e_impedance_plotting.ImpedancePlotting.residual" title="Link to this definition"></a></dt>
 <dd><p>Defines the residual plot for raw data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subplot_ax</strong> (<em>ax</em>) – Subplot axis.</p></li>
 <li><p><strong>frequency</strong> (<em>np.array</em>) – Frequency array.</p></li>

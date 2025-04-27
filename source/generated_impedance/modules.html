@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Impedance &mdash; MADAP 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -80,12 +81,53 @@
            <div itemprop="articleBody">
              
   <section id="impedance">
-<h1>Impedance<a class="headerlink" href="#impedance" title="Permalink to this headline"></a></h1>
+<h1>Impedance<a class="headerlink" href="#impedance" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="impedance.html">Impedance package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="impedance.html#module-e_impedance.e_impedance">e_impedance.e_impedance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="impedance.html#module-e_impedance.e_impedance_plotting">e_impedance.e_impedance_plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="impedance.html#module-e_impedance.e_impedance">e_impedance.e_impedance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS"><code class="docutils literal notranslate"><span class="pre">EIS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS.analyze"><code class="docutils literal notranslate"><span class="pre">EIS.analyze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS.figure"><code class="docutils literal notranslate"><span class="pre">EIS.figure</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS.perform_all_actions"><code class="docutils literal notranslate"><span class="pre">EIS.perform_all_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS.plot"><code class="docutils literal notranslate"><span class="pre">EIS.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EIS.save_data"><code class="docutils literal notranslate"><span class="pre">EIS.save_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EImpedance"><code class="docutils literal notranslate"><span class="pre">EImpedance</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EImpedance.frequency"><code class="docutils literal notranslate"><span class="pre">EImpedance.frequency</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EImpedance.imaginary_impedance"><code class="docutils literal notranslate"><span class="pre">EImpedance.imaginary_impedance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EImpedance.phase_shift"><code class="docutils literal notranslate"><span class="pre">EImpedance.phase_shift</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.EImpedance.real_impedance"><code class="docutils literal notranslate"><span class="pre">EImpedance.real_impedance</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Lissajous"><code class="docutils literal notranslate"><span class="pre">Lissajous</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Lissajous.analyze"><code class="docutils literal notranslate"><span class="pre">Lissajous.analyze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Lissajous.perform_all_actions"><code class="docutils literal notranslate"><span class="pre">Lissajous.perform_all_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Lissajous.plot"><code class="docutils literal notranslate"><span class="pre">Lissajous.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Lissajous.save_data"><code class="docutils literal notranslate"><span class="pre">Lissajous.save_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Mottschotcky"><code class="docutils literal notranslate"><span class="pre">Mottschotcky</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Mottschotcky.analyze"><code class="docutils literal notranslate"><span class="pre">Mottschotcky.analyze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Mottschotcky.perform_all_actions"><code class="docutils literal notranslate"><span class="pre">Mottschotcky.perform_all_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Mottschotcky.plot"><code class="docutils literal notranslate"><span class="pre">Mottschotcky.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance.Mottschotcky.save_data"><code class="docutils literal notranslate"><span class="pre">Mottschotcky.save_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="impedance.html#module-e_impedance.e_impedance_plotting">e_impedance.e_impedance_plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting.bode"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting.bode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting.compose_eis_subplot"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting.compose_eis_subplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting.nyquist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting.nyquist_fit"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting.nyquist_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="impedance.html#e_impedance.e_impedance_plotting.ImpedancePlotting.residual"><code class="docutils literal notranslate"><span class="pre">ImpedancePlotting.residual()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

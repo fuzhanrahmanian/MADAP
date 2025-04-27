@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arrhenius &mdash; MADAP 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -80,12 +81,40 @@
            <div itemprop="articleBody">
              
   <section id="arrhenius">
-<h1>Arrhenius<a class="headerlink" href="#arrhenius" title="Permalink to this headline"></a></h1>
+<h1>Arrhenius<a class="headerlink" href="#arrhenius" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="arrhenius.html">Arrhenius package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="arrhenius.html#module-arrhenius.arrhenius">arrhenius.arrhenius</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arrhenius.html#module-arrhenius.arrhenius_plotting">arrhenius.arrhenius_plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arrhenius.html#module-arrhenius.arrhenius">arrhenius.arrhenius</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius"><code class="docutils literal notranslate"><span class="pre">Arrhenius</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.temperatures"><code class="docutils literal notranslate"><span class="pre">Arrhenius.temperatures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.conductivity"><code class="docutils literal notranslate"><span class="pre">Arrhenius.conductivity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.gas_constant"><code class="docutils literal notranslate"><span class="pre">Arrhenius.gas_constant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.activation"><code class="docutils literal notranslate"><span class="pre">Arrhenius.activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.arrhenius_constant"><code class="docutils literal notranslate"><span class="pre">Arrhenius.arrhenius_constant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.inverted_scale_temperatures"><code class="docutils literal notranslate"><span class="pre">Arrhenius.inverted_scale_temperatures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.fit_score"><code class="docutils literal notranslate"><span class="pre">Arrhenius.fit_score</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.ln_conductivity_fit"><code class="docutils literal notranslate"><span class="pre">Arrhenius.ln_conductivity_fit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.intercept"><code class="docutils literal notranslate"><span class="pre">Arrhenius.intercept</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.coefficients"><code class="docutils literal notranslate"><span class="pre">Arrhenius.coefficients</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.analyze"><code class="docutils literal notranslate"><span class="pre">Arrhenius.analyze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.figure"><code class="docutils literal notranslate"><span class="pre">Arrhenius.figure</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.perform_all_actions"><code class="docutils literal notranslate"><span class="pre">Arrhenius.perform_all_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.plot"><code class="docutils literal notranslate"><span class="pre">Arrhenius.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius.Arrhenius.save_data"><code class="docutils literal notranslate"><span class="pre">Arrhenius.save_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="arrhenius.html#module-arrhenius.arrhenius_plotting">arrhenius.arrhenius_plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius_plotting.ArrheniusPlotting"><code class="docutils literal notranslate"><span class="pre">ArrheniusPlotting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius_plotting.ArrheniusPlotting.arrhenius"><code class="docutils literal notranslate"><span class="pre">ArrheniusPlotting.arrhenius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius_plotting.ArrheniusPlotting.arrhenius_fit"><code class="docutils literal notranslate"><span class="pre">ArrheniusPlotting.arrhenius_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="arrhenius.html#arrhenius.arrhenius_plotting.ArrheniusPlotting.compose_arrhenius_subplot"><code class="docutils literal notranslate"><span class="pre">ArrheniusPlotting.compose_arrhenius_subplot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
