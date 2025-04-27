@@ -20,7 +20,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx==4.5.0 sphinx_rtd_theme numpy pandas matplotlib optuna scikit_learn seaborn tqdm ruptures impedance attrs==21.4.0
+        pip install sphinx sphinx_rtd_theme numpy pandas matplotlib optuna scikit_learn seaborn tqdm ruptures impedance attrs==21.4.0
 
     - name: Build Documentation
       run: |
