@@ -2,6 +2,10 @@
 History
 =======
 
+1.2.8 (2025-04-28)
+-------------------
+* Fixed bug from merge conflict
+
 1.2.7 (2025-04-24)
 -------------------
 * Added support for no time data in CV
