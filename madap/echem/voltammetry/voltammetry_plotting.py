@@ -445,9 +445,6 @@ class VoltammetryPlotting(Plots):
                                     anodic_peak_params[cycle][peak]["capacitative_line"][1]],
                                     linestyle=':', linewidth=0.5, color=colors[cycle_num-1], alpha=0.7)
 
-
-                                    linestyle=':', linewidth=0.5, color=colors[cycle_num-1])
-
                     subplot_ax.plot([anodic_peak_params[cycle][peak]["voltage"],
                                     anodic_peak_params[cycle][peak]["voltage"]],
                                     [anodic_peak_params[cycle][peak]["current"],
@@ -471,9 +468,6 @@ class VoltammetryPlotting(Plots):
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][0]*cathodic_peak_params[cycle][peak]["voltage"]+\
                                     cathodic_peak_params[cycle][peak]["capacitative_line"][1]],
                                     linestyle=':',  linewidth=0.5, color=colors[cycle_num-1], alpha=0.7)
-
-
-                                    linestyle=':',  linewidth=0.5, color=colors[cycle_num-1])
 
                     subplot_ax.plot([cathodic_peak_params[cycle][peak]["voltage"],
                                     cathodic_peak_params[cycle][peak]["voltage"]],
